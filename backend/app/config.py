@@ -56,7 +56,9 @@ class Settings:
     CRAWL_EVERY_HOURS = float(_env("CRAWL_EVERY_HOURS", "0"))
     INDEX_WATCH_SECONDS = int(_env("INDEX_WATCH_SECONDS", "60"))
     # A bare host name (as a hosting blueprint provides) means its https:// origin.
-    CORS_ORIGINS = [o.strip() if "://" in o else f"https://{o.strip()}"
+    # A bare host name (as a hosting blueprint provides) means its https:// origin; a Render-internal name
+    # without a domain ("bu-ai-web") means its public onrender.com address.
+    CORS_ORIGINS = [o.strip() if "://" in o else (f"https://{o.strip()}" if "." in o else f"https://{o.strip()}.onrender.com")
                     for o in _env("CORS_ORIGINS", "http://localhost:3000").split(",") if o.strip()]
 
     # Crawler
