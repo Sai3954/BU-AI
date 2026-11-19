@@ -1,6 +1,16 @@
 const RAW_API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-/** A bare host name (as a hosting blueprint provides) means https://host. */
-export const API = RAW_API.includes("://") ? RAW_API : `https://${RAW_API}`;
+
+/** Where the assistant API lives.
+ *  On Render the website is "<name>-web.onrender.com" and the API "<name>-api.onrender.com", so the browser can
+ *  work it out from its own address; this keeps working even if the build-time setting is missing or internal. */
+function apiBase(): string {
+  if (typeof window !== "undefined") {
+    const h = window.location.hostname;
+    if (h.endsWith(".onrender.com") && h.includes("-web")) return `https://${h.replace("-web", "-api")}`;
+  }
+  return RAW_API.includes("://") ? RAW_API : `https://${RAW_API}`;
+}
+export const API = apiBase();
 
 export type Source = { title: string; url: string; category: string; updated: string; text: string };
 export type Flags = { high_risk: boolean; crisis: boolean; pii_removed?: string[] };
