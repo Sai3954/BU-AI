@@ -9,7 +9,9 @@ RUN npm run build
 
 FROM node:22-alpine
 WORKDIR /app
-ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1
+# Listen on all interfaces (Docker sets HOSTNAME to the container name, which hosting proxies cannot reach).
+# PORT comes from the host (Render sets it); 3000 locally.
+ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 HOSTNAME=0.0.0.0
 COPY --from=build /app/.next/standalone ./
 COPY --from=build /app/.next/static ./.next/static
 EXPOSE 3000
