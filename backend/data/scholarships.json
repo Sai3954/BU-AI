@@ -1,0 +1,536 @@
+{
+ "collected": "2026-11-18",
+ "notes": {
+  "international_hybrid": "Belhaven's international graduate support FAQ says it does not offer financial aid or scholarships for the international hybrid (CPT) programs. Contact gradinternational@belhaven.edu to confirm.",
+  "stacking": "Online institutional discounts and scholarships can't be combined.",
+  "rates_year": "Undergraduate scholarship amounts are for 2027-2028."
+ },
+ "awards": [
+  {
+   "name": "Distinguished Merit Scholarship",
+   "amount": "$25,000 per year (on campus)",
+   "groups": [
+    "first_year"
+   ],
+   "criteria": "High school GPA 3.5+, ACT 30+, and an interview with the Office of Admission. Competitive.",
+   "min_gpa": 3.5,
+   "min_act": 30,
+   "deadline": "Interviews rolling, Sept 1 - March 1",
+   "renewal": "Up to 5 years (10 semesters) with full-time enrollment and satisfactory academic progress",
+   "fafsa_required": false,
+   "tags": [],
+   "url": "https://www.belhaven.edu/admission/undergrad/aid/scholarships.html"
+  },
+  {
+   "name": "President's Scholarship",
+   "amount": "$17,500 - $18,000 per year",
+   "groups": [
+    "first_year"
+   ],
+   "criteria": "High school GPA 3.5+ and ACT 26+.",
+   "min_gpa": 3.5,
+   "min_act": 26,
+   "deadline": "",
+   "renewal": "Up to 5 years (10 semesters) with full-time enrollment and satisfactory academic progress",
+   "fafsa_required": false,
+   "tags": [],
+   "url": "https://www.belhaven.edu/admission/undergrad/aid/scholarships.html"
+  },
+  {
+   "name": "Dean's Scholarship",
+   "amount": "$15,000 - $17,000 per year",
+   "groups": [
+    "first_year"
+   ],
+   "criteria": "High school GPA 2.5+ and ACT 20+.",
+   "min_gpa": 2.5,
+   "min_act": 20,
+   "deadline": "",
+   "renewal": "Up to 5 years (10 semesters) with full-time enrollment and satisfactory academic progress",
+   "fafsa_required": false,
+   "tags": [],
+   "url": "https://www.belhaven.edu/admission/undergrad/aid/scholarships.html"
+  },
+  {
+   "name": "Achievement Grant",
+   "amount": "$14,000 - $15,500 per year",
+   "groups": [
+    "first_year"
+   ],
+   "criteria": "High school GPA 2.5+ and ACT 18-19.",
+   "min_gpa": 2.5,
+   "min_act": 18,
+   "deadline": "",
+   "renewal": "Up to 5 years (10 semesters) with full-time enrollment and satisfactory academic progress",
+   "fafsa_required": false,
+   "tags": [],
+   "url": "https://www.belhaven.edu/admission/undergrad/aid/scholarships.html"
+  },
+  {
+   "name": "Advantage Scholarship",
+   "amount": "$14,000 - $15,500 per year",
+   "groups": [
+    "first_year"
+   ],
+   "criteria": "High school GPA 2.75+; no test score required.",
+   "min_gpa": 2.75,
+   "min_act": null,
+   "deadline": "",
+   "renewal": "Up to 5 years (10 semesters) with full-time enrollment and satisfactory academic progress",
+   "fafsa_required": false,
+   "tags": [],
+   "url": "https://www.belhaven.edu/admission/undergrad/aid/scholarships.html"
+  },
+  {
+   "name": "Early Acceptance Award",
+   "amount": "$1,500",
+   "groups": [
+    "first_year"
+   ],
+   "criteria": "Apply by December 1 (decision by December 15).",
+   "min_gpa": null,
+   "min_act": null,
+   "deadline": "December 1",
+   "renewal": "",
+   "fafsa_required": false,
+   "tags": [],
+   "url": "https://www.belhaven.edu/admission/undergrad/aid/scholarships.html"
+  },
+  {
+   "name": "Phi Theta Kappa Transfer Scholarship",
+   "amount": "$19,000 per year",
+   "groups": [
+    "transfer"
+   ],
+   "criteria": "Current member of the Phi Theta Kappa honor society.",
+   "min_gpa": null,
+   "min_act": null,
+   "deadline": "",
+   "renewal": "Up to 5 years (10 semesters) with full-time enrollment and satisfactory academic progress",
+   "fafsa_required": false,
+   "tags": [],
+   "url": "https://www.belhaven.edu/admission/undergrad/aid/scholarships.html"
+  },
+  {
+   "name": "Transfer Scholarship",
+   "amount": "$15,000 - $16,500 per year",
+   "groups": [
+    "transfer"
+   ],
+   "criteria": "12+ college credit hours and college GPA 2.5+.",
+   "min_gpa": 2.5,
+   "min_act": null,
+   "deadline": "",
+   "renewal": "Up to 5 years (10 semesters) with full-time enrollment and satisfactory academic progress",
+   "fafsa_required": false,
+   "tags": [],
+   "url": "https://www.belhaven.edu/admission/undergrad/aid/scholarships.html"
+  },
+  {
+   "name": "Distinguished Arts Scholarship",
+   "amount": "$1,000 - $3,000",
+   "groups": [
+    "first_year",
+    "transfer"
+   ],
+   "criteria": "Majors in Art, Creative Writing, Dance, Graphic Design, Film Production, Music, Theatre or Tradigital Studies; audition or portfolio (early review by Dec 1, 2026; rolling through March 1, 2027).",
+   "min_gpa": null,
+   "min_act": null,
+   "deadline": "Dec 1, 2026 (early) / March 1, 2027 (rolling)",
+   "renewal": "",
+   "fafsa_required": false,
+   "tags": [
+    "arts"
+   ],
+   "url": "https://www.belhaven.edu/admission/undergrad/aid/scholarships.html"
+  },
+  {
+   "name": "Residence Hall Grant",
+   "amount": "$5,000",
+   "groups": [
+    "first_year",
+    "transfer"
+   ],
+   "criteria": "Traditional undergraduates living on campus. Cannot be combined with tuition discounts, waivers, sponsorships or some Belhaven scholarships.",
+   "min_gpa": null,
+   "min_act": null,
+   "deadline": "",
+   "renewal": "",
+   "fafsa_required": false,
+   "tags": [],
+   "url": "https://www.belhaven.edu/admission/undergrad/aid/scholarships.html"
+  },
+  {
+   "name": "Visit Scholarship",
+   "amount": "$1,000 (first year)",
+   "groups": [
+    "first_year"
+   ],
+   "criteria": "Make a personal campus visit or attend a Discover Day.",
+   "min_gpa": null,
+   "min_act": null,
+   "deadline": "",
+   "renewal": "",
+   "fafsa_required": false,
+   "tags": [],
+   "url": "https://www.belhaven.edu/admission/undergrad/aid/scholarships.html"
+  },
+  {
+   "name": "Legacy Scholarship",
+   "amount": "$500",
+   "groups": [
+    "first_year",
+    "transfer"
+   ],
+   "criteria": "Child or sibling of a current student or graduate.",
+   "min_gpa": null,
+   "min_act": null,
+   "deadline": "",
+   "renewal": "",
+   "fafsa_required": false,
+   "tags": [
+    "legacy"
+   ],
+   "url": "https://www.belhaven.edu/admission/undergrad/aid/scholarships.html"
+  },
+  {
+   "name": "Church Matching Grant",
+   "amount": "Up to $500 per year match",
+   "groups": [
+    "first_year",
+    "transfer"
+   ],
+   "criteria": "Belhaven matches a congregation's contribution for its members; application in BlazeNet.",
+   "min_gpa": null,
+   "min_act": null,
+   "deadline": "",
+   "renewal": "",
+   "fafsa_required": false,
+   "tags": [
+    "church"
+   ],
+   "url": "https://www.belhaven.edu/admission/undergrad/aid/scholarships.html"
+  },
+  {
+   "name": "Presbyterian Scholarship Program",
+   "amount": "$1,000 per year ($4,000 over four years)",
+   "groups": [
+    "first_year"
+   ],
+   "criteria": "Member of a Presbyterian church, traditional full-time student; church donates at least $1,000 per year to the Belhaven fund.",
+   "min_gpa": null,
+   "min_act": null,
+   "deadline": "",
+   "renewal": "",
+   "fafsa_required": false,
+   "tags": [
+    "church"
+   ],
+   "url": "https://www.belhaven.edu/admission/undergrad/aid/scholarships.html"
+  },
+  {
+   "name": "PCA Pastor's Offer",
+   "amount": "Tuition-free",
+   "groups": [
+    "first_year",
+    "transfer"
+   ],
+   "criteria": "Dependents of Presbyterian Church in America pastors and missionaries, new first-year or transfer students.",
+   "min_gpa": null,
+   "min_act": null,
+   "deadline": "",
+   "renewal": "",
+   "fafsa_required": false,
+   "tags": [
+    "church"
+   ],
+   "url": "https://www.belhaven.edu/admission/undergrad/aid/scholarships.html"
+  },
+  {
+   "name": "Double Major & 5th Year Free",
+   "amount": "Fifth-year tuition",
+   "groups": [
+    "first_year"
+   ],
+   "criteria": "First-year students who double major; Belhaven pays tuition if a fifth year is needed.",
+   "min_gpa": null,
+   "min_act": null,
+   "deadline": "",
+   "renewal": "",
+   "fafsa_required": false,
+   "tags": [],
+   "url": "https://www.belhaven.edu/admission/undergrad/aid/scholarships.html"
+  },
+  {
+   "name": "Need Grant",
+   "amount": "Varies",
+   "groups": [
+    "first_year",
+    "transfer"
+   ],
+   "criteria": "Based on financial need from the FAFSA.",
+   "min_gpa": null,
+   "min_act": null,
+   "deadline": "",
+   "renewal": "",
+   "fafsa_required": true,
+   "tags": [
+    "need"
+   ],
+   "url": "https://www.belhaven.edu/admission/undergrad/aid/scholarships.html"
+  },
+  {
+   "name": "Mississippi Tuition Assistance Grant (MTAG)",
+   "amount": "Up to $500/yr (years 1-2), $1,000/yr (years 3-4)",
+   "groups": [
+    "first_year",
+    "transfer"
+   ],
+   "criteria": "Mississippi residents; based on residency and academic achievement.",
+   "min_gpa": null,
+   "min_act": null,
+   "deadline": "",
+   "renewal": "",
+   "fafsa_required": false,
+   "tags": [
+    "mississippi"
+   ],
+   "url": "https://www.belhaven.edu/admission/undergrad/aid/scholarships.html"
+  },
+  {
+   "name": "Mississippi Eminent Scholars Grant (MESG)",
+   "amount": "Up to $2,500 per year",
+   "groups": [
+    "first_year",
+    "transfer"
+   ],
+   "criteria": "Mississippi residents; based on residency and academic achievement.",
+   "min_gpa": null,
+   "min_act": null,
+   "deadline": "",
+   "renewal": "",
+   "fafsa_required": false,
+   "tags": [
+    "mississippi"
+   ],
+   "url": "https://www.belhaven.edu/admission/undergrad/aid/scholarships.html"
+  },
+  {
+   "name": "Higher Education Legislative Plan (HELP)",
+   "amount": "Up to $9,000 per year",
+   "groups": [
+    "first_year",
+    "transfer"
+   ],
+   "criteria": "Mississippi residents; residency, academic achievement and financial need.",
+   "min_gpa": null,
+   "min_act": null,
+   "deadline": "March 30",
+   "renewal": "",
+   "fafsa_required": true,
+   "tags": [
+    "mississippi",
+    "need"
+   ],
+   "url": "https://www.belhaven.edu/admission/undergrad/aid/scholarships.html"
+  },
+  {
+   "name": "Federal Pell Grant",
+   "amount": "Up to $7,395 per year",
+   "groups": [
+    "first_year",
+    "transfer",
+    "online"
+   ],
+   "criteria": "Based on financial need.",
+   "min_gpa": null,
+   "min_act": null,
+   "deadline": "",
+   "renewal": "",
+   "fafsa_required": true,
+   "tags": [
+    "need"
+   ],
+   "url": "https://www.belhaven.edu/admission/undergrad/aid/scholarships.html"
+  },
+  {
+   "name": "Federal Work-Study",
+   "amount": "Up to $4,000 per year",
+   "groups": [
+    "first_year",
+    "transfer"
+   ],
+   "criteria": "Based on need and availability; full-time on-campus undergraduates.",
+   "min_gpa": null,
+   "min_act": null,
+   "deadline": "",
+   "renewal": "",
+   "fafsa_required": true,
+   "tags": [
+    "need"
+   ],
+   "url": "https://www.belhaven.edu/admission/undergrad/aid/scholarships.html"
+  },
+  {
+   "name": "TEACH Grant",
+   "amount": "Up to $4,000 per year",
+   "groups": [
+    "first_year",
+    "transfer",
+    "online",
+    "graduate"
+   ],
+   "criteria": "Education majors who agree to teach in high-need fields or underserved areas; converts to a loan if service isn't met.",
+   "min_gpa": null,
+   "min_act": null,
+   "deadline": "",
+   "renewal": "",
+   "fafsa_required": true,
+   "tags": [
+    "education"
+   ],
+   "url": "https://www.belhaven.edu/admission/undergrad/aid/scholarships.html"
+  },
+  {
+   "name": "Military tuition rate (active duty)",
+   "amount": "$250/credit (undergrad), $375/credit (master's)",
+   "groups": [
+    "online",
+    "graduate"
+   ],
+   "criteria": "Active-duty service members in online programs.",
+   "min_gpa": null,
+   "min_act": null,
+   "deadline": "",
+   "renewal": "",
+   "fafsa_required": false,
+   "tags": [
+    "military"
+   ],
+   "url": "https://www.belhaven.edu/admission/online/aid/index.html"
+  },
+  {
+   "name": "Military tuition rate (veterans & spouses)",
+   "amount": "$364/credit (undergrad), $500/credit (master's)",
+   "groups": [
+    "online",
+    "graduate"
+   ],
+   "criteria": "Veterans and military spouses in online programs.",
+   "min_gpa": null,
+   "min_act": null,
+   "deadline": "",
+   "renewal": "",
+   "fafsa_required": false,
+   "tags": [
+    "military"
+   ],
+   "url": "https://www.belhaven.edu/admission/online/aid/index.html"
+  },
+  {
+   "name": "First Responder Scholarship",
+   "amount": "20% tuition discount",
+   "groups": [
+    "online",
+    "graduate"
+   ],
+   "criteria": "Law enforcement, firefighters, dispatchers and their spouses; most online undergraduate and graduate programs.",
+   "min_gpa": null,
+   "min_act": null,
+   "deadline": "",
+   "renewal": "",
+   "fafsa_required": false,
+   "tags": [
+    "first_responder"
+   ],
+   "url": "https://www.belhaven.edu/admission/online/aid/index.html"
+  },
+  {
+   "name": "Educator Discount",
+   "amount": "Discounted tuition",
+   "groups": [
+    "graduate",
+    "doctoral"
+   ],
+   "criteria": "Several online master's, specialist and doctoral education degrees.",
+   "min_gpa": null,
+   "min_act": null,
+   "deadline": "",
+   "renewal": "",
+   "fafsa_required": false,
+   "tags": [
+    "education"
+   ],
+   "url": "https://www.belhaven.edu/admission/online/aid/index.html"
+  },
+  {
+   "name": "Nurse Discount (RN to BSN)",
+   "amount": "Discounted nursing course tuition",
+   "groups": [
+    "online"
+   ],
+   "criteria": "Nursing courses in the RN to BSN program.",
+   "min_gpa": null,
+   "min_act": null,
+   "deadline": "",
+   "renewal": "",
+   "fafsa_required": false,
+   "tags": [
+    "nursing"
+   ],
+   "url": "https://www.belhaven.edu/admission/online/aid/index.html"
+  },
+  {
+   "name": "Alumni Scholarship",
+   "amount": "Varies",
+   "groups": [
+    "online",
+    "graduate",
+    "doctoral"
+   ],
+   "criteria": "Belhaven graduates pursuing another Belhaven degree; cannot be combined with other discounts.",
+   "min_gpa": null,
+   "min_act": null,
+   "deadline": "",
+   "renewal": "",
+   "fafsa_required": false,
+   "tags": [
+    "alumni"
+   ],
+   "url": "https://www.belhaven.edu/admission/online/aid/index.html"
+  },
+  {
+   "name": "Free Master's Degree (Belhaven Advantage)",
+   "amount": "Full tuition for an eligible online master's",
+   "groups": [
+    "first_year",
+    "transfer"
+   ],
+   "criteria": "Qualifying traditional-campus Belhaven graduates.",
+   "min_gpa": null,
+   "min_act": null,
+   "deadline": "",
+   "renewal": "",
+   "fafsa_required": false,
+   "tags": [],
+   "url": "https://www.belhaven.edu/admission/undergrad/aid/index.html"
+  },
+  {
+   "name": "RUF Online Master's",
+   "amount": "100% tuition (fees and books not covered)",
+   "groups": [
+    "graduate"
+   ],
+   "criteria": "Reformed University Fellowship ministers, interns (second year+) and campus staff; 30- or 36-hour online master's.",
+   "min_gpa": null,
+   "min_act": null,
+   "deadline": "",
+   "renewal": "",
+   "fafsa_required": false,
+   "tags": [
+    "church"
+   ],
+   "url": "https://www.belhaven.edu/admission/online/aid/index.html"
+  }
+ ]
+}

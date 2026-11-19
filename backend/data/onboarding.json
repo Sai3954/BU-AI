@@ -1,0 +1,225 @@
+{
+ "collected": "2026-11-18",
+ "checklists": {
+  "first_year": {
+   "label": "New first-year student (on campus)",
+   "steps": [
+    {
+     "title": "Apply and send materials",
+     "detail": "Submit the online undergraduate application and the materials for your student type. A high school GPA of 2.75+ is required; most applicants don't need test scores.",
+     "url": "https://www.belhaven.edu/admission/undergrad/index.html"
+    },
+    {
+     "title": "Visit campus",
+     "detail": "A personal visit or Discover Day adds $1,000 to your first-year scholarship package.",
+     "url": "https://www.belhaven.edu/admission/undergrad/visit/index.html"
+    },
+    {
+     "title": "File the FAFSA",
+     "detail": "Belhaven's FAFSA school code is 002397. Some aid is first-come, first-served.",
+     "url": "https://www.belhaven.edu/admission/financial-aid/index.html"
+    },
+    {
+     "title": "Check your scholarships",
+     "detail": "Merit awards are based on GPA and ACT; Early Acceptance ($1,500) requires applying by December 1.",
+     "url": "https://www.belhaven.edu/admission/undergrad/aid/scholarships.html"
+    },
+    {
+     "title": "Pay the enrollment deposit",
+     "detail": "New students must pay the enrollment deposit before they can open the housing application.",
+     "url": "https://www.belhaven.edu/university-life/campus/housing/index.html"
+    },
+    {
+     "title": "Apply for housing and pick a room",
+     "detail": "The housing application is in BlazeNet (opens March 1). Pay the $150 housing deposit, then select your room in your assigned window.",
+     "url": "https://www.belhaven.edu/university-life/campus/housing/index.html"
+    },
+    {
+     "title": "Set up email, BlazeNet and Duo",
+     "detail": "Sign in with your Belhaven email, enroll in Duo two-factor, and reset passwords with PortalGuard.",
+     "url": "https://www.belhaven.edu/current-students/email.html"
+    },
+    {
+     "title": "Meet Student Care",
+     "detail": "Get academic advising, tutoring through the Think Center, and request disability accommodations if needed.",
+     "url": "https://www.belhaven.edu/university-life/care/index.html"
+    },
+    {
+     "title": "Check the academic calendar",
+     "detail": "Find term dates and the exam schedule.",
+     "url": "https://www.belhaven.edu/academics/resources/academic-calendar.html"
+    }
+   ]
+  },
+  "transfer": {
+   "label": "Transfer student",
+   "steps": [
+    {
+     "title": "Apply as a transfer",
+     "detail": "Use the undergraduate application and choose the transfer path.",
+     "url": "https://www.belhaven.edu/admission/undergrad/apply/transfer.html"
+    },
+    {
+     "title": "Send official transcripts",
+     "detail": "Have each college send official transcripts directly to Belhaven.",
+     "url": "https://www.belhaven.edu/admission/undergrad/index.html"
+    },
+    {
+     "title": "Check transfer scholarships",
+     "detail": "Transfer Scholarship ($15,000-$16,500) needs 12+ credits and a 2.5 GPA; Phi Theta Kappa members get $19,000.",
+     "url": "https://www.belhaven.edu/admission/undergrad/aid/scholarships.html"
+    },
+    {
+     "title": "File the FAFSA",
+     "detail": "FAFSA school code 002397.",
+     "url": "https://www.belhaven.edu/admission/financial-aid/index.html"
+    },
+    {
+     "title": "Housing (if under 54 credits)",
+     "detail": "Single students under 21 with fewer than 54 credits must live on campus unless exempt.",
+     "url": "https://www.belhaven.edu/university-life/campus/housing/index.html"
+    },
+    {
+     "title": "Set up email, BlazeNet and Duo",
+     "detail": "Enroll in Duo and reset passwords with PortalGuard.",
+     "url": "https://www.belhaven.edu/current-students/email.html"
+    }
+   ]
+  },
+  "international": {
+   "label": "International graduate student (hybrid with CPT)",
+   "steps": [
+    {
+     "title": "Apply with supporting documents",
+     "detail": "Resume, English score, passport, visa copy, evaluated transcripts, signed Affidavit of Support and proof of funds of at least $27,275.",
+     "url": "https://igsupport.belhaven.edu/kb/faq.php?id=17"
+    },
+    {
+     "title": "Get your transcripts evaluated",
+     "detail": "International degrees are evaluated through IEE ($120 discounted rate, usually a few days).",
+     "url": "https://www.belhaven.edu/international/grad-international/apply.html"
+    },
+    {
+     "title": "Transfer your SEVIS record",
+     "detail": "Belhaven must have your SEVIS record transferred and activated before it can process CPT.",
+     "url": "https://www.belhaven.edu/international/grad-international/apply.html"
+    },
+    {
+     "title": "Watch for your credentials email",
+     "detail": "After the Registrar registers you, gradinternational@belhaven.edu emails your student email, BlazeNet and Canvas logins.",
+     "url": "https://igsupport.belhaven.edu/kb/faq.php?id=2"
+    },
+    {
+     "title": "Complete orientation",
+     "detail": "Attend the in-person residency orientation and finish the online Canvas orientation before the term starts.",
+     "url": "https://www.belhaven.edu/international/grad-international/faq.html"
+    },
+    {
+     "title": "Request CPT",
+     "detail": "Download the CPT packet, complete the request form and attach it to a DSO ticket. Don't start work until you have a CPT-authorized I-20.",
+     "url": "https://igsupport.belhaven.edu/kb/faq.php?id=39"
+    },
+    {
+     "title": "Apply for a Social Security number",
+     "detail": "Apply within 30 days of your job start with your CPT I-20, I-94, employment letter and DSO letter.",
+     "url": "https://www.belhaven.edu/international/grad-international/faq.html"
+    },
+    {
+     "title": "Buy health insurance",
+     "detail": "Hybrid students and dependents must buy their own coverage.",
+     "url": "https://igsupport.belhaven.edu/kb/faq.php?id=49"
+    },
+    {
+     "title": "Plan your residencies",
+     "detail": "One weekend residency per term is mandatory to keep F-1 status; a makeup residency costs $300.",
+     "url": "https://igsupport.belhaven.edu/kb/faq.php?id=11"
+    },
+    {
+     "title": "Keep 6 credit hours every term",
+     "detail": "Falling below 6 credits can make your SEVIS record inactive.",
+     "url": "https://igsupport.belhaven.edu/kb/faq.php?id=4"
+    }
+   ]
+  },
+  "online": {
+   "label": "Online student",
+   "steps": [
+    {
+     "title": "Apply online",
+     "detail": "Create an account and start your application; review How to Apply.",
+     "url": "https://www.belhaven.edu/admission/online/index.html"
+    },
+    {
+     "title": "Check costs and discounts",
+     "detail": "Use the tuition estimator; military, first-responder (20%), educator, nurse and alumni discounts may apply.",
+     "url": "https://www.belhaven.edu/admission/online/aid/index.html"
+    },
+    {
+     "title": "File the FAFSA",
+     "detail": "Federal grants and loans may be available. School code 002397.",
+     "url": "https://www.belhaven.edu/admission/financial-aid/index.html"
+    },
+    {
+     "title": "Check computer requirements",
+     "detail": "Make sure your computer meets the requirements before your first 7-week term.",
+     "url": "https://www.belhaven.edu/admission/online/computer-requirements.html"
+    },
+    {
+     "title": "Follow the accepted-student checklist",
+     "detail": "Complete the After You're Accepted steps.",
+     "url": "https://www.belhaven.edu/admission/online/accepted-students.html"
+    },
+    {
+     "title": "Set up email, BlazeNet, Canvas and Duo",
+     "detail": "All classes run in Canvas; enroll in Duo two-factor.",
+     "url": "https://www.belhaven.edu/current-students/email.html"
+    },
+    {
+     "title": "Meet your Student Services Representative",
+     "detail": "They help with schedules, aid, payments and Canvas: onlinestudentservices@belhaven.edu.",
+     "url": "https://www.belhaven.edu/university-life/online.html"
+    },
+    {
+     "title": "Use the library and career services",
+     "detail": "Digital library databases and Career & Calling are open to online students.",
+     "url": "https://www.belhaven.edu/university-life/online.html"
+    }
+   ]
+  },
+  "graduate": {
+   "label": "Graduate or doctoral student (online)",
+   "steps": [
+    {
+     "title": "Choose your program",
+     "detail": "Explore online master's and doctoral programs; doctoral and a few master's programs include residencies.",
+     "url": "https://www.belhaven.edu/admission/masters.html"
+    },
+    {
+     "title": "Apply",
+     "detail": "Start your application and follow the How to Apply guidance.",
+     "url": "https://www.belhaven.edu/admission/online/apply.html"
+    },
+    {
+     "title": "Review cost and aid",
+     "detail": "Check discounts and federal loans.",
+     "url": "https://www.belhaven.edu/admission/online/aid/index.html"
+    },
+    {
+     "title": "Check computer requirements",
+     "detail": "Required before your first term.",
+     "url": "https://www.belhaven.edu/admission/online/computer-requirements.html"
+    },
+    {
+     "title": "Set up email, BlazeNet, Canvas and Duo",
+     "detail": "Enroll in Duo; reset passwords with PortalGuard.",
+     "url": "https://www.belhaven.edu/current-students/email.html"
+    },
+    {
+     "title": "Find research help",
+     "detail": "Use Hood Library databases and Ask a Librarian.",
+     "url": "https://www.belhaven.edu/academics/resources/library/index.html"
+    }
+   ]
+  }
+ }
+}

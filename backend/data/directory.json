@@ -1,0 +1,336 @@
+{
+ "source": "https://www.belhaven.edu/about/contact/index.html",
+ "collected": "2026-11-18",
+ "offices": [
+  {
+   "name": "Undergraduate Admission",
+   "group": "Admission",
+   "handles": "Undergraduate applications, campus visits, admission questions",
+   "phone": "601-968-5940",
+   "email": "admission@belhaven.edu",
+   "location": "Jimmy Hood Welcome Center",
+   "url": "https://www.belhaven.edu/about/contact/index.html",
+   "keywords": "apply freshman transfer visit admission toll-free 800-960-5940"
+  },
+  {
+   "name": "Online & Graduate Admission",
+   "group": "Admission",
+   "handles": "Online, adult and graduate applications",
+   "phone": "601-968-8881",
+   "email": "onlineadmission@belhaven.edu",
+   "location": "Welcome Center",
+   "url": "https://www.belhaven.edu/about/contact/index.html",
+   "keywords": "online graduate masters doctoral apply"
+  },
+  {
+   "name": "International Graduate Admission / Graduate International Office",
+   "group": "International",
+   "handles": "International hybrid MBA, MSITM, DBA admission; I-20; CPT/OPT questions",
+   "phone": "601-974-6366",
+   "email": "gradinternational@belhaven.edu",
+   "location": "1500 Peachtree St.",
+   "url": "https://www.belhaven.edu/international/grad-international/",
+   "keywords": "international f1 i20 cpt opt hybrid"
+  },
+  {
+   "name": "DSO Support Tickets (International Graduate)",
+   "group": "International",
+   "handles": "CPT and OPT requests, I-20 updates, travel signatures, SEVIS questions",
+   "phone": "",
+   "email": "",
+   "location": "Online ticket: igsupport.belhaven.edu/open.php",
+   "url": "https://igsupport.belhaven.edu/open.php",
+   "keywords": "dso cpt opt i20 sevis travel signature ticket"
+  },
+  {
+   "name": "International Student Office (undergraduate)",
+   "group": "International",
+   "handles": "On-campus international undergraduates: admission and immigration",
+   "phone": "800-960-5940",
+   "email": "",
+   "location": "Jimmy Hood Welcome Center",
+   "url": "https://www.belhaven.edu/admission/undergrad/apply/international/index.html",
+   "keywords": "international undergraduate f1 immigration"
+  },
+  {
+   "name": "Financial Aid",
+   "group": "Student Resources",
+   "handles": "Scholarships, grants, loans, FAFSA, payments and refunds",
+   "phone": "601-968-5933",
+   "email": "studentaid@belhaven.edu",
+   "location": "Welcome Center, 1st Floor",
+   "url": "https://www.belhaven.edu/about/contact/index.html",
+   "keywords": "fafsa aid scholarship loan grant payment refund"
+  },
+  {
+   "name": "Online & Graduate Student Services",
+   "group": "Student Resources",
+   "handles": "Schedules, tuition payment, Canvas help for online and graduate students",
+   "phone": "601-968-8881",
+   "email": "onlinestudentservices@belhaven.edu",
+   "location": "Welcome Center",
+   "url": "https://www.belhaven.edu/about/contact/index.html",
+   "keywords": "online student services rep schedule"
+  },
+  {
+   "name": "Center for Career & Calling",
+   "group": "Student Resources",
+   "handles": "Career planning, resumes, interviews, internships, career fairs",
+   "phone": "601-968-8995",
+   "email": "",
+   "location": "Library, 1st Floor",
+   "url": "https://www.belhaven.edu/about/contact/index.html",
+   "keywords": "career resume internship job"
+  },
+  {
+   "name": "Counseling Services",
+   "group": "Student Resources",
+   "handles": "Personal counseling",
+   "phone": "601-965-4128",
+   "email": "counselor@belhaven.edu",
+   "location": "Student Center, 2nd Floor",
+   "url": "https://www.belhaven.edu/about/contact/index.html",
+   "keywords": "counseling mental health counselor wellness"
+  },
+  {
+   "name": "Student Care & Think Center",
+   "group": "Student Resources",
+   "handles": "Tutoring, academic advising, disability accommodations, study help",
+   "phone": "601-968-8865",
+   "email": "studentcare@belhaven.edu",
+   "location": "Library, 1st Floor",
+   "url": "https://www.belhaven.edu/university-life/care/index.html",
+   "keywords": "tutoring advising accommodations disability writing lab"
+  },
+  {
+   "name": "Writing Lab",
+   "group": "Student Resources",
+   "handles": "Writing assistance",
+   "phone": "601-968-8865",
+   "email": "studentcare@belhaven.edu",
+   "location": "Think Center, Library 1st Floor",
+   "url": "https://www.belhaven.edu/about/contact/index.html",
+   "keywords": "writing essay paper"
+  },
+  {
+   "name": "Veterans Services",
+   "group": "Student Resources",
+   "handles": "Support for veteran and military students",
+   "phone": "601-968-8838",
+   "email": "",
+   "location": "Preston Hall, 1st Floor",
+   "url": "https://www.belhaven.edu/about/contact/index.html",
+   "keywords": "veteran military gi bill"
+  },
+  {
+   "name": "Registrar",
+   "group": "Academic Resources",
+   "handles": "Transcripts, enrollment verification, graduation, academic records, catalogue",
+   "phone": "601-968-5922",
+   "email": "registrar@belhaven.edu",
+   "location": "Preston Hall, 2nd Floor",
+   "url": "https://www.belhaven.edu/academics/resources/registrar/index.html",
+   "keywords": "transcript enrollment verification graduation diploma records"
+  },
+  {
+   "name": "Warren A. Hood Library",
+   "group": "Academic Resources",
+   "handles": "Books, databases, research help, interlibrary loan",
+   "phone": "601-968-5948",
+   "email": "askalibrarian@belhaven.edu",
+   "location": "Hood Library",
+   "url": "https://www.belhaven.edu/academics/resources/library/index.html",
+   "keywords": "library research databases librarian"
+  },
+  {
+   "name": "IT Help Desk",
+   "group": "Administrative",
+   "handles": "Email, passwords, Duo, BlazeNet and Canvas login problems",
+   "phone": "601-968-8777",
+   "email": "helpdesk@belhaven.edu",
+   "location": "Student Center, Basement",
+   "url": "https://www.belhaven.edu/current-students/email.html",
+   "keywords": "it password email duo canvas blazenet wifi login"
+  },
+  {
+   "name": "Office of Student Development / Housing",
+   "group": "Campus Life",
+   "handles": "Housing, residence halls, student activities, health resources",
+   "phone": "601-968-5969",
+   "email": "sdevelopment@belhaven.edu",
+   "location": "Student Center, 2nd Floor",
+   "url": "https://www.belhaven.edu/university-life/campus/housing/index.html",
+   "keywords": "housing dorm residence student life"
+  },
+  {
+   "name": "Bailey Dining Commons",
+   "group": "Campus Life",
+   "handles": "Meals and meal plans",
+   "phone": "601-968-5912",
+   "email": "dining@belhaven.edu",
+   "location": "Student Center",
+   "url": "https://www.belhaven.edu/about/contact/index.html",
+   "keywords": "dining food meal plan"
+  },
+  {
+   "name": "Shoe Bird Cafe",
+   "group": "Campus Life",
+   "handles": "Cafe dining",
+   "phone": "601-968-5927",
+   "email": "shoebird@belhaven.edu",
+   "location": "Student Center",
+   "url": "https://www.belhaven.edu/about/contact/index.html",
+   "keywords": "cafe coffee"
+  },
+  {
+   "name": "Student Activities & Intramurals",
+   "group": "Campus Life",
+   "handles": "Clubs, activities, intramural sports",
+   "phone": "601-968-8901",
+   "email": "sdevelopment@belhaven.edu",
+   "location": "Student Center, 2nd Floor",
+   "url": "https://www.belhaven.edu/about/contact/index.html",
+   "keywords": "clubs intramurals activities"
+  },
+  {
+   "name": "Athletics",
+   "group": "Campus Life",
+   "handles": "Blazer athletic programs",
+   "phone": "601-968-5956",
+   "email": "",
+   "location": "Raymond Hall",
+   "url": "https://www.belhaven.edu/about/contact/index.html",
+   "keywords": "sports athletics teams"
+  },
+  {
+   "name": "Master Calendar / Campus Operations",
+   "group": "Campus Life",
+   "handles": "Campus event scheduling and facilities",
+   "phone": "601-968-5914",
+   "email": "campusoperations@belhaven.edu",
+   "location": "",
+   "url": "https://www.belhaven.edu/about/contact/index.html",
+   "keywords": "event room reservation calendar"
+  },
+  {
+   "name": "Business Office",
+   "group": "Administrative",
+   "handles": "University billing and finances",
+   "phone": "601-968-5901",
+   "email": "",
+   "location": "Preston Hall, 1st Floor",
+   "url": "https://www.belhaven.edu/about/contact/index.html",
+   "keywords": "bill billing business office"
+  },
+  {
+   "name": "Alumni / College Relations",
+   "group": "Alumni",
+   "handles": "Alumni engagement, events and updates",
+   "phone": "601-968-8719",
+   "email": "alumni@belhaven.edu",
+   "location": "Fitzhugh, 2nd Floor",
+   "url": "https://www.belhaven.edu/alumni/index.html",
+   "keywords": "alumni homecoming giving"
+  },
+  {
+   "name": "Human Resources",
+   "group": "Administrative",
+   "handles": "Employee HR and jobs at Belhaven",
+   "phone": "601-968-8774",
+   "email": "",
+   "location": "Preston Hall, 1st Floor",
+   "url": "https://www.belhaven.edu/about/contact/index.html",
+   "keywords": "hr employment job staff"
+  },
+  {
+   "name": "School of Business",
+   "group": "Academic Departments",
+   "handles": "Business programs and dean's office",
+   "phone": "601-968-8945",
+   "email": "",
+   "location": "",
+   "url": "https://www.belhaven.edu/about/contact/index.html",
+   "keywords": "business mba dean"
+  },
+  {
+   "name": "School of Education",
+   "group": "Academic Departments",
+   "handles": "Education programs",
+   "phone": "601-968-8703",
+   "email": "",
+   "location": "",
+   "url": "https://www.belhaven.edu/about/contact/index.html",
+   "keywords": "education teaching"
+  },
+  {
+   "name": "School of Nursing",
+   "group": "Academic Departments",
+   "handles": "Nursing programs",
+   "phone": "601-968-8935",
+   "email": "nursing@belhaven.edu",
+   "location": "",
+   "url": "https://www.belhaven.edu/about/contact/index.html",
+   "keywords": "nursing bsn"
+  },
+  {
+   "name": "Computer Information Systems & Computer Science",
+   "group": "Academic Departments",
+   "handles": "Computing programs",
+   "phone": "601-973-5004",
+   "email": "",
+   "location": "",
+   "url": "https://www.belhaven.edu/about/contact/index.html",
+   "keywords": "computer science cis"
+  },
+  {
+   "name": "Music",
+   "group": "Academic Departments",
+   "handles": "Music programs",
+   "phone": "601-974-6494",
+   "email": "music@belhaven.edu",
+   "location": "",
+   "url": "https://www.belhaven.edu/about/contact/index.html",
+   "keywords": "music"
+  },
+  {
+   "name": "Theatre",
+   "group": "Academic Departments",
+   "handles": "Theatre programs",
+   "phone": "601-974-6478",
+   "email": "theatre@belhaven.edu",
+   "location": "",
+   "url": "https://www.belhaven.edu/about/contact/index.html",
+   "keywords": "theatre"
+  },
+  {
+   "name": "Art + Design",
+   "group": "Academic Departments",
+   "handles": "Visual arts and design programs",
+   "phone": "601-965-1400",
+   "email": "visualarts@belhaven.edu",
+   "location": "",
+   "url": "https://www.belhaven.edu/about/contact/index.html",
+   "keywords": "art design"
+  },
+  {
+   "name": "Psychology",
+   "group": "Academic Departments",
+   "handles": "Psychology programs",
+   "phone": "601-973-5017",
+   "email": "",
+   "location": "",
+   "url": "https://www.belhaven.edu/about/contact/index.html",
+   "keywords": "psychology"
+  },
+  {
+   "name": "Biology",
+   "group": "Academic Departments",
+   "handles": "Biology programs",
+   "phone": "601-968-5962",
+   "email": "",
+   "location": "",
+   "url": "https://www.belhaven.edu/about/contact/index.html",
+   "keywords": "biology"
+  }
+ ]
+}

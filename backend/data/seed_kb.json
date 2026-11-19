@@ -1,0 +1,829 @@
+[
+ {
+  "id": "cpt-request",
+  "cat": "International",
+  "title": "How to request CPT",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=39",
+  "updated": "~2 years ago",
+  "text": "To request Curricular Practical Training (CPT): download the CPT packet attached to the FAQ (it contains detailed instructions), fill out the CPT request form inside the packet, open a support ticket at https://igsupport.belhaven.edu/open.php, and attach the completed CPT request form to the ticket. The team reviews the request and helps where needed.",
+  "audiences": [
+   "international"
+  ]
+ },
+ {
+  "id": "cpt-grad-apply",
+  "cat": "International",
+  "title": "CPT rules for international graduate students (Apply page)",
+  "url": "https://www.belhaven.edu/international/grad-international/apply.html",
+  "updated": "current site",
+  "text": "Submit the CPT Request Form. Belhaven must first have your SEVIS record transferred to and activated at Belhaven before it can review or process a CPT request. Requests are processed in the order received; the goal is about 48 business hours after complete documentation is received, but approval is not guaranteed. CPT must relate directly to your program of study, cannot start before your program's first day, and cannot be backdated. CPT is authorized for up to 12 months at a time. Twelve or more months of full-time CPT at the same degree level makes you ineligible for OPT at that level. Do not start working until you receive a CPT-authorized I-20.",
+  "audiences": [
+   "international"
+  ]
+ },
+ {
+  "id": "cpt-start-date",
+  "cat": "International",
+  "title": "Can CPT start before the program start date?",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=79",
+  "updated": "~11 months ago",
+  "text": "No. CPT work authorization cannot be issued or approved before the program start date (federal regulation 8 CFR 214.2(f)(10)(i)). CPT is employment that is an integral part of an established curriculum, such as internships, practicums or cooperative education. It requires a job offer and DSO authorization before the student starts working. There is no official 30-day CPT rule in the regulations; the 30-day figure relates to Social Security: students authorized for CPT may apply for an SSN no earlier than 30 days before their employment start date.",
+  "audiences": [
+   "international"
+  ]
+ },
+ {
+  "id": "cpt-what",
+  "cat": "International",
+  "title": "What is CPT in the hybrid program, and travel during CPT",
+  "url": "https://www.belhaven.edu/international/grad-international/faq.html",
+  "updated": "current site",
+  "text": "Curricular Practical Training (CPT) lets F-1 students gain work experience related to their major. The hybrid program has a required CPT component: each hybrid student must secure an approved internship or employment and stay continuously enrolled in the CPT course each term. The CPT course fee equals one credit hour of tuition. You may travel during CPT but cannot work while abroad; you need a travel signature on your I-20 to re-enter, valid for one year.",
+  "audiences": [
+   "international"
+  ]
+ },
+ {
+  "id": "opt-apply",
+  "cat": "International",
+  "title": "How to apply for OPT",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=29",
+  "updated": "~2 years ago",
+  "text": "OPT (Optional Practical Training) is temporary employment authorization for F-1 students to work in their field of study for up to 12 months after completing their program. Eligibility: valid F-1 status and full-time enrollment for at least one academic year (some exceptions, e.g. qualifying STEM programs); intend to work in a job directly related to the major; not more than 12 months of full-time CPT at the same academic level. Timeline: apply up to 90 days before and up to 60 days after program completion; per this FAQ the application must be received by USCIS before the program end date. You cannot work until USCIS approves. Steps: 1) get an I-20 with an OPT recommendation from your DSO; 2) file Form I-765 with USCIS (https://www.uscis.gov/i-765); 3) after approval USCIS issues an EAD (OPT card). Report changes in employment, address or status to your DSO within 10 days and complete SEVIS reporting. The FAQ says students should work 20 or more hours per week on OPT. Confirm current fees and rules on the USCIS OPT page: https://www.uscis.gov/working-in-the-united-states/students-and-exchange-visitors/optional-practical-training-opt-for-f-1-students",
+  "audiences": [
+   "international"
+  ]
+ },
+ {
+  "id": "opt-eligibility",
+  "cat": "International",
+  "title": "OPT eligibility",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=28",
+  "updated": "~2 years ago",
+  "text": "OPT eligibility: valid F-1 status and full-time enrollment for at least one academic year (with exceptions such as qualifying STEM programs); intent to work in a job directly related to the major; no more than 12 months of full-time CPT at the same academic level. Apply up to 90 days before and up to 60 days after completing the program. USCIS must approve before you begin OPT work.",
+  "audiences": [
+   "international"
+  ]
+ },
+ {
+  "id": "opt-i20",
+  "cat": "International",
+  "title": "How to request an OPT I-20",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=40",
+  "updated": "~2 years ago",
+  "text": "To request an OPT I-20: download the OPT packet attached to the FAQ (it contains instructions), fill out the OPT request form, open a ticket at https://igsupport.belhaven.edu/open.php, and attach the completed form. The team reviews and assists.",
+  "audiences": [
+   "international"
+  ]
+ },
+ {
+  "id": "opt-job",
+  "cat": "International",
+  "title": "Do I need a job offer to apply for OPT?",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=30",
+  "updated": "~2 years ago",
+  "text": "No, a job offer is not required to apply for OPT. During the 12-month OPT period you may be unemployed for a total of 90 days (cumulative). Having a job lined up helps you keep status and avoid exceeding the 90-day unemployment limit. See also DHS Study in the States: https://studyinthestates.dhs.gov/students/work/applying-for-practical-training",
+  "audiences": [
+   "international"
+  ]
+ },
+ {
+  "id": "opt-status",
+  "cat": "International",
+  "title": "Visa status while OPT is pending and while on OPT",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=31",
+  "updated": "~2 years ago",
+  "text": "While an OPT application is pending, you remain in F-1 status. After approval you are still in F-1 status; OPT is a benefit of F-1 status. Keep using your OPT I-20 and F-1 documents to travel, and get fresh travel signatures from the Belhaven DSO every 6 months. The DSO continues to report changes to SEVIS.",
+  "audiences": [
+   "international"
+  ]
+ },
+ {
+  "id": "opt-report",
+  "cat": "International",
+  "title": "Report initial OPT employment",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=41",
+  "updated": "~2 years ago",
+  "text": "To report your initial OPT employment to the DSO: download and fill out the OPT job reporting form linked from the FAQ, open a ticket at https://igsupport.belhaven.edu/open.php, and attach the completed form.",
+  "audiences": [
+   "international"
+  ]
+ },
+ {
+  "id": "opt-update",
+  "cat": "International",
+  "title": "Update OPT employment information",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=32",
+  "updated": "~2 years ago",
+  "text": "To update OPT employment: notify your DSO of any change in employment status or job details; provide documents if asked (e.g. updated offer letter); STEM OPT students must submit an updated Form I-983 training plan when employment changes; the DSO updates your SEVIS record (employer name, address, dates). Report changes within 10 days of the change; failing to do so may affect your status. Keep copies of everything you submit.",
+  "audiences": [
+   "international"
+  ]
+ },
+ {
+  "id": "stem-opt",
+  "cat": "International",
+  "title": "When and how to apply for STEM OPT",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=33",
+  "updated": "~2 years ago",
+  "text": "STEM OPT eligibility: a degree in a qualifying STEM field from an accredited U.S. institution, currently on post-completion OPT based on that degree, and an employer enrolled in E-Verify. Timing: apply up to 90 days before your 12-month OPT expires; USCIS must receive it before the current OPT end date; file within 60 days of the DSO's STEM OPT recommendation in SEVIS. Steps: ask your DSO for a new I-20 recommending STEM OPT; gather Form I-765, the new I-20, I-94, passport ID page, F-1 visa stamp, proof of the STEM degree, and an offer letter from an E-Verify employer; file I-765 (online filing available); USCIS issues an EAD if approved.",
+  "audiences": [
+   "international"
+  ]
+ },
+ {
+  "id": "cap-gap",
+  "cat": "International",
+  "title": "Cap-gap / H-1B petitions",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=34",
+  "updated": "~2 years ago",
+  "text": "If you are an F-1 student with a timely filed H-1B petition and change-of-status request, and your F-1 status and work authorization would expire before the H-1B takes effect, you may be eligible for a cap-gap extension. Details are on the USCIS cap-gap page. Contact the DSO for your situation.",
+  "audiences": [
+   "international"
+  ]
+ },
+ {
+  "id": "travel",
+  "cat": "International",
+  "title": "Travel abroad: documents to carry as an F-1 student",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=8",
+  "updated": "~2 years ago",
+  "text": "Before traveling: passport valid at least six months beyond your return date; valid F-1 visa stamp (renew at a U.S. embassy/consulate if expired); most recent I-20 signed by the DSO within the last six months; EAD if on OPT or STEM OPT; DSO travel signature (page 2 of the I-20), request a new one before leaving if it will expire; stay enrolled full-time; check visa needs for destination and transit countries; carry proof of enrollment, financial support and return itinerary. More: https://studyinthestates.dhs.gov/students/study/traveling-as-an-international-student",
+  "audiences": [
+   "international"
+  ]
+ },
+ {
+  "id": "travel-opt",
+  "cat": "International",
+  "title": "Travel while OPT or STEM OPT is pending or approved",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=56",
+  "updated": "~2 years ago",
+  "text": "If your OPT/STEM OPT application is pending, Belhaven strongly recommends you do not travel outside the U.S. If an emergency makes travel unavoidable, carry: I-20 with travel signature dated within 6 months of re-entry, I-797 receipt notice, employer letter confirming your job and return, passport valid at least six months, and a valid F-1 visa. If OPT is approved and you have a job offer or are working, carry: I-20 with valid travel signature (within 6 months) and updated employment info, valid EAD card, employer letter, passport valid six months, valid F-1 visa.",
+  "audiences": [
+   "international"
+  ]
+ },
+ {
+  "id": "ssn",
+  "cat": "International",
+  "title": "How to get a Social Security Number",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=35",
+  "updated": "~2 years ago",
+  "text": "F-1 students usually need work authorization (on-campus job, CPT or OPT) and a job offer to get an SSN. Bring valid F-1 documents (I-20, I-94), passport, visa, and employment authorization documents to a local Social Security Administration office in person, complete the application, and the card is mailed to you. https://www.ssa.gov/",
+  "audiences": [
+   "international"
+  ]
+ },
+ {
+  "id": "ssn-hybrid",
+  "cat": "International",
+  "title": "SSN rules for hybrid CPT students",
+  "url": "https://www.belhaven.edu/international/grad-international/faq.html",
+  "updated": "current site",
+  "text": "An SSN is issued only once in a lifetime; if lost, contact the local Social Security office. All students in the hybrid CPT program must apply for a Social Security card. F-2 dependents are not eligible. To apply you must be in the U.S., apply within 30 days of your job start date, and have an active I-20 (with CPT), current I-94, employment letter and a letter from the DSO. You may work while the SSN is pending, but only after DSO permission and receiving a new I-20 showing CPT approval.",
+  "audiences": [
+   "international"
+  ]
+ },
+ {
+  "id": "health-ins",
+  "cat": "International",
+  "title": "Health insurance for hybrid graduate students",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=49",
+  "updated": "~2 years ago",
+  "text": "Belhaven does not provide or charge for health insurance for the off-campus hybrid graduate programs. Each hybrid student and their dependents must buy their own health insurance. (Traditional on-campus international students are handled differently; see undergraduate international admission.)",
+  "audiences": [
+   "international"
+  ]
+ },
+ {
+  "id": "continuing-i20",
+  "cat": "International",
+  "title": "Continuing Attendance I-20",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=55",
+  "updated": "~2 years ago",
+  "text": "To get a 'Continuing Attendance' version of your I-20, open a ticket at https://igsupport.belhaven.edu/open.php requesting an updated I-20. At the start of each semester the DSO team registers every new student in SEVIS, which can take a few weeks, so please be patient.",
+  "audiences": [
+   "international"
+  ]
+ },
+ {
+  "id": "dependents",
+  "cat": "International",
+  "title": "Adding a dependent (F-2) to your F-1",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=51",
+  "updated": "~2 years ago",
+  "text": "To add dependents (F-2), provide: spouse's passport bio page, each child's passport bio page, marriage certificate, each child's birth certificate, additional funds of USD 5,000 for a spouse and USD 3,000 per child (added to the I-20 expenses; covers basic living only), and proof of health insurance for each dependent. Documents must be in English or have notarized English translations.",
+  "audiences": [
+   "international"
+  ]
+ },
+ {
+  "id": "greencard-residency",
+  "cat": "International",
+  "title": "Residency after a green card or citizenship",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=53",
+  "updated": "~2 years ago",
+  "text": "Once you have a green card or U.S. citizenship you no longer need to maintain F-1 status, so you do not have to attend the mandatory F-1 residencies each semester. You must notify your assigned DSO of the change in immigration status.",
+  "audiences": [
+   "international"
+  ]
+ },
+ {
+  "id": "sevis-termination",
+  "cat": "International",
+  "title": "Visa revocation or SEVIS termination: first steps",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=66",
+  "updated": "~1 year ago",
+  "text": "If you receive a visa revocation or SEVIS termination notice: stay calm; talk to your DSO, who may be able to request a SEVIS data correction or reinstatement if eligible; contact an immigration attorney; do not work without permission and do not travel outside the U.S. until resolved; save all related emails; document your current status and classes; act quickly. Contact the DSO via https://igsupport.belhaven.edu/open.php",
+  "audiences": [
+   "international"
+  ]
+ },
+ {
+  "id": "residency-mandatory",
+  "cat": "Academics",
+  "title": "Is the residency mandatory?",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=9",
+  "updated": "~2 years ago",
+  "text": "Yes. The weekend residency is mandatory for F-1 students in the hybrid program; it keeps you in F-1 status for this program. All F-1 international graduate students attend one weekend residency per term.",
+  "audiences": [
+   "international",
+   "graduate",
+   "doctoral"
+  ]
+ },
+ {
+  "id": "residency-change",
+  "cat": "Academics",
+  "title": "Changing a residency date / makeup residency",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=11",
+  "updated": "~2 years ago",
+  "text": "Residency dates cannot be changed; your date is set by your course assignment. If you cannot attend, you must complete a makeup residency: notify the residency coordinator, get the makeup session dates and location, complete any registration forms, pay the makeup residency fee of USD 300, and attend. Attending the makeup residency fulfills the requirement to maintain F-1 status. (See also https://igsupport.belhaven.edu/kb/faq.php?id=10)",
+  "audiences": [
+   "international",
+   "graduate",
+   "doctoral"
+  ]
+ },
+ {
+  "id": "credit-load",
+  "cat": "Academics",
+  "title": "Minimum credit hours per term",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=4",
+  "updated": "~2 years ago",
+  "text": "International graduate (F-1) students must take at least 6 credit hours per term. Falling below this may make the SEVIS record inactive and lead to loss of F-1 status. F-1 students may take one online course per semester per immigration regulations (the hybrid format is one online class plus one hybrid class with residency).",
+  "audiences": [
+   "international",
+   "graduate",
+   "doctoral"
+  ]
+ },
+ {
+  "id": "drop-class",
+  "cat": "Academics",
+  "title": "Can I drop a class?",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=1",
+  "updated": "~2 years ago",
+  "text": "F-1 students must keep at least 6 credit hours per term, so dropping below that may put status at risk. H-1 or H-4 visa holders may study part-time and can drop to 3 credits. Drop within the required timeframe to avoid billing problems. Contact Student Services via https://igsupport.belhaven.edu/open.php",
+  "audiences": [
+   "international",
+   "graduate",
+   "doctoral"
+  ]
+ },
+ {
+  "id": "withdraw",
+  "cat": "Academics",
+  "title": "Withdrawing from the university",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=16",
+  "updated": "~2 years ago",
+  "text": "To withdraw: log in to BlazeNet, open Student Forms, and complete the withdrawal form selecting 'I wish to withdraw from Belhaven University.' For refunds contact the Financial Aid Office: 601-968-5933, studentaid@belhaven.edu. F-1 students should talk to the DSO first because withdrawing affects immigration status.",
+  "audiences": [
+   "international",
+   "graduate",
+   "doctoral"
+  ]
+ },
+ {
+  "id": "credits-30-42",
+  "cat": "Academics",
+  "title": "Why 30 credits becomes 39-42",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=54",
+  "updated": "~2 years ago",
+  "text": "The MSITM and MBA are designed as 30 credit-hour programs; adding a concentration increases the credit hours, depending on the concentration chosen. Graduate programs range from 30-42 credits.",
+  "audiences": [
+   "international",
+   "graduate",
+   "doctoral"
+  ]
+ },
+ {
+  "id": "transfer-credit",
+  "cat": "Academics",
+  "title": "Transferring credits",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=46",
+  "updated": "~2 years ago",
+  "text": "To transfer credits: have official transcripts sent directly from your previous school to Belhaven; confirm Belhaven received them; submit the Transfer Credit Form (https://forms.office.com/r/UgfPXhmbDq); courses must have a grade of B or better and match Belhaven course learning outcomes. Processing takes 5-7 business days. For the dual MBA/MSITM, up to 9 hours of graduate transfer credit may transfer into a Belhaven master's degree.",
+  "audiences": [
+   "international",
+   "graduate",
+   "doctoral"
+  ]
+ },
+ {
+  "id": "transcripts",
+  "cat": "Academics",
+  "title": "Getting your Belhaven transcript",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=50",
+  "updated": "~2 years ago",
+  "text": "Order official transcripts online through the National Student Clearinghouse: on belhaven.edu go to Degrees & Programs > Academic Resources > Registrar > Transcript Requests, or go directly to https://www.studentclearinghouse.org/",
+  "audiences": [
+   "all"
+  ]
+ },
+ {
+  "id": "diploma",
+  "cat": "Academics",
+  "title": "When will I get my diploma?",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=13",
+  "updated": "~1 year ago",
+  "text": "Diplomas are produced and mailed by a third party to the address in BlazeNet. Fall graduates receive them by mid-February, spring graduates by mid-July, summer graduates by mid-October at the latest. If not received, email registrar@belhaven.edu.",
+  "audiences": [
+   "all"
+  ]
+ },
+ {
+  "id": "login-help",
+  "cat": "IT Support",
+  "title": "Login problems: email, BlazeNet, Canvas",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=5",
+  "updated": "~2 years ago",
+  "text": "For trouble logging into student email, BlazeNet or Canvas, contact the Help Desk: phone 601-968-8777, email helpdesk@belhaven.edu. Include your full name and student ID number.",
+  "audiences": [
+   "all"
+  ]
+ },
+ {
+  "id": "credentials",
+  "cat": "IT Support",
+  "title": "When do I get my student email, BlazeNet and Canvas credentials?",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=2",
+  "updated": "~1 year ago",
+  "text": "The Registrar's Office must register you for courses first. After registration you receive an email from gradinternational@belhaven.edu with login details for student email, BlazeNet and Canvas plus a new-student checklist. Check your spam folder. There is no fixed timeline.",
+  "audiences": [
+   "international",
+   "graduate",
+   "doctoral"
+  ]
+ },
+ {
+  "id": "externships",
+  "cat": "Academics",
+  "title": "New externships (Generative AI, AWS Cloud Foundations)",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=77",
+  "updated": "~1 year ago",
+  "text": "Belhaven offers externship courses in Generative AI and AWS Cloud Foundations, which satisfy the academic externship requirement for eligible graduate students. Eligibility: completed two semesters in your current graduate program, minimum GPA 3.0, and submit an externship enrollment request by the first day of the term you want to start. Registration: https://igsupport.belhaven.edu/kb/faq.php?id=78",
+  "audiences": [
+   "international",
+   "graduate",
+   "doctoral"
+  ]
+ },
+ {
+  "id": "grad-programs",
+  "cat": "Admissions",
+  "title": "Graduate programs for international students",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=18",
+  "updated": "~2 years ago",
+  "text": "International graduate hybrid programs: MBA (Master of Business Administration), MSITM (Master of Information Technology Management), the dual MBA & MSITM degree, and the DBA (Doctor of Business Administration). Programs combine online classes with a mandatory weekend residency and include CPT. Graduate programs are 30-42 credits.",
+  "audiences": [
+   "prospective",
+   "international",
+   "graduate",
+   "doctoral"
+  ]
+ },
+ {
+  "id": "mba",
+  "cat": "Admissions",
+  "title": "MBA program requirements",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=19",
+  "updated": "~2 years ago",
+  "text": "MBA: 36 credit hours (per this FAQ), mandatory weekend face-to-face residency plus one online class each term, 14-week or 7-week terms. Admission: bachelor's degree, minimum cumulative GPA 3.0, English proficiency for international applicants: TOEFL 71 iBT, IELTS 6, CAEL 70 or Duolingo 95, scores no more than two years old. Concentrations: Business Intelligence and Analytics, Finance, Health Administration, Information Technology, Project Management, Supply Chain Management.",
+  "audiences": [
+   "prospective",
+   "international",
+   "graduate",
+   "doctoral"
+  ]
+ },
+ {
+  "id": "msitm",
+  "cat": "Admissions",
+  "title": "MSITM program requirements",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=20",
+  "updated": "~2 years ago",
+  "text": "Master of (Science in) Information Technology Management: 30 credit hours, mandatory weekend residency plus one online class, 14-week or 7-week terms. Admission: bachelor's degree with minimum 3.0 GPA; international applicants need TOEFL 71 iBT, IELTS 6 or CAEL 70; conditional admission possible after committee review with two recommendation letters and a 3.0 GPA in the first six graduate hours. Concentrations: Business Intelligence and Analytics, Computer Information Systems, Cyber Security, Project Management, Supply Chain Management, Health Administration.",
+  "audiences": [
+   "prospective",
+   "international",
+   "graduate",
+   "doctoral"
+  ]
+ },
+ {
+  "id": "dba",
+  "cat": "Admissions",
+  "title": "DBA program requirements",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=21",
+  "updated": "~2 years ago",
+  "text": "Doctor of Business Administration: 60 credit hours including 12 research hours; mandatory weekend residency plus one online class; 14-week and 7-week terms. Admission: an MBA with minimum GPA 3.0, plus English proficiency for international applicants. Specializations: Business Intelligence and Analytics, Health Administration, Project Management, Strategic Management.",
+  "audiences": [
+   "prospective",
+   "international",
+   "graduate",
+   "doctoral"
+  ]
+ },
+ {
+  "id": "how-apply",
+  "cat": "Admissions",
+  "title": "How to apply (international graduate)",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=17",
+  "updated": "~1 year ago",
+  "text": "Apply through the Belhaven admissions portal (https://belhaven.elluciancrmrecruit.com/Apply/Account/Create). Supplemental documents: resume, English proficiency score, passport copy, current visa copy if applicable, official U.S. transcript or evaluated international transcript, signed Affidavit of Support (write 'self' if self-funded), and proof of finances (bank statement or employer salary letter) of at least USD 27,275; a sponsor may sign and submit their financial records instead. The application is reviewed only when complete; the decision comes by email or mail.",
+  "audiences": [
+   "prospective",
+   "international",
+   "graduate",
+   "doctoral"
+  ]
+ },
+ {
+  "id": "grad-apply-req",
+  "cat": "Admissions",
+  "title": "International graduate admission requirements (Apply page)",
+  "url": "https://www.belhaven.edu/international/grad-international/apply.html",
+  "updated": "current site",
+  "text": "Official transcripts must come directly from each institution attended. International degree holders submit evaluated transcripts through International Education Evaluations (IEE), discounted to USD 120 for Belhaven applicants, usually a few days. English proficiency per the current apply page: minimum 4.5 on the new TOEFL iBT scale; TOEFL taken before January 21, 2026 needs 79 iBT; CAEL 70 accepted; scores no more than two years old; Belhaven TOEFL code 1055; may be waived with two years of successful U.S. college-level study. Also required: certified translations of transcripts/mark sheets, proof of funds matching the Estimated Expense form dated within 90 days, and a passport copy. F-1 reminders: maintain 6 credit hours per term, report address/program/CPT employer changes, get a DSO travel signature before leaving the U.S., and you may enter up to 30 days before the program start date. Contact: 601-974-6366, gradinternational@belhaven.edu.",
+  "audiences": [
+   "prospective",
+   "international",
+   "graduate",
+   "doctoral"
+  ]
+ },
+ {
+  "id": "tuition-grad",
+  "cat": "Financial Aid",
+  "title": "Tuition for international graduate programs",
+  "url": "https://belhaven.edu/international/grad-international/tuition.html",
+  "updated": "current site",
+  "text": "The current tuition page asks students to contact gradinternational@belhaven.edu for current tuition rates. Costs for the hybrid CPT program include tuition, a resource fee, a CPT fee (equal to one credit hour of tuition per term), books, and a graduation audit fee. Belhaven reserves the right to change fees and tuition.",
+  "audiences": [
+   "international",
+   "graduate",
+   "doctoral"
+  ]
+ },
+ {
+  "id": "scholarships-grad",
+  "cat": "Financial Aid",
+  "title": "Scholarships for international hybrid graduate students",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=44",
+  "updated": "~2 years ago",
+  "text": "Per the international graduate support FAQ, Belhaven does not offer financial aid or scholarships for the international hybrid programs. The programs offer day-one CPT (full-time or part-time), students can work anywhere in the U.S., and coursework is mostly online with one two-day in-person residency per semester.",
+  "audiences": [
+   "international",
+   "graduate",
+   "doctoral"
+  ]
+ },
+ {
+  "id": "payments",
+  "cat": "Financial Aid",
+  "title": "Payments, payment plans and wires",
+  "url": "https://igsupport.belhaven.edu/kb/faq.php?id=24",
+  "updated": "~2 years ago",
+  "text": "For payment or payment-plan issues contact the Financial Office: 601-968-5933, studentaid@belhaven.edu. Pay through BlazeNet using the 'Make a Payment' button. Only U.S. dollars are accepted; wires must include beneficiary bank information and a USD 10-20 wire fee applies per wire.",
+  "audiences": [
+   "international",
+   "graduate",
+   "doctoral"
+  ]
+ },
+ {
+  "id": "finaid-general",
+  "cat": "Financial Aid",
+  "title": "Financial aid overview (domestic and online students)",
+  "url": "https://www.belhaven.edu/admission/financial-aid/index.html",
+  "updated": "current site",
+  "text": "Belhaven builds customized aid packages using FAFSA data, GPA, test scores and achievements. Aid types: scholarships (on-campus undergraduates; online students do not receive institutional scholarships), work-study for full-time on-campus undergraduates, federal and state grants including Pell, and federal/private loans. Online graduate students may use federal and private loans, outside scholarships and online tuition discounts. FAFSA: https://studentaid.gov/. Office of Financial Aid: 601-968-5933, studentaid@belhaven.edu, Mon-Fri 8am-5pm, Jimmy Hood Welcome Center, 855 Riverside Drive, Jackson, MS.",
+  "audiences": [
+   "prospective",
+   "undergraduate",
+   "graduate",
+   "online"
+  ]
+ },
+ {
+  "id": "ug-intl",
+  "cat": "Admissions",
+  "title": "International undergraduate (on-campus) admission",
+  "url": "https://www.belhaven.edu/admission/undergrad/apply/international/index.html",
+  "updated": "current site",
+  "text": "Residential undergraduate international applicants: apply online or by mail, pay a USD 25 non-refundable application fee (applications are not considered until paid); submit certified English translations of all secondary and college records, TOEFL or IELTS scores, a signed Affidavit of Support, Estimated Expenses form, bank or employer letter, and an academic reference. Recommended evaluators: The Evaluation Company (discounted Belhaven application) or WES. Admission is valid for one year. On-campus international students are automatically enrolled in the university health insurance plan (LewerMark through CIGNA). Admission Office: 601-968-5940, admission@belhaven.edu. International Student Office (Jimmy Hood Welcome Center): 800-960-5940.",
+  "audiences": [
+   "prospective",
+   "international",
+   "undergraduate"
+  ]
+ },
+ {
+  "id": "contacts",
+  "cat": "Student Services",
+  "title": "Key contacts",
+  "url": "https://www.belhaven.edu/international/grad-international/",
+  "updated": "current site",
+  "text": "International Graduate Admission / Graduate International Office: phone 601-974-6366, email gradinternational@belhaven.edu, 1500 Peachtree Street, Jackson, MS 39202. DSO and international graduate support tickets: https://igsupport.belhaven.edu/open.php. Financial Office: 601-968-5933, studentaid@belhaven.edu. Help Desk: 601-968-8777, helpdesk@belhaven.edu. Registrar: registrar@belhaven.edu. Undergraduate Admission: 601-968-5940, admission@belhaven.edu.",
+  "audiences": [
+   "all"
+  ]
+ },
+ {
+  "id": "driver-license",
+  "cat": "International",
+  "title": "Driver's license, passport loss, taxes, orientation",
+  "url": "https://www.belhaven.edu/international/grad-international/faq.html",
+  "updated": "current site",
+  "text": "Driver's license: contact your state DMV; you need your I-20 and a letter of good standing from Belhaven, and possibly passport, I-94, proof of address and birth certificate. Lost passport: file a police report and contact your home country's consulate or embassy. Taxes: F-1 students who worked, earned U.S. income or received a scholarship must file U.S. taxes; deadline April 15; a tax professional is recommended. Orientation is required: attend the in-person residency orientation and complete the online Canvas orientation before the term starts. Class format: weekly assignments due Saturdays, discussion posts due Wednesdays.",
+  "audiences": [
+   "international"
+  ]
+ },
+ {
+  "id": "ug-admission",
+  "cat": "Admissions",
+  "audiences": [
+   "prospective",
+   "undergraduate"
+  ],
+  "title": "Undergraduate admission requirements",
+  "url": "https://www.belhaven.edu/admission/undergrad/index.html",
+  "updated": "current site",
+  "text": "Undergraduate admission is test-optional for most applicants, but you need a high school cumulative GPA of at least 2.75 to be eligible; some programs such as nursing and education require test scores. The average ACT is 22. Steps: complete the online application, submit materials for your student type (first-year, transfer, homeschool, dual enrollment, international), and apply for financial aid. Visit options: personal campus visit, Discover Day, or Arts Discover Day; Belhaven adds USD 1,000 to the first-year scholarship package if you visit or attend a Discover Day. The Belhaven Advantage: eligible traditional undergraduates may get fifth-year tuition for a second major or degree plus a full-tuition scholarship for an eligible online master's after graduation. Office of Admission: 601-968-5940, admission@belhaven.edu, Jimmy Hood Welcome Center, 855 Riverside Drive, Jackson, MS."
+ },
+ {
+  "id": "online-programs",
+  "cat": "Admissions",
+  "audiences": [
+   "prospective",
+   "online",
+   "graduate",
+   "undergraduate"
+  ],
+  "title": "Online degree programs and format",
+  "url": "https://www.belhaven.edu/admission/online/index.html",
+  "updated": "current site",
+  "text": "Belhaven online programs are 100% online in 7-week terms. Online graduate programs include M.S. Applied AI, M.A. Biblical & Theological Studies, MBA, DBA, Ph.D. in Business Administration, M.S. Computer Information Systems, M.A. Counseling, M.Ed. Curriculum & Instruction, M.S. Data Science, Education Specialist, Reading Literacy, Ed.D. Educational Leadership, M.H.A., M.S. Information Technology Management, Entrepreneurship MBA with GSV, M.O.L., M.P.A., M.Ed. School Leadership, M.S. Sports Administration, STEM MBA and M.A. Teaching. Online bachelor's: Accounting, Applied Psychology, Biblical Studies, BBA, Elementary Education, BHA, Human Services, Interdisciplinary Studies, Management, RN to BSN, Sport Management; associate degrees in Arts, Biblical Studies and Business; plus certificates (e.g. Applied AI, AWS Academy). Discounts for military and veterans, first-responder scholarships, and credit for prior learning. Adult, Graduate & Online Admission: 601-968-5940, onlineadmission@belhaven.edu."
+ },
+ {
+  "id": "doctoral-programs",
+  "cat": "Admissions",
+  "audiences": [
+   "prospective",
+   "doctoral"
+  ],
+  "title": "Doctoral programs",
+  "url": "https://www.belhaven.edu/admission/doctorate.html",
+  "updated": "current site",
+  "text": "Belhaven doctoral programs (online, for working adults, 7-week courses plus on-campus residency classes, small cohorts, set graduation plan): DBA in Business Administration, Ph.D. in Business Administration, Education Specialist, and Ed.D. in Educational Leadership. Admission requirements and tuition are on the How to Apply and Cost & Aid pages. Contact Adult, Graduate & Online Admission: 601-968-5940, onlineadmission@belhaven.edu."
+ },
+ {
+  "id": "academic-calendar",
+  "cat": "Academics",
+  "audiences": [
+   "all"
+  ],
+  "title": "Academic calendar and exam schedule",
+  "url": "https://www.belhaven.edu/academics/resources/academic-calendar.html",
+  "updated": "current site",
+  "text": "The academic calendar page links three PDFs: the Traditional Campus Academic Calendar 2026-2027, the Fall 2026 Exam Schedule, and the Adult, Graduate & Online Academic Calendar 2026-2027. Term start and end dates, registration, add/drop, holidays and exams are in those PDFs. Online programs also have their own academic calendar page (https://www.belhaven.edu/admission/online/academic-calendar.html). Confirm dates with the Registrar (601-968-5922, registrar@belhaven.edu)."
+ },
+ {
+  "id": "registrar",
+  "cat": "Academics",
+  "audiences": [
+   "all"
+  ],
+  "title": "Registrar services",
+  "url": "https://www.belhaven.edu/academics/resources/registrar/index.html",
+  "updated": "current site",
+  "text": "The Office of the Registrar handles academic records, degree and enrollment verification, letters of good standing, transcript requests, commencement, diplomas and certificates, summer classes, free master's degree eligibility, and the academic calendar, exam schedule and catalogue. Contact: 601-968-5922, registrar@belhaven.edu, 2nd floor Preston Hall, 8 a.m.-5 p.m."
+ },
+ {
+  "id": "library",
+  "cat": "Library",
+  "audiences": [
+   "all"
+  ],
+  "title": "Warren A. Hood Library",
+  "url": "https://www.belhaven.edu/academics/resources/library/index.html",
+  "updated": "current site",
+  "text": "Hood Library hours (non-summer, Central Time): Monday-Friday 7:30 a.m.-10 p.m., Saturday 1:30-10 p.m., Sunday 6 p.m.-midnight; hours change during breaks and summer. Research help: Ask a Librarian form, askalibrarian@belhaven.edu, 601-968-5948. Over 100 electronic databases and research guides at belhaven.libguides.com; catalogue at belhaven.tlcdelivers.com. Services include interlibrary loan, acquisition requests, course reserves, computers and printing, and the Think Center on the first floor. Books: 21-day loan, 2 renewals, no overdue fines (lost-item charges apply); course reserves have a USD 3 per day fine. University Archives on the third floor by appointment."
+ },
+ {
+  "id": "student-care",
+  "cat": "Wellness",
+  "audiences": [
+   "undergraduate",
+   "all"
+  ],
+  "title": "Student Care, tutoring and disability accommodations",
+  "url": "https://www.belhaven.edu/university-life/care/index.html",
+  "updated": "current site",
+  "text": "Student Care supports academic success: the Wynn Kenyon Think Center (first floor of Hood Library) for study space and connecting with a tutor; academic advising and registration help; academic support coaching; Services for Students with Disabilities, where students who qualify under the ADA submit documentation and request reasonable accommodations through the Accommodations page; and Belhaven Basics for strengths and calling. Schedule a meeting via the Student Care page in BlazeNet, call 601-968-8865, email studentcare@belhaven.edu, or visit the Library main floor."
+ },
+ {
+  "id": "health",
+  "cat": "Wellness",
+  "audiences": [
+   "undergraduate",
+   "all"
+  ],
+  "title": "Health services and nearby medical care",
+  "url": "https://www.belhaven.edu/university-life/campus/development/health.html",
+  "updated": "current site",
+  "text": "Belhaven's Health Services page lists nearby providers rather than an on-campus clinic: MEA Medical Clinics (walk-in, non-emergency), Baptist Health Systems clinics (Baptist Medical Center has a 24-hour ER), Flowood Primary Care, and the University of Mississippi Medical Center, less than a mile from campus, for emergencies. The bacterial meningitis vaccine is recommended but not required for incoming resident students. Contact the Office of Student Development: 601-968-5969, sdevelopment@belhaven.edu. In an emergency call 911."
+ },
+ {
+  "id": "career",
+  "cat": "Careers",
+  "audiences": [
+   "all"
+  ],
+  "title": "Center for Career & Calling",
+  "url": "https://www.belhaven.edu/university-life/career/index.html",
+  "updated": "current site",
+  "text": "The Center for Career & Calling offers career and major advising, resume workshops and proofreading, interview practice, annual career fairs and networking events (open to residential undergraduates and online students living in the U.S.), a Career Preparation Checklist, and the Blazer Career Portal for job and internship postings. Location: Irby Hall 208. Phone 601-973-5155, email clangley@belhaven.edu (Director Claire Langley). Drop in or schedule online. Alumni can keep using the Blazer Career Portal."
+ },
+ {
+  "id": "housing",
+  "cat": "Campus Life",
+  "audiences": [
+   "prospective",
+   "undergraduate"
+  ],
+  "title": "Residence halls and housing",
+  "url": "https://www.belhaven.edu/university-life/campus/housing/index.html",
+  "updated": "current site",
+  "text": "Belhaven has six furnished residence halls: Caldwell, Lakeview and Helen White (women), Robertson and Wells (men), and University Village co-ed quad apartments with separate floors. Students with fewer than 54 earned credit hours who are single and under 21 must live on campus unless living with a parent or guardian; off-campus requests use the Housing Exemption Form in BlazeNet. The housing application is in BlazeNet and opens March 1; new students must pay the enrollment deposit first; you must select a room (2026 selection windows ran March 26 to April 6 by class standing). Housing deposit USD 150, applied to residence charges, paid in BlazeNet; financial aid cannot pay it. Office of Student Development: 601-968-5969, sdevelopment@belhaven.edu."
+ },
+ {
+  "id": "dining",
+  "cat": "Campus Life",
+  "audiences": [
+   "prospective",
+   "undergraduate",
+   "all"
+  ],
+  "title": "Dining hours and meal plans",
+  "url": "https://www.belhaven.edu/university-life/campus/dining/index.html",
+  "updated": "current site",
+  "text": "Bailey Dining Commons (first floor, McCravey-Triplett Student Center) is buffet-style; the Shoe Bird Cafe is another option. Weekday hours: hot breakfast 7-8:30 a.m., continental 8:30-9:30 a.m., lunch 11 a.m.-2 p.m., dinner 4:45-7 p.m. Weekends: Sunday continental 8:30-9:30 a.m., brunch/lunch 11:30 a.m.-1:30 p.m., dinner 4:45-6 p.m. Residents of the traditional halls have a full meal plan included in room and board. University Village residents and commuters can buy meal blocks: 10 meals USD 85, 40 meals USD 320, 80 meals USD 620, 120 meals USD 900. Contact: Corey Jones, 601-968-5912."
+ },
+ {
+  "id": "campus-life",
+  "cat": "Campus Life",
+  "audiences": [
+   "prospective",
+   "undergraduate",
+   "all"
+  ],
+  "title": "Campus life, activities and student development",
+  "url": "https://www.belhaven.edu/university-life/index.html",
+  "updated": "current site",
+  "text": "Campus life includes six residence halls, Bailey Dining Commons, the Shoe Bird Cafe, a fitness center, the McCravey-Triplett Student Center and bookstore, Blazer Athletics, clubs, student ministries, intramural sports, arts and athletic events, and a weekly chapel hour (videos on the Chapel Blog for online students). Students come from 17 countries, supported by the Dr. Billy Kim International Center. Office of Student Development: 601-968-5969, sdevelopment@belhaven.edu, Student Center 2nd floor."
+ },
+ {
+  "id": "events",
+  "cat": "Events",
+  "audiences": [
+   "all"
+  ],
+  "title": "Upcoming events and campus calendar",
+  "url": "https://www.belhaven.edu/university-life/index.html",
+  "updated": "current site",
+  "text": "Events are listed on the campus calendar (https://www.belhaven.edu/university-life/calendar/index.html). Recent and upcoming highlights listed on the Campus & Community page: Homecoming & Family Weekend (October 23-25, 2026), concerts, a dance concert, a leadership forum, the Singing Christmas Tree at Belhaven Bowl the first weekend in December, and the fall 2026 graduation celebration on December 12. Online students are welcome to attend; a student ID gives free admission to Belhaven arts and athletic events."
+ },
+ {
+  "id": "email-it",
+  "cat": "IT Support",
+  "audiences": [
+   "all"
+  ],
+  "title": "Student email, password reset and Duo",
+  "url": "https://www.belhaven.edu/current-students/email.html",
+  "updated": "current site",
+  "text": "Access email through BlazeNet (Check My Email) or Outlook with your full Belhaven address; student emails follow firstnamelastname@students.belhaven.edu. Reset your password with PortalGuard; the new password updates Canvas and BlazeNet too. Enroll in Duo two-factor authentication from the Duo email or setup prompt, even if you forward email. Forwarding: Outlook Web App > Settings > Options > Account > Forwarding. IT Help Desk: 601-968-8777, helpdesk@belhaven.edu, or the web help form (give your name, a non-Belhaven email, last six digits of your student ID, campus and the problem)."
+ },
+ {
+  "id": "blazenet",
+  "cat": "IT Support",
+  "audiences": [
+   "all"
+  ],
+  "title": "BlazeNet, Canvas and student tools",
+  "url": "https://www.belhaven.edu/current-students/index.html",
+  "updated": "current site",
+  "text": "BlazeNet (blazenet.belhaven.edu, also a mobile app) is where students check grades and account balance, make payments, plan schedules, apply for graduation, access forms, and reach email. Courses run in Canvas (belhaven.instructure.com). Other tools: the University Catalogue (catalogue.belhaven.edu), The Kilt student handbook, the academic calendar, and office, staff and faculty directories."
+ },
+ {
+  "id": "online-services",
+  "cat": "Student Services",
+  "audiences": [
+   "online",
+   "graduate",
+   "doctoral"
+  ],
+  "title": "Services for online students",
+  "url": "https://www.belhaven.edu/university-life/online.html",
+  "updated": "current site",
+  "text": "Online students have a Student Services Representative for class schedules, financial aid, tuition payments and Canvas help (onlinestudentservices@belhaven.edu). They can use the Hood Library's digital books, databases and research guides, Career & Calling services, and online chapel. With a student ID (from the Security & Safety Office, Bettye Quinn Center) they get free admission to arts and athletic events, discounted Dining Commons prices and free Fitness Center workouts."
+ },
+ {
+  "id": "alumni",
+  "cat": "Alumni",
+  "audiences": [
+   "alumni"
+  ],
+  "title": "Alumni services",
+  "url": "https://www.belhaven.edu/alumni/index.html",
+  "updated": "current site",
+  "text": "Alumni can update contact details through the Class News Update Form, refer students, join the 50 Year Club, read The Tartan magazine, request transcripts through the Registrar, use the Blazer Career Portal, browse digital archives through Hood Library, and give to Belhaven. Office of Advancement & Alumni: 601-968-8719, alumni@belhaven.edu."
+ },
+ {
+  "id": "ug-costs",
+  "cat": "Financial Aid",
+  "audiences": [
+   "prospective",
+   "undergraduate"
+  ],
+  "title": "Undergraduate tuition, fees and room costs 2026-2027",
+  "url": "https://www.belhaven.edu/admission/undergrad/aid/index.html",
+  "updated": "current site",
+  "text": "Full-time undergraduate (12-18 hours) published costs for 2026-2027 before aid: tuition USD 15,350 per semester (USD 30,700 per year); student activity fee USD 395 per semester (USD 790 per year). Room per semester: double in Caldwell, Wells or Robertson USD 4,925; Helen White USD 5,425; Lakeview double USD 5,625; Lakeview quad USD 5,825; University Village (no meal plan) USD 6,425; private room in Wells USD 6,200. International undergraduates: international fee USD 50 per semester, TB testing USD 50 once, personal expenses estimate USD 1,200 per semester. Part-time and overload hours: USD 595 per credit hour. Summer online undergraduate courses: USD 465 per credit hour plus a USD 40 per credit hour technology fee. 100% of full-time undergraduates receive some aid; FAFSA school code 002397. Use the cost estimator for net price."
+ },
+ {
+  "id": "ug-scholarships",
+  "cat": "Financial Aid",
+  "audiences": [
+   "prospective",
+   "undergraduate"
+  ],
+  "title": "Undergraduate scholarships (2027-2028)",
+  "url": "https://www.belhaven.edu/admission/undergrad/aid/scholarships.html",
+  "updated": "current site",
+  "text": "First-year merit awards for 2027-2028: Distinguished Merit USD 25,000 (GPA 3.5+, ACT 30+, interview; competitive; interviews Sept 1-March 1); President's USD 17,500-18,000 (GPA 3.5+, ACT 26+); Dean's USD 15,000-17,000 (GPA 2.5+, ACT 20+); Achievement Grant USD 14,000-15,500 (GPA 2.5+, ACT 18-19); Advantage USD 14,000-15,500 (GPA 2.75+, no test required); Early Acceptance USD 1,500 (apply by December 1). For on-campus students USD 5,000 of these merit awards goes toward housing. Renewable up to 5 years with full-time enrollment and satisfactory progress. Transfer: Phi Theta Kappa USD 19,000; Transfer Scholarship USD 15,000-16,500 (12+ credits, GPA 2.5+). Also arts scholarships (USD 1,000-3,000 by audition or portfolio), Residence Hall Grant USD 5,000, Visit Scholarship USD 1,000, Legacy USD 500, church matching up to USD 500, Mississippi grants (MTAG, MESG, HELP up to USD 9,000, deadline March 30) and federal aid (Pell up to USD 7,395, Work-Study up to USD 4,000, TEACH up to USD 4,000)."
+ },
+ {
+  "id": "online-costs",
+  "cat": "Financial Aid",
+  "audiences": [
+   "online",
+   "graduate",
+   "doctoral",
+   "prospective"
+  ],
+  "title": "Online tuition, discounts and scholarships",
+  "url": "https://www.belhaven.edu/admission/online/aid/index.html",
+  "updated": "current site",
+  "text": "Online tuition is charged per credit hour and varies by program; use the Tuition Payment Estimator or each program page. Military rates: active duty USD 250 per credit (undergraduate) and USD 375 (master's); veterans and military spouses USD 364 (undergraduate) and USD 500 (master's). First Responder Scholarship: 20% off most programs for law enforcement, firefighters, dispatchers and spouses. Educator discount on several education master's, specialist and doctoral degrees; nurse discount on RN to BSN nursing courses; alumni scholarship for Belhaven graduates; RUF ministers and staff may get a tuition-free online master's. Institutional discounts and scholarships cannot be combined. Fees (such as the technology fee) are listed in the catalogue. Financial aid: 601-968-5933, studentaid@belhaven.edu."
+ },
+ {
+  "id": "online-faq",
+  "cat": "Admissions",
+  "audiences": [
+   "online",
+   "graduate",
+   "prospective"
+  ],
+  "title": "Online programs FAQ: format, length, transfer credit, states",
+  "url": "https://www.belhaven.edu/admission/online/faq.html",
+  "updated": "current site",
+  "text": "Belhaven is accredited by SACSCOC to award associate, bachelor's, master's and doctoral degrees. Online undergraduates typically take two 7-week courses per term (12 credit hours per semester); graduate students typically take one course per 7-week term. All online classes use Canvas, with weekly video lectures, readings and discussion posts; deadlines are in each syllabus. Undergraduate online programs take about four years and graduate programs about two; transfer credit can shorten this and is evaluated individually. Most programs can be completed fully online; doctoral and a few master's programs have residency requirements. Textbooks come from the Barnes & Noble campus bookstore. Belhaven participates in NC-SARA, so it can offer online classes outside Mississippi. Online admission: 601-968-8881, onlineadmission@belhaven.edu."
+ },
+ {
+  "id": "counseling",
+  "cat": "Wellness",
+  "audiences": [
+   "all"
+  ],
+  "title": "Counseling Services",
+  "url": "https://www.belhaven.edu/about/contact/index.html",
+  "updated": "current site",
+  "text": "Counseling Services provides personal counseling: phone 601-965-4128, email counselor@belhaven.edu, Student Center 2nd floor. Student Care and the Think Center (Library 1st floor, 601-968-8865, studentcare@belhaven.edu) handle tutoring, the Writing Lab, advising and disability accommodations. In a crisis call or text 988, or call 911 in an emergency."
+ }
+]

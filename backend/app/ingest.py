@@ -1,0 +1,93 @@
+"""Load content into the database and (re)build the search index.
+
+    python -m app.ingest            # load seed knowledge base, embed, rebuild
+    python -m app.ingest --embed    # only compute missing embeddings
+"""
+from __future__ import annotations
+
+import json
+import logging
+import sys
+
+from sqlalchemy import select
+
+from .config import settings
+from .db import Chunk, SessionLocal, init_db
+from .llm import get_embedder
+from .retrieval import index
+
+log = logging.getLogger(__name__)
+
+
+def load_seed(force: bool = False) -> int:
+    """Insert the hand-checked seed knowledge base plus passages generated from the structured data
+    (programs, office directory). Crawled content for the same URL takes priority over seed text."""
+    from .features import passages
+    data = json.loads(settings.SEED_FILE.read_text(encoding="utf-8")) + passages()
+    n = 0
+    with SessionLocal() as s:
+        if not force and s.scalar(select(Chunk.id).limit(1)) is not None:
+            return 0
+        crawled = {u for (u,) in s.execute(select(Chunk.url).where(Chunk.source == "crawl").distinct())}
+        for d in data:
+            if d["url"] in crawled and not d["id"].startswith(("office-", "programs-")):
+                continue
+            key = f"seed:{d['id']}"
+            row = s.scalar(select(Chunk).where(Chunk.key == key))
+            if row is None:
+                row = Chunk(key=key)
+                s.add(row)
+            row.url, row.title, row.category = d["url"], d["title"], d["cat"]
+            row.audiences = ",".join(d.get("audiences", ["all"]))
+            row.text, row.updated_label, row.source = d["text"], d.get("updated", ""), "seed"
+            row.embedding = None
+            n += 1
+        s.commit()
+    return n
+
+
+def embed_missing() -> int:
+    emb = get_embedder()
+    if emb.name == "none":
+        return 0
+    with SessionLocal() as s:
+        rows = list(s.scalars(select(Chunk).where(Chunk.embedding.is_(None))))
+        if not rows:
+            return 0
+        vecs = emb.embed([f"{r.title}\n{r.text}" for r in rows])
+        if not vecs:
+            return 0
+        for r, v in zip(rows, vecs):
+            r.embedding = json.dumps(v)
+        s.commit()
+        return len(rows)
+
+
+def rebuild_index() -> int:
+    from .redact import refresh_allowlist
+    with SessionLocal() as s:
+        rows = list(s.scalars(select(Chunk)))
+    index.build(rows)
+    refresh_allowlist(r.text for r in rows)  # published contacts that redaction must keep
+    return len(rows)
+
+
+def bootstrap() -> dict:
+    init_db()
+    seeded = load_seed()
+    try:
+        embedded = embed_missing()
+    except Exception as e:
+        log.warning("Embedding failed, continuing with keyword search only: %s", e)
+        embedded = 0
+    total = rebuild_index()
+    return {"seeded": seeded, "embedded": embedded, "chunks": total, "vectors": index.has_vectors}
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    init_db()
+    if "--embed" not in sys.argv:
+        print("seed rows:", load_seed(force=True))
+    print("embedded:", embed_missing())
+    print("index size:", rebuild_index())
