@@ -1,0 +1,61 @@
+name: Crawl Belhaven public pages
+
+# Runs the polite crawler (robots.txt, 1 request/second, public pages only, no logins) on GitHub's
+# servers and saves the page text to backend/data/crawled_pages.json.gz, which the app loads at startup.
+# Start it by editing backend/crawl.request on the v2 branch (or "Run workflow" in the Actions tab).
+# No schedule on purpose: regular re-crawls only once the university agrees.
+on:
+  workflow_dispatch:
+    inputs:
+      max_pages:
+        description: Most pages to fetch
+        default: "2500"
+  push:
+    branches: [v2]
+    paths: [backend/crawl.request]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: crawl
+  cancel-in-progress: false
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Crawl
+        env:
+          DATABASE_URL: sqlite:////tmp/crawl.db
+          LLM_PROVIDER: none
+          CRAWL_DELAY_SECONDS: "1.0"
+        run: |
+          python -m app.crawl --sitemap --max "${{ github.event.inputs.max_pages || '2500' }}" \
+            --export data/crawled_pages.json.gz 2>&1 | tee /tmp/crawl.log | tail -n 40
+      - name: Summary
+        run: |
+          python - <<'PY'
+          import gzip, json, collections, re
+          pages = json.load(gzip.open("data/crawled_pages.json.gz", "rt"))["pages"]
+          hosts = collections.Counter(re.sub(r"https?://([^/]+).*", r"\1", p["url"]) for p in pages)
+          print("pages:", len(pages), dict(hosts))
+          print("pdfs:", sum(p["url"].lower().endswith(".pdf") for p in pages))
+          PY
+      - name: Save results to the v2 branch
+        run: |
+          git config user.name "BU AI crawl bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/crawled_pages.json.gz
+          git commit -m "Knowledge base: crawled Belhaven public pages ($(date -u +%Y-%m-%d))" || echo "no changes"
+          git pull --rebase origin v2 && git push origin HEAD:v2

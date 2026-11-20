@@ -71,6 +71,7 @@ class Settings:
     ).split(",") if s]
     CRAWL_ALLOWED_HOSTS = [h for h in _env(
         "CRAWL_ALLOWED_HOSTS", "www.belhaven.edu,belhaven.edu,igsupport.belhaven.edu").split(",") if h]
+    CRAWLED_FILE = BASE_DIR / "data" / "crawled_pages.json.gz"   # written by the crawl job, loaded at startup
     CRAWL_MAX_PAGES = int(_env("CRAWL_MAX_PAGES", "400"))
     CRAWL_DELAY_SECONDS = float(_env("CRAWL_DELAY_SECONDS", "1.0"))
     CRAWL_USER_AGENT = _env(

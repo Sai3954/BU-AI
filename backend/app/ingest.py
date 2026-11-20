@@ -26,7 +26,7 @@ def load_seed(force: bool = False) -> int:
     data = json.loads(settings.SEED_FILE.read_text(encoding="utf-8")) + passages()
     n = 0
     with SessionLocal() as s:
-        if not force and s.scalar(select(Chunk.id).limit(1)) is not None:
+        if not force and s.scalar(select(Chunk.id).where(Chunk.source == "seed").limit(1)) is not None:
             return 0
         crawled = {u for (u,) in s.execute(select(Chunk.url).where(Chunk.source == "crawl").distinct())}
         for d in data:
@@ -74,6 +74,8 @@ def rebuild_index() -> int:
 
 def bootstrap() -> dict:
     init_db()
+    from .crawl import load_export
+    crawled = load_export(str(settings.CRAWLED_FILE))  # pages saved by the crawl job (if any)
     seeded = load_seed()
     try:
         embedded = embed_missing()
@@ -81,7 +83,8 @@ def bootstrap() -> dict:
         log.warning("Embedding failed, continuing with keyword search only: %s", e)
         embedded = 0
     total = rebuild_index()
-    return {"seeded": seeded, "embedded": embedded, "chunks": total, "vectors": index.has_vectors}
+    return {"crawled_pages": crawled, "seeded": seeded, "embedded": embedded, "chunks": total,
+            "vectors": index.has_vectors}
 
 
 if __name__ == "__main__":

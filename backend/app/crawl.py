@@ -37,25 +37,32 @@ SKIP_PATH = re.compile(r"(/login|/open\.php|/view\.php|/account|/apply/account|\
 PDF_MAX_BYTES = 15 * 1024 * 1024
 PDF_MAX_PAGES = 80
 
-# URL path -> (category, audiences)
+# URL path -> (category, audiences). More specific patterns first; audiences drive program/level-aware answers.
 RULES = [
     (r"igsupport\.belhaven\.edu.*cid=4|residency", ("Academics", ["international", "graduate", "doctoral"])),
     (r"igsupport\.belhaven\.edu", ("International", ["international", "graduate", "doctoral"])),
     (r"/international/", ("International", ["international"])),
-    (r"/financial-aid/|/aid/|tuition|scholarship", ("Financial Aid", ["prospective", "undergraduate", "graduate", "online"])),
-    (r"/admission/online|/admission/masters|/admission/doctorate", ("Admissions", ["prospective", "online", "graduate", "doctoral"])),
-    (r"/admission/", ("Admissions", ["prospective", "undergraduate"])),
+    (r"dissertation|/doctora|/dba|/phd|/edd|doctor-of", ("Academics", ["doctoral"])),
+    (r"/online/|/adult|/admission/online", ("Admissions", ["online", "prospective"])),
+    (r"/admission/masters|/graduate|/masters|master-of|/mba", ("Admissions", ["graduate", "prospective"])),
+    (r"/admission/doctorate", ("Admissions", ["doctoral", "prospective"])),
+    (r"/financial-aid/|/aid/|tuition|scholarship|/cost|fees|business-office|/payment", ("Financial Aid", ["prospective", "undergraduate", "graduate", "doctoral", "online"])),
+    (r"/admission/|/visit|/apply", ("Admissions", ["prospective", "undergraduate"])),
     (r"/library", ("Library", ["all"])),
-    (r"/career", ("Careers", ["all"])),
+    (r"/career|internship|externship", ("Careers", ["all"])),
     (r"academic-calendar|calendar.*\.pdf|exam-schedule", ("Academics", ["all"])),
-    (r"/calendar|/news/", ("Events", ["all"])),
-    (r"/care/|/health|counsel|wellness|accommodation", ("Wellness", ["all"])),
-    (r"/housing|/dining|/campus/|/university-life/", ("Campus Life", ["prospective", "undergraduate"])),
-    (r"/athletics|blazers\.", ("Campus Life", ["prospective", "undergraduate"])),
-    (r"email|helpdesk|/canvas|technology", ("IT Support", ["all"])),
+    (r"/news/|announce|/calendar|/events", ("Events", ["all"])),
+    (r"/care/|/health|counsel|wellness|accommodation|disabilit|accessib", ("Wellness", ["all"])),
+    (r"safety|security|police|title-ix|titleix|emergency|clery", ("Campus Safety", ["all"])),
+    (r"/athletics|blazers\.|sports", ("Campus Life", ["prospective", "undergraduate"])),
+    (r"/housing|/dining|/residence|/campus-life|/university-life/|/student-life|organization|/clubs|/ministry", ("Campus Life", ["prospective", "undergraduate"])),
+    (r"email|helpdesk|/canvas|technology|/it/|computer", ("IT Support", ["all"])),
     (r"/alumni", ("Alumni", ["alumni"])),
-    (r"/faculty-staff|/about/contact", ("Student Services", ["faculty", "all"])),
-    (r"/academics/|/registrar|catalog", ("Academics", ["all"])),
+    (r"/faculty-staff|/hr/|human-resources|employment|/faculty/", ("Faculty & Staff", ["faculty"])),
+    (r"handbook|policy|policies|catalog|/registrar|transcript|graduation|commencement", ("Policies & Registrar", ["all"])),
+    (r"publication|research|journal|/press", ("Research", ["graduate", "doctoral", "faculty"])),
+    (r"/about/contact|directory|/offices", ("Student Services", ["all"])),
+    (r"/academics/|/programs?/|/majors|/minors", ("Academics", ["all"])),
 ]
 UPDATED = re.compile(r"Last Updated\s+([\w ]+?ago)", re.I)
 
@@ -191,12 +198,43 @@ def fetch(client: httpx.Client, url: str) -> tuple[httpx.Response | None, str]:
     return None, url
 
 
-def crawl(seeds: list[str], max_pages: int) -> dict:
+def sitemap_urls(client: httpx.Client, host: str, limit: int = 5000) -> list[str]:
+    """Page URLs listed in the host's sitemap(s), from robots.txt "Sitemap:" lines or /sitemap.xml."""
+    found, todo, done = [], [], set()
+    try:
+        r = client.get(f"https://{host}/robots.txt")
+        todo += [ln.split(":", 1)[1].strip() for ln in r.text.splitlines() if ln.lower().startswith("sitemap:")]
+    except Exception:
+        pass
+    todo = todo or [f"https://{host}/sitemap.xml"]
+    while todo and len(found) < limit:
+        sm = todo.pop()
+        if sm in done or urlparse(sm).netloc.lower() not in settings.CRAWL_ALLOWED_HOSTS:
+            continue
+        done.add(sm)
+        try:
+            r = client.get(sm)
+            if r.status_code != 200:
+                continue
+            locs = re.findall(r"<loc>\s*([^<\s]+)\s*</loc>", r.text)
+        except Exception:
+            continue
+        for loc in locs:
+            (todo if loc.lower().endswith(".xml") else found).append(loc.replace("&amp;", "&"))
+    return [u for u in dict.fromkeys(found) if allowed(u)][:limit]
+
+
+def crawl(seeds: list[str], max_pages: int, use_sitemap: bool = False) -> dict:
     init_db()
     robots: dict[str, RobotFileParser] = {}
     seen, queue = set(), deque((u, "") for u in seeds)
     stats = {"fetched": 0, "changed": 0, "errors": 0}
     with httpx.Client(headers={"User-Agent": settings.CRAWL_USER_AGENT}, follow_redirects=False, timeout=20) as client:
+        if use_sitemap:
+            for host in settings.CRAWL_ALLOWED_HOSTS:
+                urls = sitemap_urls(client, host)
+                stats[f"sitemap:{host}"] = len(urls)
+                queue.extend((u, "sitemap") for u in urls)
         while queue and stats["fetched"] < max_pages:
             url, parent = queue.popleft()
             if url in seen or not allowed(url):
@@ -264,12 +302,60 @@ def crawl(seeds: list[str], max_pages: int) -> dict:
     return stats
 
 
+def export_pages(path: str) -> int:
+    """Write every crawled page (url, title, updated label, full text) to a gzipped JSON file."""
+    import gzip
+    import json
+    with SessionLocal() as s:
+        pages = {p.url: p for p in s.scalars(select(Page))}
+        by_url: dict[str, list[Chunk]] = {}
+        for c in s.scalars(select(Chunk).where(Chunk.source == "crawl").order_by(Chunk.id)):
+            by_url.setdefault(c.url, []).append(c)
+    out = []
+    for url, chunks in by_url.items():
+        p = pages.get(url)
+        title = p.title if p else chunks[0].title
+        body = []
+        for c in chunks:
+            head = c.title[len(title) + 3:] if c.title.startswith(title + " - ") else ""
+            body.append((f"#{head}\n" if head else "") + c.text)
+        out.append({"url": url, "title": title, "updated": p.updated_label if p else "",
+                    "text": "\n".join(body)})
+    with gzip.open(path, "wt", encoding="utf-8") as f:
+        json.dump({"pages": out}, f, ensure_ascii=False)
+    return len(out)
+
+
+def load_export(path: str) -> int:
+    """Load pages saved by export_pages (only into an empty crawl store). Returns pages loaded."""
+    import gzip
+    import json
+    import os
+    if not os.path.exists(path):
+        return 0
+    with SessionLocal() as s:
+        if s.scalar(select(Chunk.id).where(Chunk.source == "crawl").limit(1)) is not None:
+            return 0
+    with gzip.open(path, "rt", encoding="utf-8") as f:
+        data = json.load(f)
+    n = 0
+    for p in data.get("pages", []):
+        if p.get("text") and allowed(p["url"]):
+            store_page(p["url"], p["title"], p["text"], p.get("updated", ""), 200)
+            n += 1
+    return n
+
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     ap = argparse.ArgumentParser()
     ap.add_argument("--max", type=int, default=settings.CRAWL_MAX_PAGES)
     ap.add_argument("--url", action="append", help="crawl only these URLs (repeatable)")
+    ap.add_argument("--sitemap", action="store_true", help="also queue every page listed in the sitemaps")
+    ap.add_argument("--export", help="after crawling, save all crawled pages to this .json.gz file")
     a = ap.parse_args()
     seeds = a.url or settings.CRAWL_SEEDS
     limit = len(a.url) if a.url and a.max == settings.CRAWL_MAX_PAGES else a.max
-    print(crawl(seeds, limit))
+    print(crawl(seeds, limit, use_sitemap=a.sitemap))
+    if a.export:
+        print("exported pages:", export_pages(a.export))

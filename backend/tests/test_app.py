@@ -610,3 +610,24 @@ def test_guard_cited_lead_in_covers_the_list_below():
     docs = [Doc(1, "u1", "Library", "x", ["all"], "Hours: Monday-Friday 7:30 a.m.-10 p.m., Saturday 1:30-10 p.m.", "")]
     r = guard.check("Regular hours are: [1]\n- Monday-Friday: 7:30 a.m.-10 p.m.\n- Saturday: 1:30-10 p.m.", docs)
     assert not r["uncited"] and not r["unverified"]
+
+
+def test_crawl_export_roundtrip_and_tagging(tmp_path):
+    from app import crawl
+    from app.db import Chunk, SessionLocal
+    from sqlalchemy import select
+    assert crawl.classify("https://www.belhaven.edu/academics/business/online/doctor-of-business-administration.html")[1] == ["doctoral"]
+    assert crawl.classify("https://www.belhaven.edu/campus-safety/index.html")[0] == "Campus Safety"
+    assert crawl.classify("https://www.belhaven.edu/student-handbook.pdf")[0] == "Policies & Registrar"
+    url = "https://www.belhaven.edu/test-roundtrip/index.html"
+    crawl.store_page(url, "Roundtrip Page", "#Hours\nOpen Monday to Friday, 8 a.m. to 5 p.m., for all students. " * 3,
+                     "current site", 200)
+    out = tmp_path / "pages.json.gz"
+    assert crawl.export_pages(str(out)) >= 1
+    import gzip, json
+    pages = json.load(gzip.open(out, "rt"))["pages"]
+    assert any(p["url"] == url and "Open Monday" in p["text"] for p in pages)
+    with SessionLocal() as s:  # loading is skipped while crawled content already exists
+        assert s.scalar(select(Chunk.id).where(Chunk.source == "crawl").limit(1)) is not None
+    assert crawl.load_export(str(out)) == 0
+    assert crawl.load_export(str(tmp_path / "missing.json.gz")) == 0
