@@ -1,0 +1,39 @@
+# v2 PREVIEW (separate from the live demo). In Render: New > Blueprint > this repository,
+# Branch: v2, Blueprint Path: render.v2.yaml. Creates bu-ai-v2-api and bu-ai-v2-web on the free plan.
+# No separate database: the knowledge base is rebuilt at each start from backend/data/crawled_pages.json.gz
+# (and the seed file), so nothing needs to persist. Question logs reset when the service restarts.
+services:
+  - type: web
+    name: bu-ai-v2-api
+    runtime: docker
+    rootDir: backend
+    branch: v2
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: CORS_ORIGINS
+        value: https://bu-ai-v2-web.onrender.com
+      - key: TRUST_PROXY
+        value: "true"
+      - key: EMBEDDINGS_PROVIDER
+        value: local            # semantic search runs on the server itself (no extra key or cost)
+      - key: ADMIN_TOKEN
+        sync: false             # can be the same strong token as the live site
+      - key: LLM_PROVIDER
+        value: anthropic
+      - key: ANTHROPIC_API_KEY
+        sync: false             # paste in the Render dashboard only, never in code or chat
+      - key: DAILY_AI_LIMIT
+        value: "150"            # lower cap for the preview
+      - key: CHAT_RATE_PER_MINUTE
+        value: "12"
+
+  - type: web
+    name: bu-ai-v2-web
+    runtime: docker
+    rootDir: frontend
+    branch: v2
+    plan: free
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        value: https://bu-ai-v2-api.onrender.com
