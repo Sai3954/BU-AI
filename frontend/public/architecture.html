@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BU AI – How it works</title>
+<style>
+  :root{
+    --ink:#14213d; --muted:#5b6478; --line:#d9dee8; --bg:#f6f7fb; --card:#fff;
+    --navy:#0b2a5b; --gold:#c9a227; --teal:#0f766e; --violet:#5b3fb5; --rose:#b4234a; --amber:#b7791f;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg)}
+  header{background:var(--navy);color:#fff;padding:22px 28px 18px}
+  header h1{margin:0;font-size:24px;letter-spacing:.2px}
+  header p{margin:4px 0 0;color:#c9d4ea;font-size:14px}
+  .wrap{max-width:1220px;margin:0 auto;padding:18px 20px 40px;display:grid;grid-template-columns:1fr 340px;gap:18px}
+  @media (max-width:980px){.wrap{grid-template-columns:1fr}}
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+  .toolbar button,.toolbar select{font:inherit;border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 12px;cursor:pointer}
+  .toolbar button.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .toolbar button:focus-visible,.node:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  main{min-width:0} .toolbar select{max-width:100%}
+  .stage{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;overflow-x:auto}
+  .lanes{display:grid;grid-template-columns:repeat(5,minmax(150px,1fr));gap:12px;min-width:820px;position:relative}
+  .lane h3{margin:0 0 8px;font-size:11.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)}
+  .node{display:block;width:100%;text-align:left;border:1px solid var(--line);border-left:5px solid var(--c,var(--navy));
+        background:#fff;border-radius:10px;padding:10px 11px;margin-bottom:10px;cursor:pointer;font:inherit;color:inherit;
+        transition:transform .15s, box-shadow .15s, background .2s}
+  .node:hover{transform:translateY(-1px);box-shadow:0 3px 10px rgba(20,33,61,.08)}
+  .node b{display:block;font-size:14px}
+  .node span{display:block;font-size:12.5px;color:var(--muted);margin-top:2px}
+  .node.sel{background:#f3f6fd;box-shadow:0 0 0 2px var(--c,var(--navy)) inset}
+  .node.lit{background:#fff8e1;box-shadow:0 0 0 2px var(--gold) inset}
+  .node{position:relative}
+  .lane .node.new{padding-right:38px}
+  .node.new::after{content:"v2";position:absolute;top:9px;right:8px;font-size:10.5px;font-weight:700;color:#fff;background:var(--teal);border-radius:6px;padding:1px 6px}
+  .c-src{--c:var(--muted)} .c-ing{--c:var(--teal)} .c-kb{--c:var(--violet)} .c-ret{--c:var(--navy)} .c-gen{--c:var(--rose)} .c-safe{--c:var(--amber)}
+  .rails{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px;min-width:820px}
+  .rail{border:1px dashed var(--line);border-radius:10px;padding:10px 12px;background:#fbfcfe}
+  .rail h3{margin:0 0 6px;font-size:11.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)}
+  .rail .node{display:inline-block;width:auto;margin:0 6px 6px 0;padding:6px 10px}
+  .rail .node span{display:none}
+  .rail .node.new::after{position:static;margin:0 0 0 6px;display:inline-block}
+  aside{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;position:sticky;top:12px;align-self:start}
+  aside h2{margin:0 0 6px;font-size:19px}
+  aside .tag{display:inline-block;font-size:11.5px;font-weight:600;color:#fff;background:var(--c,var(--navy));border-radius:6px;padding:2px 8px;margin-bottom:8px}
+  aside ul{padding-left:18px;margin:8px 0}
+  aside li{margin:3px 0}
+  aside .why{background:#f6f7fb;border-radius:8px;padding:9px 11px;font-size:13.5px;margin-top:10px}
+  .trace{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+  .trace h3{margin:0 0 6px;font-size:15px}
+  .steps{list-style:none;padding:0;margin:0;counter-reset:s}
+  .steps li{counter-increment:s;padding:6px 0 6px 34px;position:relative;color:#9aa3b5;transition:color .25s}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:5px;width:24px;height:24px;border-radius:50%;background:#e8ebf2;
+                    color:#7b8496;font-size:12px;font-weight:700;display:grid;place-items:center}
+  .steps li.on{color:var(--ink)} .steps li.on::before{background:var(--gold);color:#14213d}
+  .steps code{background:#f1f3f8;border-radius:4px;padding:0 4px;font-size:12.5px}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+  @media (max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px}
+  .stat b{display:block;font-size:22px;color:var(--navy)} .stat span{font-size:12.5px;color:var(--muted)}
+  footer{max-width:1220px;margin:0 auto;padding:0 20px 30px;color:var(--muted);font-size:12.5px}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <h1>How BU AI answers a question</h1>
+  <p>Click any box to see what it does. Press “Trace a question” to follow one answer from the website to the student.</p>
+</header>
+
+<div class="wrap">
+  <main>
+    <div class="toolbar">
+      <select id="ex" aria-label="Example question">
+        <option value="0">“As a DBA student, when is my next residency?”</option>
+        <option value="1">“How do I pay my bill?” (said in my own words)</option>
+        <option value="2">“My visa was revoked, can I keep working on CPT?”</option>
+        <option value="3">“What's tuition per credit hour for the MBA?”</option>
+      </select>
+      <button class="primary" id="play">▶ Trace a question</button>
+      <button id="reset">Reset</button>
+    </div>
+
+    <div class="stage">
+      <div class="lanes">
+        <div class="lane"><h3>1 · Public sources</h3>
+          <button class="node c-src" data-k="pages"><b>Belhaven public web pages</b><span>Programs, policies, offices, FAQs</span></button>
+          <button class="node c-src new" data-k="pdfs"><b>Catalogs, handbooks &amp; PDFs</b><span>Academic catalog, student handbook</span></button>
+          <button class="node c-src new" data-k="sitemap"><b>Sitemap discovery</b><span>Finds pages links alone miss</span></button>
+        </div>
+        <div class="lane"><h3>2 · Collect &amp; prepare</h3>
+          <button class="node c-ing" data-k="crawler"><b>Polite crawler</b><span>robots.txt · 1 page/sec · public only</span></button>
+          <button class="node c-ing new" data-k="tagging"><b>Tagging</b><span>Topic · audience · level · catalog year</span></button>
+          <button class="node c-ing" data-k="chunking"><b>Passages</b><span>Pages split into short, citable pieces</span></button>
+        </div>
+        <div class="lane"><h3>3 · Knowledge base</h3>
+          <button class="node c-kb" data-k="kb"><b>Knowledge store</b><span>Text, link, page date, tags</span></button>
+          <button class="node c-kb" data-k="kw"><b>Keyword index (BM25)</b><span>Exact terms: CPT, I-20, FAFSA</span></button>
+          <button class="node c-kb new" data-k="vec"><b>Meaning index</b><span>Semantic embeddings, on our server</span></button>
+        </div>
+        <div class="lane"><h3>4 · Find the right pages</h3>
+          <button class="node c-ret" data-k="privacy"><b>Privacy filter</b><span>Removes names, IDs, emails first</span></button>
+          <button class="node c-ret" data-k="hybrid"><b>Hybrid search</b><span>Keywords + meaning, fused</span></button>
+          <button class="node c-ret new" data-k="level"><b>Level &amp; current-first ranking</b><span>DBA ≠ undergrad · newest catalog wins</span></button>
+          <button class="node c-ret new" data-k="conflict"><b>Conflict check</b><span>Do the sources disagree?</span></button>
+        </div>
+        <div class="lane"><h3>5 · Answer</h3>
+          <button class="node c-gen" data-k="llm"><b>AI writes the answer</b><span>Only from the sources, cited [1][2]</span></button>
+          <button class="node c-gen" data-k="checker"><b>Answer checker</b><span>Every number &amp; citation verified</span></button>
+          <button class="node c-gen" data-k="ui"><b>Student sees</b><span>Answer · links · page dates · warnings</span></button>
+        </div>
+      </div>
+      <div class="rails">
+        <div class="rail"><h3>Safety built in</h3>
+          <button class="node c-safe" data-k="dso"><b>Immigration → DSO</b><span></span></button>
+          <button class="node c-safe" data-k="crisis"><b>Crisis → 988</b><span></span></button>
+          <button class="node c-safe" data-k="offtopic"><b>Off-topic refused</b><span></span></button>
+          <button class="node c-safe" data-k="limits"><b>Usage limits</b><span></span></button>
+        </div>
+        <div class="rail"><h3>For university staff</h3>
+          <button class="node c-safe" data-k="monitor"><b>Content monitor</b><span></span></button>
+          <button class="node c-safe" data-k="analytics"><b>Question analytics</b><span></span></button>
+          <button class="node c-safe new" data-k="refresh"><b>Scheduled refresh</b><span></span></button>
+          <button class="node c-safe" data-k="tests"><b>100-question test suite</b><span></span></button>
+        </div>
+      </div>
+    </div>
+
+    <section class="trace" aria-live="polite">
+      <h3 id="tq">Trace</h3>
+      <ol class="steps" id="steps"></ol>
+    </section>
+
+    <div class="stats">
+      <div class="stat"><b>95 / 100</b><span>Live AI test answers graded correct (v1)</span></div>
+      <div class="stat"><b>100 / 100</b><span>Automated checks pass on every change</span></div>
+      <div class="stat"><b>0</b><span>Student records used — public pages only</span></div>
+      <div class="stat"><b>9 of 10</b><span>Changed top results in v2 testing were better; none worse</span></div>
+    </div>
+  </main>
+
+  <aside id="panel" aria-live="polite">
+    <span class="tag">Overview</span>
+    <h2>Retrieval-augmented generation (RAG)</h2>
+    <p>The AI never answers from memory. For every question it first <b>finds</b> the relevant official pages, then <b>writes</b> an answer using only those pages, then <b>checks</b> the answer against them before the student sees it.</p>
+    <div class="why"><b>Boxes marked <span style="background:var(--teal);color:#fff;border-radius:5px;padding:0 5px;font-size:11px">v2</span></b> are new in the stronger version being tested now.</div>
+  </aside>
+</div>
+
+<footer>Independent prototype · Not an official Belhaven University service · Uses public pages only; no student records.</footer>
+
+<script>
+const INFO = {
+  pages:{t:"Belhaven public web pages",g:"Public sources",c:"--muted",p:"Everything a student could read on the public website: admissions, programs, tuition, financial aid, international (F-1), doctoral research support, faculty & staff resources, library, career services and internships, athletics, accessibility, alumni, scholarships, student organizations, campus safety, policies and calendars.",w:"Same information students already have — just found and summarized faster."},
+  pdfs:{t:"Catalogs, handbooks & PDFs",g:"Public sources",c:"--muted",p:"Academic catalogs, student handbooks and policy PDFs are read as text. Each passage remembers the catalog year it came from.",w:"Many detailed rules (credit hours, residency, grading) live only in PDFs."},
+  sitemap:{t:"Sitemap discovery",g:"Public sources",c:"--muted",p:"The crawler reads the site's own sitemap list, so it reaches pages that menus don't link to.",w:"Wider coverage without guessing addresses."},
+  crawler:{t:"Polite crawler",g:"Collect & prepare",c:"--teal",p:"Follows robots.txt, fetches about one page per second, never logs in, and only reads public belhaven.edu pages.",w:"Respects the university's servers and its rules. Regular refresh stays off until the university approves it."},
+  tagging:{t:"Tagging",g:"Collect & prepare",c:"--teal",p:"Each page is tagged with topic (e.g. Financial Aid), audience (international, online, faculty…), level (undergraduate, graduate, doctoral) and catalog year.",w:"Lets the search tell a DBA rule from an undergraduate rule."},
+  chunking:{t:"Passages",g:"Collect & prepare",c:"--teal",p:"Long pages are split into short passages, each with its own link and page date.",w:"Citations point to the exact passage, not a 40-page PDF."},
+  kb:{t:"Knowledge store",g:"Knowledge base",c:"--violet",p:"A database of passages with their source link, title, page date and tags. It can be rebuilt from scratch at any time.",w:"One place to see what the AI knows — and what is out of date."},
+  kw:{t:"Keyword index (BM25)",g:"Knowledge base",c:"--violet",p:"Classic search ranking for exact terms and form names: CPT, OPT, I-20, FAFSA, BlazeNet, plus a list of everyday synonyms (bill → payment).",w:"Exact terms must never be missed."},
+  vec:{t:"Meaning index",g:"Knowledge base",c:"--violet",p:"A small open embedding model runs on our own server and turns each passage into numbers that capture meaning, so “how do I pay my bill” finds the payment-plans page.",w:"No extra API cost and no text sent to another company for search."},
+  privacy:{t:"Privacy filter",g:"Find the right pages",c:"--navy",p:"Before anything else, names, student IDs, SEVIS numbers, emails, phones and addresses are replaced with tags like [NAME].",w:"Personal details never reach the search, the logs or the AI."},
+  hybrid:{t:"Hybrid search",g:"Find the right pages",c:"--navy",p:"Keyword and meaning results are combined (reciprocal rank fusion). A strong meaning match can stand alone; a weak one needs keyword support, which keeps off-topic questions out.",w:"On the 100-question test, 9 of the 10 changed top sources were better and none were worse."},
+  level:{t:"Level & current-first ranking",g:"Find the right pages",c:"--navy",p:"The question (“my DBA residency”) or the chosen role sets the level. Pages for that level rank higher; pages only for another level drop — but only when a page for the student's own level exists. Older catalog years and long-unchanged pages rank lower.",w:"Answers fit the student's program and use the newest rules."},
+  conflict:{t:"Conflict check",g:"Find the right pages",c:"--navy",p:"Looks at the sources chosen for this answer. If two pages give different values for the same fact (tuition per credit hour, minimum GPA, TOEFL score…), the AI is told and the student sees “Official pages differ”.",w:"Better to show a disagreement than to hide it."},
+  llm:{t:"AI writes the answer",g:"Answer",c:"--rose",p:"A large language model writes a short answer using only the numbered sources, citing each sentence. If the sources don't answer it, it says so and gives the right office.",w:"Readable answers, with no invented policies."},
+  checker:{t:"Answer checker",g:"Answer",c:"--rose",p:"Every figure, date, phone and citation in the answer is matched back to the cited source. Unsupported promises (“you are guaranteed…”) are flagged.",w:"A second line of defence against mistakes."},
+  ui:{t:"What the student sees",g:"Answer",c:"--rose",p:"The answer, clickable source links with page dates, and any notes: pages differ, check with the DSO, or a page may be out of date. Thumbs up/down feeds the dashboard.",w:"Students can always check the official page themselves."},
+  dso:{t:"Immigration → DSO",g:"Safety",c:"--amber",p:"Status problems (SEVIS termination, visa revoked, unauthorized work) get general information plus a clear “talk to your DSO first” with the ticket link.",w:"The AI never decides someone's eligibility or status."},
+  crisis:{t:"Crisis → 988",g:"Safety",c:"--amber",p:"Mentions of self-harm show 988, 911 and Belhaven counseling contacts at once.",w:""},
+  offtopic:{t:"Off-topic refused",g:"Safety",c:"--amber",p:"Sports scores, homework, coding and weather get a polite “I only answer Belhaven questions”.",w:"Keeps cost down and avoids academic-integrity problems."},
+  limits:{t:"Usage limits",g:"Safety",c:"--amber",p:"Per-minute and daily AI limits, one answer at a time per person.",w:"Predictable monthly cost."},
+  monitor:{t:"Content monitor",g:"Staff",c:"--amber",p:"Finds stale pages, broken links and facts the website states two different ways, so offices can fix the source.",w:"Improves the website itself, not just the chatbot."},
+  analytics:{t:"Question analytics",g:"Staff",c:"--amber",p:"Top topics, unanswered questions and helpful rate — without personal details.",w:"Shows offices what students keep asking."},
+  refresh:{t:"Scheduled refresh",g:"Staff",c:"--amber",p:"The same crawler can re-read the site on a schedule (e.g. weekly) and rebuild the knowledge base. Switched off until the university gives permission.",w:"Keeps answers current without manual work."},
+  tests:{t:"100-question test suite",g:"Staff",c:"--amber",p:"Every change is run against 100 real-style questions, including trick, off-topic, privacy and crisis cases.",w:"Changes can't quietly make answers worse."}
+};
+const TRACES = [
+  {q:"As a DBA student, when is my next residency?",s:[
+    ["privacy","No personal details to remove."],
+    ["hybrid","Keyword hits on <code>residency</code>; the meaning index adds doctoral calendar pages."],
+    ["level","Level read from “DBA” → <b>doctoral</b>. Doctoral residency pages rise; undergraduate calendar pages drop."],
+    ["conflict","Sources agree on dates — no warning."],
+    ["llm","Answer cites the doctoral residency page [1] and academic calendar [2]."],
+    ["checker","Every date found in its cited source ✓"],
+    ["ui","Student sees the dates, two links and the page dates."]]},
+  {q:"How do I pay my bill?",s:[
+    ["privacy","Nothing to remove."],
+    ["kw","“bill” is a synonym for <code>payment</code>, <code>tuition</code>."],
+    ["vec","Meaning match: “Payments, payment plans and wires” (similarity 0.57)."],
+    ["hybrid","Both indexes agree → payments page ranks first."],
+    ["llm","Short steps with links to BlazeNet payment and payment plans."],
+    ["ui","Answer with the official payments page."]]},
+  {q:"My visa was revoked, can I keep working on CPT?",s:[
+    ["privacy","Nothing to remove."],
+    ["hybrid","Meaning match puts “Visa revocation or SEVIS termination: first steps” first (keyword-only search ranked it second)."],
+    ["dso","Status-risk question detected → DSO safety rule switched on."],
+    ["llm","General information only, cited; no ruling on this student's status."],
+    ["checker","Checks no promise like “you can keep working”."],
+    ["ui","Red box: “Talk to your DSO first” with the ticket link."]]},
+  {q:"What's tuition per credit hour for the MBA?",s:[
+    ["level","“MBA” → <b>graduate</b> level; undergraduate tuition tables drop."],
+    ["hybrid","Graduate tuition page and newest catalog fee page found."],
+    ["conflict","If an older page lists a different rate for the same year, it is flagged."],
+    ["llm","Gives the current rate, cites it, and mentions any difference."],
+    ["ui","Shows “Official pages differ” only when they really do."]]}
+];
+const panel = document.getElementById("panel");
+const nodes = [...document.querySelectorAll(".node")];
+function show(k){
+  const i = INFO[k]; if(!i) return;
+  nodes.forEach(n=>n.classList.toggle("sel", n.dataset.k===k));
+  panel.style.setProperty("--c", `var(${i.c})`);
+  panel.innerHTML = `<span class="tag" style="--c:var(${i.c})">${i.g}</span><h2>${i.t}</h2><p>${i.p}</p>` +
+    (i.w ? `<div class="why"><b>Why it matters:</b> ${i.w}</div>` : "");
+}
+nodes.forEach(n=>n.addEventListener("click",()=>show(n.dataset.k)));
+const steps = document.getElementById("steps"), tq = document.getElementById("tq");
+let timer = null;
+function load(ix){
+  clearInterval(timer); nodes.forEach(n=>n.classList.remove("lit"));
+  const t = TRACES[ix]; tq.textContent = "Trace: “" + t.q + "”";
+  steps.innerHTML = t.s.map(([k,txt])=>`<li data-k="${k}"><b>${INFO[k].t}.</b> ${txt}</li>`).join("");
+  return t;
+}
+function play(){
+  const t = load(+document.getElementById("ex").value); let i = 0;
+  const lis = [...steps.children];
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const step = ()=>{
+    if(i >= lis.length){ clearInterval(timer); return; }
+    lis[i].classList.add("on");
+    const k = t.s[i][0];
+    nodes.forEach(n=>n.classList.toggle("lit", n.dataset.k===k));
+    show(k); i++;
+  };
+  if(reduce){ while(i < lis.length) step(); return; }
+  step(); timer = setInterval(step, 1600);
+}
+document.getElementById("play").onclick = play;
+document.getElementById("reset").onclick = ()=>{ load(+document.getElementById("ex").value); nodes.forEach(n=>n.classList.remove("sel")); };
+document.getElementById("ex").onchange = e=>load(+e.target.value);
+load(0);
+</script>
+</body>
+</html>

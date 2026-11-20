@@ -194,6 +194,13 @@ export default function Home() {
                   {m.status === "searching" && <p className="muted">Searching university pages…</p>}
                   {m.text && <Answer text={m.text} sources={m.sources} />}
                   {m.status === "done" && m.checks && <CheckNote c={m.checks} />}
+                  {m.status === "done" && m.flags?.conflicts && m.flags.conflicts.length > 0 && (
+                    <p className="note conflict">
+                      <b>Official pages differ:</b>{" "}
+                      {m.flags.conflicts.map(c => `${c.fact}: ` + c.values.map(v => `${v.value} (source ${v.sources.join(", ")})`).join(" vs ")).join("; ")}.
+                      {" "}Please confirm with the office before relying on it.
+                    </p>
+                  )}
                   {m.status === "done" && <SourceList sources={m.sources} text={m.text} />}
                   {m.status === "done" && m.queryId && (
                     <div className="rate">

@@ -13,7 +13,8 @@ function apiBase(): string {
 export const API = apiBase();
 
 export type Source = { title: string; url: string; category: string; updated: string; text: string };
-export type Flags = { high_risk: boolean; crisis: boolean; pii_removed?: string[] };
+export type Conflict = { fact: string; values: { value: string; sources: number[] }[] };
+export type Flags = { high_risk: boolean; crisis: boolean; pii_removed?: string[]; level?: string; conflicts?: Conflict[] };
 export type Meta = {
   app_name: string; tagline: string; university: string; roles: string[];
   categories: Record<string, number>; sources: number; passages: number;
