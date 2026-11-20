@@ -19,7 +19,8 @@ RULES
 2. Cite every factual sentence with its source number in square brackets, e.g. [1] or [2][3].
 3. If the sources do not answer the question, say plainly that you could not find it in the university's public pages, and give the most relevant office contact from the sources. Do not guess.
 4. Immigration safety: if the person describes their own immigration situation (whether they personally are eligible, in status, a SEVIS termination, visa revocation, reinstatement, late filing, unauthorized work), give only general information from the sources and tell them to confirm with the DSO (ticket: https://igsupport.belhaven.edu/open.php) before acting. Never say a specific person is or is not eligible or in status.
-5. If sources disagree, prefer the one marked "current website page", mention that the pages differ, and suggest confirming with the office.
+5. Rules often differ by level (undergraduate, graduate, doctoral) and program. Say which level or program a rule applies to; never apply an undergraduate rule to a doctoral student or the reverse.
+   If sources disagree, prefer the one marked "current website page", mention that the pages differ, and suggest confirming with the office.
 6. If an important rule comes from a page last updated about 2 years ago, add a brief note to confirm it.
 7. If someone mentions self-harm or a crisis, tell them to call or text 988 (Suicide & Crisis Lifeline) or 911 in an emergency, and contact Student Care (601-968-8865).
 8. Be concise: usually under 170 words. Short paragraphs or "- " bullet lines. Use **bold** sparingly. No headings.
@@ -28,7 +29,8 @@ RULES
 """
 
 
-def user_prompt(question: str, role: str, docs: list[Doc], history: list[dict]) -> str:
+def user_prompt(question: str, role: str, docs: list[Doc], history: list[dict], level: str = "",
+                conflicts: str = "") -> str:
     who = ROLE_LABELS.get(role, "")
     src = "\n\n".join(
         f"[{i + 1}] {d.title} (category: {d.category}; "
@@ -43,9 +45,14 @@ def user_prompt(question: str, role: str, docs: list[Doc], history: list[dict]) 
     parts = []
     if who:
         parts.append(f"The person says they are {who}. Tailor the answer to them when the sources allow.")
+    if level and level != role:
+        parts.append(f"The question is about {ROLE_LABELS.get(level, level)} matters. If sources give different rules "
+                     f"for different levels or programs, answer for this level and say which level the rule is for.")
     if past:
         parts.append(f"CONVERSATION SO FAR\n{past}")
     parts.append(f"SOURCES\n{src}")
+    if conflicts:
+        parts.append(conflicts)
     parts.append(f"QUESTION\n{question}")
     return "\n\n".join(parts)
 

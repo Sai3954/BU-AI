@@ -24,7 +24,8 @@ from .ingest import bootstrap, embed_missing, rebuild_index
 from .llm import get_embedder, get_provider
 from .prompts import extractive_answer, system_prompt, user_prompt
 from .redact import redact
-from .retrieval import ROLES, index, is_crisis, is_high_risk
+from .retrieval import ROLES, detect_level, index, is_crisis, is_high_risk
+from .conflicts import conflict_note, find_conflicts
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("api")
@@ -265,7 +266,10 @@ def chat(req: ChatRequest, request: Request):
     docs = index.search(sq, role=role, qvec=qvec, category=req.category)
     if len(docs) < 3 and prev:
         docs = index.search(f"{prev} {sq}", role=role, qvec=qvec, category=req.category)
-    flags = {"high_risk": is_high_risk(q), "crisis": is_crisis(q), "pii_removed": pii}
+    level = detect_level(sq, role)
+    conflicts = find_conflicts(docs)
+    flags = {"high_risk": is_high_risk(q), "crisis": is_crisis(q), "pii_removed": pii,
+             "level": level, "conflicts": conflicts}
     ip = client_ip(request)
     if not concurrency.acquire(ip):
         raise HTTPException(429, "Please wait for your current answer to finish.")
@@ -291,7 +295,7 @@ def chat(req: ChatRequest, request: Request):
             yield _sse("sources", {"sources": [d.public() for d in docs], "flags": flags})
             if use_ai:
                 try:
-                    for delta in provider.stream(system_prompt(), user_prompt(q, role, docs, history)):
+                    for delta in provider.stream(system_prompt(), user_prompt(q, role, docs, history, level, conflict_note(conflicts))):
                         answer += delta
                         yield _sse("delta", {"text": delta})
                     checked = guard.check(answer, docs, q)

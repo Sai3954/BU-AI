@@ -48,7 +48,7 @@ SYN = {
     "semester": ["term", "calendar"], "break": ["calendar", "holiday"], "deadline": ["calendar", "date"],
     "transcript": ["registrar"], "graduation": ["commencement", "registrar"], "wifi": ["helpdesk"],
     "event": ["calendar", "events"], "freshman": ["first", "undergraduate", "admission"],
-    "gpa": ["admission"], "bill": ["payment", "tuition"], "pay": ["payment", "blazenet"], "gym": ["fitness"],
+    "gpa": ["admission"], "bill": ["payment", "tuition"], "plan": ["payment"], "pay": ["payment", "blazenet"], "gym": ["fitness"],
     "workout": ["fitness"], "parking": ["security", "campus"], "id": ["security", "student"], "college": ["admission", "undergraduate"], "concert": ["events"], "homecoming": ["events"],
 }
 RISK = re.compile(r"\b(terminat|revok|revocation|out of status|deport|arrest|reinstat|illegal|overstay|"
@@ -56,6 +56,41 @@ RISK = re.compile(r"\b(terminat|revok|revocation|out of status|deport|arrest|rei
                   r"work(ed|ing)? (off[- ]campus )?without (an? )?(cpt|opt|ead|authori[sz]ation|permission)|"
                   r"(am|was) i (still )?(in|out of) status|sevis (record )?(inactive|terminat))", re.I)
 CRISIS = re.compile(r"\b(suicid|kill myself|self[- ]harm|hurt myself|end my life)", re.I)
+
+# The student's level, read from the question itself ("my DBA dissertation") or from the chosen role.
+LEVELS = [
+    ("doctoral", re.compile(r"\b(doctoral|doctorate|dba|ph\.?d|ed\.?d|dissertation|residenc(y|ies)|comps?|"
+                            r"comprehensive exam|prospectus|irb|chair)\b", re.I)),
+    ("graduate", re.compile(r"\b(graduate|grad school|master'?s?|mba|msitm|msl|m\.?ed|mfa|ma in|ms in)\b", re.I)),
+    ("undergraduate", re.compile(r"\b(undergrad\w*|freshm[ae]n|sophomore|junior|senior year|bachelor'?s?|"
+                                 r"first[- ]year|transfer student|high school)\b", re.I)),
+    ("online", re.compile(r"\b(online|distance|remote(ly)?)\b", re.I)),
+]
+LEVEL_NAMES = {"doctoral", "graduate", "undergraduate"}
+YEAR = re.compile(r"\b(20\d\d)\s*[-–/]\s*(?:20)?\d\d\b")
+AGE = re.compile(r"(\d+)\s*years?\s*ago|a year ago", re.I)
+VEC_MIN, VEC_STRONG, VEC_WEIGHT = 0.2, 0.5, 0.8   # cosine: a hit at all / strong enough to stand without keyword overlap
+
+
+def detect_level(q: str, role: str = "") -> str:
+    """Level from the question text first (it is more specific), else from the chosen role."""
+    if re.search(r"\bgraduation\b", q, re.I) and not re.search(r"\bgraduate (student|program|school)", q, re.I):
+        q = re.sub(r"\bgraduation\b", " ", q, flags=re.I)
+    for name, rx in LEVELS:
+        if rx.search(q):
+            return name
+    return role if role in LEVEL_NAMES or role == "online" else ""
+
+
+def _academic_year(d: "Doc") -> int:
+    m = YEAR.search(f"{d.url} {d.title}")
+    return int(m.group(1)) if m else 0
+
+
+def _age_years(label: str) -> int:
+    m = AGE.search(label or "")
+    return 0 if not m else (int(m.group(1)) if m.group(1) else 1)
+
 
 ROLES = ["prospective", "undergraduate", "graduate", "doctoral", "international", "online", "faculty", "alumni"]
 
@@ -164,7 +199,7 @@ class HybridIndex:
         q /= (np.linalg.norm(q) + 1e-9)
         sims = self.vectors @ q
         order = np.argsort(-sims)[:30]
-        return [(int(i), float(sims[i])) for i in order if sims[i] > 0.2]
+        return [(int(i), float(sims[i])) for i in order if sims[i] > VEC_MIN]
 
     def search(self, query: str, role: str = "", qvec: list[float] | None = None, k: int = 6,
                category: str = "") -> list[Doc]:
@@ -175,10 +210,13 @@ class HybridIndex:
             vec = self._vector(qvec)
             if not kw and not vec:
                 return []
-            # Off-topic guard: without vector hits, require that the best keyword matches cover
-            # at least half of the meaningful words in the question.
+            # Off-topic guard: unless the meaning match is strong, require that the best keyword matches
+            # cover at least half of the meaningful words in the question.
             base = set(tokenize(query))
-            if not vec and base:
+            strong_vec = bool(vec) and vec[0][1] >= VEC_STRONG
+            if not strong_vec:
+                vec = [x for x in vec if x[1] >= VEC_STRONG * 0.8]
+            if not strong_vec and base:
                 alts = {w: {w, *(stem(x) for x in SYN.get(w, []))} for w in base}
                 covered = {w for w in base for i, _ in kw[:3] if alts[w] & self.tf[i].keys()}
                 cov = len(covered) / len(base)
@@ -192,11 +230,33 @@ class HybridIndex:
             scores: dict[int, float] = {}
             for rank, (i, _) in enumerate(kw):
                 scores[i] = scores.get(i, 0) + 1 / (60 + rank)
+            # The on-server embedding model is small, so meaning matches count a bit less than exact terms.
             for rank, (i, _) in enumerate(vec):
-                scores[i] = scores.get(i, 0) + 1 / (60 + rank)
+                scores[i] = scores.get(i, 0) + VEC_WEIGHT / (60 + rank)
             kw_score = dict(kw)
             kw_top = kw[0][1] if kw else 0
+            level = detect_level(query, role)
+            vec_top = {i for i, sim in vec[:5] if vec and sim >= vec[0][1] - 0.05}
+            newest = max((_academic_year(self.docs[i]) for i in scores), default=0)
+            def near(i: int) -> bool:
+                return kw_score.get(i, 0) >= kw_top * 0.75 or i in vec_top
+            # Only demote another level's page when a close match exists for this student's own level.
+            own_level_alt = level in LEVEL_NAMES and any(level in self.docs[j].audiences and near(j) for j in scores)
             for i in scores:
+                d = self.docs[i]
+                # Prefer pages for the student's level; push down pages written only for another level.
+                # (Scores here are rank-fusion values ~0.016; one rank step is ~0.0003, so these are tie-breakers.)
+                if level:
+                    lv = set(d.audiences) & LEVEL_NAMES
+                    if level in d.audiences and near(i):
+                        scores[i] += 0.0015
+                    elif lv and own_level_alt and "all" not in d.audiences:
+                        scores[i] -= 0.0015
+                # Prefer current information: older catalog years and pages untouched for years rank lower.
+                y = _academic_year(d)
+                if y and newest and y < newest:
+                    scores[i] -= 0.0015 * min(newest - y, 3)
+                scores[i] -= 0.0003 * min(_age_years(d.updated_label), 3)
                 aud = self.docs[i].audiences
                 # The role only breaks near-ties: a graduate student asking about OPT still gets the OPT pages,
                 # not admission pages that merely share the word "apply".
@@ -204,8 +264,17 @@ class HybridIndex:
                     scores[i] += 0.004
                 if category and self.docs[i].category == category:
                     scores[i] += 0.006
-            ranked = sorted(scores.items(), key=lambda x: -x[1])[:k]
-            return [self.docs[i] for i, _ in ranked]
+            # Diversity: at most two passages from the same page, so one long page can't crowd out the rest.
+            out, per_url = [], Counter()
+            for i, _ in sorted(scores.items(), key=lambda x: -x[1]):
+                u = self.docs[i].url.split("#")[0]
+                if per_url[u] >= 2:
+                    continue
+                per_url[u] += 1
+                out.append(self.docs[i])
+                if len(out) >= k:
+                    break
+            return out
 
 
 index = HybridIndex()
