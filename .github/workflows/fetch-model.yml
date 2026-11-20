@@ -1,0 +1,38 @@
+name: Fetch local embedding model
+
+# Downloads the small open embedding model (minishlab/potion-base-8M, MIT licence, ~30 MB) into
+# backend/models so the app can do semantic search on the server itself, with no API key or cost.
+on:
+  workflow_dispatch:
+  push:
+    branches: [v2]
+    paths: [backend/model.request]
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install model2vec==0.10.0
+      - name: Download and save
+        run: |
+          python - <<'PY'
+          from model2vec import StaticModel
+          m = StaticModel.from_pretrained("minishlab/potion-base-8M")
+          m.save_pretrained("backend/models/potion-base-8M")
+          print(m.encode(["How do I pay my tuition bill?"]).shape)
+          PY
+          ls -la backend/models/potion-base-8M
+      - name: Commit
+        run: |
+          git config user.name "BU AI model bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add backend/models
+          git commit -m "Add local embedding model (potion-base-8M, MIT)" || echo "no changes"
+          git pull --rebase origin v2 && git push origin HEAD:v2

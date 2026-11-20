@@ -111,10 +111,41 @@ class OpenAIEmbedder(Embedder):
         return out
 
 
+class LocalEmbedder(Embedder):
+    """Small static embedding model (model2vec) that runs on the server itself: no API key, no cost,
+    fast on a small CPU. Gives semantic search ("how do I pay my bill" ~ "payment plans") alongside keywords."""
+    name = "local"
+
+    def __init__(self) -> None:
+        from model2vec import StaticModel
+        self.model = StaticModel.from_pretrained(settings.LOCAL_EMBED_MODEL)
+
+    def embed(self, texts: list[str]) -> list[list[float]] | None:
+        vecs = self.model.encode([t[:2000] for t in texts], batch_size=256)
+        return [[round(float(x), 5) for x in v] for v in vecs]
+
+
+_local: Embedder | None = None
+
+
+def _local_embedder() -> Embedder:
+    global _local
+    if _local is None:
+        try:
+            _local = LocalEmbedder()
+        except Exception as ex:  # model not installed or not downloaded: keyword search only
+            log.warning("Local embeddings unavailable: %s", ex)
+            _local = Embedder()
+    return _local
+
+
 def get_embedder() -> Embedder:
     e = settings.EMBEDDINGS_PROVIDER
     if e == "auto":
-        e = {"openai": "openai", "azure": "azure"}.get(settings.LLM_PROVIDER, "openai" if settings.OPENAI_API_KEY else "none")
+        e = {"openai": "openai", "azure": "azure"}.get(
+            settings.LLM_PROVIDER, "openai" if settings.OPENAI_API_KEY else "local")
+    if e == "local":
+        return _local_embedder()
     try:
         if e == "openai" and settings.OPENAI_API_KEY:
             return OpenAIEmbedder()

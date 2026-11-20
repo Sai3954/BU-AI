@@ -27,7 +27,8 @@ class Settings:
     # none | openai | azure | anthropic
     LLM_PROVIDER = _env("LLM_PROVIDER", "none").lower()
     # Embeddings provider for vector search: auto | openai | azure | none
-    EMBEDDINGS_PROVIDER = _env("EMBEDDINGS_PROVIDER", "auto").lower()
+    EMBEDDINGS_PROVIDER = _env("EMBEDDINGS_PROVIDER", "auto").lower()   # auto | openai | azure | local | none
+    LOCAL_EMBED_MODEL = _env("LOCAL_EMBED_MODEL", str(BASE_DIR / "models" / "potion-base-8M"))
 
     OPENAI_API_KEY = _env("OPENAI_API_KEY")
     OPENAI_MODEL = _env("OPENAI_MODEL", "gpt-4o-mini")
