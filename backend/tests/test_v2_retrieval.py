@@ -40,3 +40,16 @@ def test_trace_endpoint_shows_working():
         assert "EMAIL" in j["pii_removed"] or "email" in str(j["pii_removed"]).lower()
         assert "a@b.com" not in j["prompt"]["user"]
         assert j["keyword"] and j["timings"]["search_ms"] >= 0
+
+
+def test_feedback_reason_saved_and_summarized():
+    from fastapi.testclient import TestClient
+    from app.main import app
+    from app.db import SessionLocal, QueryLog
+    with TestClient(app) as c:
+        with SessionLocal() as s:
+            r = QueryLog(question="test q"); s.add(r); s.commit(); qid = r.id
+        assert c.post("/api/feedback", json={"query_id": qid, "helpful": False, "reason": "missing"}).status_code == 200
+        assert c.post("/api/feedback", json={"query_id": qid, "helpful": False, "reason": "rude"}).status_code == 422
+        with SessionLocal() as s:
+            assert s.get(QueryLog, qid).feedback_reason == "missing"

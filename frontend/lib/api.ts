@@ -34,6 +34,7 @@ type Handlers = {
   onDelta: (t: string) => void;
   onDone: (queryId: number, checks: Checks) => void;
   onReplace?: (t: string) => void;
+  onStage?: (stage: string) => void;
   onError: (msg: string) => void;
 };
 
@@ -70,16 +71,17 @@ export async function streamChat(
       if (ev === "sources") h.onSources(d.sources, d.flags);
       else if (ev === "delta") h.onDelta(d.text);
       else if (ev === "replace") h.onReplace?.(d.text);
+      else if (ev === "stage") h.onStage?.(d.stage);
       else if (ev === "done") h.onDone(d.query_id, { unverified: d.unverified || [], misattributed: d.misattributed || [], uncited: d.uncited || [], unsupported_claims: d.unsupported_claims || [], ai_flags: d.ai_flags || [] });
       else if (ev === "error") h.onError(d.message);
     }
   }
 }
 
-export async function sendFeedback(queryId: number, helpful: boolean) {
+export async function sendFeedback(queryId: number, helpful: boolean, reason: "" | "wrong" | "missing" | "unclear" = "") {
   await fetch(`${API}/api/feedback`, {
     method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ query_id: queryId, helpful }),
+    body: JSON.stringify({ query_id: queryId, helpful, reason }),
   }).catch(() => {});
 }
 

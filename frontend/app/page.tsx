@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { Answer, SourceList } from "@/components/Answer";
 import { Header } from "@/components/Header";
+import { Activity, ActivityEvent, Stage } from "@/components/Activity";
 import { Checks, Flags, Meta, Source, Turn, getMeta, sendFeedback, streamChat } from "@/lib/api";
 
 const ROLES: { id: string; label: string }[] = [
@@ -34,7 +35,29 @@ const SERVICES: { cat: string; label: string; ask: string; icon: string }[] = [
 type Msg = {
   id: number; q: string; text: string; sources: Source[]; flags?: Flags;
   status: "searching" | "streaming" | "done" | "error"; queryId?: number; rated?: boolean; checks?: Checks;
+  stage: Stage; events: ActivityEvent[]; started: number; reason?: "" | "wrong" | "missing" | "unclear"; askWhy?: boolean;
+  copied?: boolean;
 };
+
+/** Follow-up suggestions grounded in what was found: titles of retrieved FAQ pages that are themselves
+ *  questions (so Bela can answer them), not already asked. */
+function suggestions(m: Msg, asked: string[]): string[] {
+  const norm = (x: string) => x.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
+  const STOP = new Set("a an the i my me do does can to of for in on is are be at before after how what when where who".split(" "));
+  const words = (x: string) => new Set(norm(x).split(/\s+/).filter(w => w.length > 2 && !STOP.has(w)));
+  const askedWords = asked.map(words);
+  const tooClose = (t: string) => { const w = words(t); return askedWords.some(a => {
+    const common = Array.from(w).filter(x => a.has(x)).length; return w.size > 0 && common / Math.min(w.size, a.size || 1) >= 0.5; }); };
+  const seen = new Set(asked.map(norm));
+  const out: string[] = [];
+  for (const s of m.sources) {
+    const t = s.title.replace(/^(faq|frequently asked questions?)\s*[-–:]\s*/i, "").trim();
+    if (!t.endsWith("?") || t.length > 70 || seen.has(norm(t)) || tooClose(t)) continue;
+    seen.add(norm(t)); out.push(t);
+    if (out.length === 3) break;
+  }
+  return out;
+}
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 function getRecognizer(): any {
@@ -126,22 +149,41 @@ export default function Home() {
       { role: "user" as const, text: m.q },
       { role: "assistant" as const, text: m.text.replace(/\[\d+\]/g, "") },
     ]).slice(-6);
-    setMsgs(ms => [...ms, { id, q, text: "", sources: [], status: "searching" }]);
+    const started = Date.now();
+    const at = () => Date.now() - started;
+    setMsgs(ms => [...ms, { id, q, text: "", sources: [], status: "searching", stage: "searching", started,
+      events: [{ at: 0, kind: "search", label: "Searching Belhaven’s official pages" }] }]);
     abortRef.current = new AbortController();
     await streamChat({ question: q, role: roleOverride ?? role, category, history }, {
-      onSources: (sources, flags) => update(id, { sources, flags, status: "streaming" }),
-      onDelta: t => update(id, m => ({ text: m.text + t })),
+      onSources: (sources, flags) => update(id, m => {
+        const pages = new Set(sources.map(s => s.url.split("#")[0])).size;
+        return { sources, flags, status: "streaming", stage: "reading", events: [...m.events, { at: at(), kind: "found",
+          label: sources.length ? `Found ${sources.length} passage${sources.length > 1 ? "s" : ""} on ${pages} official page${pages > 1 ? "s" : ""} and read them` : "No official page answers this" }] };
+      }),
+      onDelta: t => update(id, m => m.stage === "writing" ? { text: m.text + t }
+        : { text: m.text + t, stage: "writing", events: [...m.events, { at: at(), kind: "write", label: "Wrote the answer from those sources" }] }),
       onReplace: text => update(id, { text }),
-      onDone: (queryId, checks) => update(id, { status: "done", queryId, checks }),
-      onError: msg => update(id, m => ({ status: "error", text: m.text || msg })),
+      onStage: st => { if (st === "verifying") update(id, m => ({ stage: "verifying", events: [...m.events, { at: at(), kind: "verify", label: "Checked every fact against the sources" }] })); },
+      onDone: (queryId, checks) => update(id, m => ({ status: "done", stage: "done", queryId, checks,
+        events: [...m.events, { at: at(), kind: "ready", label: "Answer ready" }] })),
+      onError: msg => update(id, m => ({ status: "error", stage: "error", text: m.text || msg })),
     }, abortRef.current.signal);
     setBusy(false);
   }
 
   const submit = (e: FormEvent) => { e.preventDefault(); ask(input); };
   const rate = (m: Msg, helpful: boolean) => {
-    if (m.queryId) sendFeedback(m.queryId, helpful);
-    update(m.id, { rated: true });
+    if (helpful) { if (m.queryId) sendFeedback(m.queryId, true); update(m.id, { rated: true }); }
+    else update(m.id, { askWhy: true });
+  };
+  const why = (m: Msg, reason: "wrong" | "missing" | "unclear") => {
+    if (m.queryId) sendFeedback(m.queryId, false, reason);
+    update(m.id, { rated: true, askWhy: false, reason });
+  };
+  const copy = async (m: Msg) => {
+    const used = new Set(Array.from(m.text.matchAll(/\[(\d+)\]/g)).map(x => Number(x[1])));
+    const src = m.sources.map((s, i) => ({ s, n: i + 1 })).filter(x => used.has(x.n)).map(x => `[${x.n}] ${x.s.title}: ${x.s.url}`);
+    try { await navigator.clipboard.writeText(m.text + (src.length ? "\n\nSources:\n" + src.join("\n") : "")); update(m.id, { copied: true }); } catch { /* clipboard blocked */ }
   };
   const reset = () => { abortRef.current?.abort(); setMsgs([]); setBusy(false); };
 
@@ -191,7 +233,7 @@ export default function Home() {
                   {m.flags?.pii_removed && m.flags.pii_removed.length > 0 && (
                     <p className="note">For your privacy, personal details ({m.flags.pii_removed.join(", ").toLowerCase().replace(/_/g, " ")}) were removed before your question was processed.</p>
                   )}
-                  {m.status === "searching" && <p className="muted">Searching university pages…</p>}
+                  <Activity stage={m.stage} events={m.events} sources={m.sources} checks={m.checks} />
                   {m.text && <Answer text={m.text} sources={m.sources} />}
                   {m.status === "done" && m.checks && <CheckNote c={m.checks} />}
                   {m.status === "done" && m.flags?.conflicts && m.flags.conflicts.length > 0 && (
@@ -204,13 +246,33 @@ export default function Home() {
                   {m.status === "done" && <SourceList sources={m.sources} text={m.text} />}
                   {m.status === "done" && m.queryId && (
                     <div className="rate">
-                      {m.rated ? <span className="muted">Thanks for the feedback.</span> : (
-                        <>
-                          <span className="muted">Was this helpful?</span>
-                          <button className="ghost sm" onClick={() => rate(m, true)}>Yes</button>
-                          <button className="ghost sm" onClick={() => rate(m, false)}>No</button>
-                        </>
-                      )}
+                      <button className="icon-btn" onClick={() => copy(m)} aria-label="Copy answer with sources" title={m.copied ? "Copied" : "Copy answer with sources"}>
+                        {m.copied ? <span aria-hidden="true">✓</span> : <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2" /><path d="M5 15V5a2 2 0 012-2h10" /></svg>}
+                      </button>
+                      {m.rated ? <span className="muted">{m.reason ? "Thanks, that helps us improve." : "Thanks for the feedback."}</span> : (<>
+                        <button className="icon-btn" onClick={() => rate(m, true)} aria-label="Helpful" title="Helpful">
+                          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" aria-hidden="true"><path d="M7 11v9H4v-9zM7 11l4-8a2 2 0 012 2v4h5a2 2 0 012 2.3l-1.2 7A2 2 0 0116.8 20H7" /></svg>
+                        </button>
+                        <button className={`icon-btn ${m.askWhy ? "on" : ""}`} onClick={() => rate(m, false)} aria-label="Not helpful" title="Not helpful">
+                          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" aria-hidden="true"><path d="M17 13V4h3v9zM17 13l-4 8a2 2 0 01-2-2v-4H6a2 2 0 01-2-2.3l1.2-7A2 2 0 017.2 4H17" /></svg>
+                        </button>
+                        {m.askWhy && (<span className="why"><span className="muted">What was wrong?</span>
+                          <button className="pill-btn" onClick={() => why(m, "wrong")}>Wrong info</button>
+                          <button className="pill-btn" onClick={() => why(m, "missing")}>Missing info</button>
+                          <button className="pill-btn" onClick={() => why(m, "unclear")}>Hard to understand</button></span>)}
+                      </>)}
+                    </div>
+                  )}
+                  {m.status === "done" && m.id === msgs[msgs.length - 1]?.id && suggestions(m, msgs.map(x => x.q)).length > 0 && (
+                    <div className="suggest">
+                      <div className="muted">You might also ask</div>
+                      <div className="suggest-row">
+                        {suggestions(m, msgs.map(x => x.q)).map(sq => (
+                          <button key={sq} className="suggest-chip" onClick={() => ask(sq)} disabled={busy}>
+                            <svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path d="M12 3l1.6 4.9L18.5 9.5l-4.9 1.6L12 16l-1.6-4.9L5.5 9.5l4.9-1.6z" fill="currentColor" /></svg>{sq}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -223,7 +285,7 @@ export default function Home() {
         <form className={chatting ? "ask docked" : "ask"} onSubmit={submit}>
           <label htmlFor="q" className="sr">Ask a question</label>
           <input id="q" value={input} onChange={e => setInput(e.target.value)} autoComplete="off"
-            placeholder={chatting ? "Ask a follow-up…" : "Ask anything about Belhaven…"} />
+            placeholder={chatting ? "Ask a follow-up…" : "Ask Bela about admissions, classes, aid…"} />
           {canVoice && (
             <button type="button" className={`mic ${listening ? "on" : ""}`} onClick={toggleVoice}
               aria-pressed={listening} aria-label={listening ? "Stop voice input" : "Ask by voice"} title="Ask by voice">

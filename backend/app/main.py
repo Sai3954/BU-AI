@@ -9,6 +9,7 @@ import threading
 import time
 from collections import Counter, defaultdict, deque
 from contextlib import asynccontextmanager
+from typing import Literal
 from datetime import timedelta
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
@@ -220,6 +221,7 @@ class ChatRequest(BaseModel):
 class Feedback(BaseModel):
     query_id: int
     helpful: bool
+    reason: Literal["", "wrong", "missing", "unclear"] = ""
 
 
 @app.get("/api/health")
@@ -387,6 +389,7 @@ def chat(req: ChatRequest, request: Request):
                     for delta in provider.stream(system_prompt(), user_prompt(q, role, docs, history, level, conflict_note(conflicts))):
                         answer += delta
                         yield _sse("delta", {"text": delta})
+                    yield _sse("stage", {"stage": "verifying"})   # the answer checker is running now
                     checked = guard.check(answer, docs, q)
                     if checked["invalid_citations"]:
                         answer = checked["text"]
@@ -435,6 +438,7 @@ def feedback(fb: Feedback, request: Request):
         if not row:
             raise HTTPException(404, "Unknown question")
         row.helpful = fb.helpful
+        row.feedback_reason = "" if fb.helpful else fb.reason
         s.commit()
     return {"ok": True}
 
@@ -475,6 +479,7 @@ def admin_summary(days: int = 30):
             "questions": len(qs),
             "answered_rate": round(sum(q.answered for q in qs) / len(qs), 3) if qs else None,
             "helpful_rate": round(sum(q.helpful for q in rated) / len(rated), 3) if rated else None,
+            "not_helpful_reasons": dict(Counter(q.feedback_reason for q in rated if not q.helpful and q.feedback_reason)),
             "high_risk": sum(q.high_risk for q in qs),
             "pii_redacted": sum(bool(q.pii_removed) for q in qs),
             "unverified_answers": sum(q.unverified > 0 for q in ai_qs),
