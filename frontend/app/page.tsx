@@ -36,7 +36,7 @@ type Msg = {
   id: number; q: string; text: string; sources: Source[]; flags?: Flags;
   status: "searching" | "streaming" | "done" | "error"; queryId?: number; rated?: boolean; checks?: Checks;
   stage: Stage; events: ActivityEvent[]; started: number; reason?: "" | "wrong" | "missing" | "unclear"; askWhy?: boolean;
-  copied?: boolean;
+  copied?: boolean; votes?: { likes: number; dislikes: number }; myVote?: "up" | "down";
 };
 
 /** Follow-up suggestions grounded in what was found: titles of retrieved FAQ pages that are themselves
@@ -164,7 +164,7 @@ export default function Home() {
         : { text: m.text + t, stage: "writing", events: [...m.events, { at: at(), kind: "write", label: "Wrote the answer from those sources" }] }),
       onReplace: text => update(id, { text }),
       onStage: st => { if (st === "verifying") update(id, m => ({ stage: "verifying", events: [...m.events, { at: at(), kind: "verify", label: "Checked every fact against the sources" }] })); },
-      onDone: (queryId, checks) => update(id, m => ({ status: "done", stage: "done", queryId, checks,
+      onDone: (queryId, checks, votes) => update(id, m => ({ status: "done", stage: "done", queryId, checks, votes,
         events: [...m.events, { at: at(), kind: "ready", label: "Answer ready" }] })),
       onError: msg => update(id, m => ({ status: "error", stage: "error", text: m.text || msg })),
     }, abortRef.current.signal);
@@ -173,13 +173,14 @@ export default function Home() {
 
   const submit = (e: FormEvent) => { e.preventDefault(); ask(input); };
   const rate = (m: Msg, helpful: boolean) => {
-    if (helpful) { if (m.queryId) sendFeedback(m.queryId, true); update(m.id, { rated: true }); }
+    if (helpful) { if (m.queryId) sendFeedback(m.queryId, true); update(m.id, v => ({ rated: true, myVote: "up", votes: bump(v.votes, "likes") })); }
     else update(m.id, { askWhy: true });
   };
   const why = (m: Msg, reason: "wrong" | "missing" | "unclear") => {
     if (m.queryId) sendFeedback(m.queryId, false, reason);
-    update(m.id, { rated: true, askWhy: false, reason });
+    update(m.id, v => ({ rated: true, askWhy: false, reason, myVote: "down", votes: bump(v.votes, "dislikes") }));
   };
+  const bump = (v: Msg["votes"], k: "likes" | "dislikes") => ({ likes: v?.likes ?? 0, dislikes: v?.dislikes ?? 0, [k]: (v?.[k] ?? 0) + 1 });
   const copy = async (m: Msg) => {
     const used = new Set(Array.from(m.text.matchAll(/\[(\d+)\]/g)).map(x => Number(x[1])));
     const src = m.sources.map((s, i) => ({ s, n: i + 1 })).filter(x => used.has(x.n)).map(x => `[${x.n}] ${x.s.title}: ${x.s.url}`);
@@ -249,13 +250,17 @@ export default function Home() {
                       <button className="icon-btn" onClick={() => copy(m)} aria-label="Copy answer with sources" title={m.copied ? "Copied" : "Copy answer with sources"}>
                         {m.copied ? <span aria-hidden="true">✓</span> : <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2" /><path d="M5 15V5a2 2 0 012-2h10" /></svg>}
                       </button>
+                      <button className={`icon-btn vote ${m.myVote === "up" ? "on" : ""}`} onClick={() => !m.rated && rate(m, true)} disabled={m.rated}
+                        aria-label={`Helpful${m.votes?.likes ? `, ${m.votes.likes} so far` : ""}`} title="Helpful">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" aria-hidden="true"><path d="M7 11v9H4v-9zM7 11l4-8a2 2 0 012 2v4h5a2 2 0 012 2.3l-1.2 7A2 2 0 0116.8 20H7" /></svg>
+                        {m.votes?.likes ? <span className="vcount">{m.votes.likes}</span> : null}
+                      </button>
+                      <button className={`icon-btn vote ${m.myVote === "down" || m.askWhy ? "on" : ""}`} onClick={() => !m.rated && rate(m, false)} disabled={m.rated}
+                        aria-label={`Not helpful${m.votes?.dislikes ? `, ${m.votes.dislikes} so far` : ""}`} title="Not helpful">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" aria-hidden="true"><path d="M17 13V4h3v9zM17 13l-4 8a2 2 0 01-2-2v-4H6a2 2 0 01-2-2.3l1.2-7A2 2 0 017.2 4H17" /></svg>
+                        {m.votes?.dislikes ? <span className="vcount">{m.votes.dislikes}</span> : null}
+                      </button>
                       {m.rated ? <span className="muted">{m.reason ? "Thanks, that helps us improve." : "Thanks for the feedback."}</span> : (<>
-                        <button className="icon-btn" onClick={() => rate(m, true)} aria-label="Helpful" title="Helpful">
-                          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" aria-hidden="true"><path d="M7 11v9H4v-9zM7 11l4-8a2 2 0 012 2v4h5a2 2 0 012 2.3l-1.2 7A2 2 0 0116.8 20H7" /></svg>
-                        </button>
-                        <button className={`icon-btn ${m.askWhy ? "on" : ""}`} onClick={() => rate(m, false)} aria-label="Not helpful" title="Not helpful">
-                          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" aria-hidden="true"><path d="M17 13V4h3v9zM17 13l-4 8a2 2 0 01-2-2v-4H6a2 2 0 01-2-2.3l1.2-7A2 2 0 017.2 4H17" /></svg>
-                        </button>
                         {m.askWhy && (<span className="why"><span className="muted">What was wrong?</span>
                           <button className="pill-btn" onClick={() => why(m, "wrong")}>Wrong info</button>
                           <button className="pill-btn" onClick={() => why(m, "missing")}>Missing info</button>

@@ -32,7 +32,7 @@ export async function getMeta(): Promise<Meta> {
 type Handlers = {
   onSources: (s: Source[], f: Flags) => void;
   onDelta: (t: string) => void;
-  onDone: (queryId: number, checks: Checks) => void;
+  onDone: (queryId: number, checks: Checks, votes?: { likes: number; dislikes: number }) => void;
   onReplace?: (t: string) => void;
   onStage?: (stage: string) => void;
   onError: (msg: string) => void;
@@ -72,7 +72,7 @@ export async function streamChat(
       else if (ev === "delta") h.onDelta(d.text);
       else if (ev === "replace") h.onReplace?.(d.text);
       else if (ev === "stage") h.onStage?.(d.stage);
-      else if (ev === "done") h.onDone(d.query_id, { unverified: d.unverified || [], misattributed: d.misattributed || [], uncited: d.uncited || [], unsupported_claims: d.unsupported_claims || [], ai_flags: d.ai_flags || [] });
+      else if (ev === "done") h.onDone(d.query_id, { unverified: d.unverified || [], misattributed: d.misattributed || [], uncited: d.uncited || [], unsupported_claims: d.unsupported_claims || [], ai_flags: d.ai_flags || [] }, d.votes);
       else if (ev === "error") h.onError(d.message);
     }
   }

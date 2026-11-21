@@ -74,3 +74,17 @@ def test_admin_summary_counts_likes_and_dislikes():
         t = r.json()["totals"]
         assert t["likes"] >= 1 and t["dislikes"] >= 1 and t["not_helpful_reasons"].get("wrong", 0) >= 1
         assert any(d["question"] == "disliked q" for d in r.json()["disliked"])
+
+
+def test_question_votes_counts_same_question_only():
+    from app.main import question_votes
+    from app.db import SessionLocal, QueryLog
+    with SessionLocal() as s:
+        s.add_all([QueryLog(question="How do I request OPT?", helpful=True),
+                   QueryLog(question="how do i request  opt", helpful=True),
+                   QueryLog(question="How do I request OPT?", helpful=False),
+                   QueryLog(question="How do I request OPT extension?", helpful=True)])
+        s.commit()
+    v = question_votes("How do I request OPT?")
+    assert v["likes"] >= 2 and v["dislikes"] >= 1
+    assert question_votes("Something nobody asked?") == {"likes": 0, "dislikes": 0}

@@ -248,6 +248,17 @@ def _sse(event: str, data) -> str:
     return f"event: {event}\ndata: {json.dumps(data)}\n\n"
 
 
+def question_votes(q: str, days: int = 180) -> dict:
+    """👍/👎 totals from everyone who asked this same question (case and spacing ignored)."""
+    key = " ".join(q.lower().split()).rstrip("?.! ")
+    since = now() - timedelta(days=days)
+    with SessionLocal() as s:
+        rows = s.execute(select(QueryLog.question, QueryLog.helpful).where(
+            QueryLog.created_at >= since, QueryLog.helpful.is_not(None))).all()   # only rated rows: few
+    hits = [h for qq, h in rows if " ".join(qq.lower().split()).rstrip("?.! ") == key]
+    return {"likes": sum(1 for h in hits if h), "dislikes": sum(1 for h in hits if not h)}
+
+
 def retrieve(sq: str, prev: str, role: str, qvec, category: str, trace: dict | None = None):
     """Search for one question. A follow-up ("What documents do I need?") is searched together with the
     previous question, so it stays on the same topic; the question's own meaning vector still applies."""
@@ -410,7 +421,7 @@ def chat(req: ChatRequest, request: Request):
                 answer = extractive_answer(docs, crisis=flags["crisis"])
                 yield _sse("delta", {"text": answer})
             finished = True
-            yield _sse("done", {"query_id": qid, "answered": is_answered(answer, docs),
+            yield _sse("done", {"query_id": qid, "answered": is_answered(answer, docs), "votes": question_votes(q),
                                 **{k: checked.get(k, []) for k in ("unverified", "misattributed", "uncited",
                                                                     "unsupported_claims", "ai_flags")}})
         finally:
