@@ -8,7 +8,7 @@ export default function WebsiteDemo() {
     <div className="demo-site">
       <p className="demo-note">
         Sample page for the demo (fictional “Example University”). On a real site, the button in the corner is added with one line of code:{" "}
-        <code>{'<script src="https://YOUR-BU-AI-HOST/embed.js" defer></script>'}</code>
+        <code>{'<script src="https://YOUR-BELA-HOST/embed.js" defer></script>'}</code>
       </p>
       <header className="demo-top">
         <span className="demo-logo" aria-hidden="true">E</span>
