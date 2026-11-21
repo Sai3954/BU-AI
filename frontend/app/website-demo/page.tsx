@@ -1,8 +1,8 @@
 import Script from "next/script";
 
-export const metadata = { title: "Ask BU AI button – website demo" };
+export const metadata = { title: "Ask Bela button – website demo" };
 
-/** A fictional sample university page showing how the one-line "Ask BU AI" launcher looks on a website. */
+/** A fictional sample university page showing how the one-line "Ask Bela" launcher looks on a website. */
 export default function WebsiteDemo() {
   return (
     <div className="demo-site">

@@ -189,7 +189,7 @@ code { background: var(--accent-soft); padding: 1px 5px; border-radius: 4px; }
 .checklist li.done b { text-decoration: line-through; color: var(--muted); }
 .kpi b small { font-size: 14px; color: var(--muted); }
 
-/* Embedded mode: the assistant inside the "Ask BU AI" website panel */
+/* Embedded mode: the assistant inside the "Ask Bela" website panel */
 .embed .main.home { padding-top: 18px; gap: 16px; }
 .embed .hero h1 { font-size: 26px; margin-bottom: 6px; }
 .embed .lede { font-size: 14.5px; margin-bottom: 12px; }

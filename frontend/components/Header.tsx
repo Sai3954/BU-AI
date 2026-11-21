@@ -11,7 +11,7 @@ const NAV = [
   { href: "/onboarding", label: "Getting started" },
 ];
 
-export function Header({ name = process.env.NEXT_PUBLIC_APP_NAME || "BU AI", tagline = "Intelligent Student Success Platform", onHome }: {
+export function Header({ name = process.env.NEXT_PUBLIC_APP_NAME || "Bela", tagline = "Your Belhaven guide", onHome }: {
   name?: string; tagline?: string; onHome?: () => void;
 }) {
   const path = usePathname();

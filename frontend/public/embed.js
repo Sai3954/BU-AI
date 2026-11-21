@@ -1,15 +1,15 @@
 /*
-  BU AI website launcher. Add one line to any page:
-    <script src="https://YOUR-BU-AI-HOST/embed.js" defer></script>
-  Optional attributes: data-label="Ask BU AI"  data-app="https://YOUR-BU-AI-HOST"  data-position="right|left"
-  Shows an "Ask BU AI" button in the corner; clicking opens the assistant in a panel. It never opens by itself.
+  Ask Bela website launcher. Add one line to any page:
+    <script src="https://YOUR-BELA-HOST/embed.js" defer></script>
+  Optional attributes: data-label="Ask Bela"  data-app="https://YOUR-BELA-HOST"  data-position="right|left"
+  Shows an "Ask Bela" button in the corner; clicking opens the assistant in a panel. It never opens by itself.
 */
 (function () {
   if (window.__buaiLauncher) return;
   window.__buaiLauncher = true;
   var script = document.currentScript;
   var base = (script && script.getAttribute("data-app")) || (script ? new URL(script.src).origin : location.origin);
-  var label = (script && script.getAttribute("data-label")) || "Ask BU AI";
+  var label = (script && script.getAttribute("data-label")) || "Ask Bela";
   var side = (script && script.getAttribute("data-position")) === "left" ? "left" : "right";
 
   var css = [
@@ -54,17 +54,17 @@
   panel.id = "buai-panel";
   panel.hidden = true;
   panel.setAttribute("role", "dialog");
-  panel.setAttribute("aria-label", "BU AI assistant");
+  panel.setAttribute("aria-label", "Bela assistant");
   panel.innerHTML = '<div class="buai-head"><span class="buai-mark" aria-hidden="true">BU</span>' +
-    '<span>BU AI<small>Independent prototype</small></span>' +
-    '<button type="button" class="buai-x" aria-label="Close BU AI">&times;</button></div>';
+    '<span>Ask Bela<small>Independent prototype</small></span>' +
+    '<button type="button" class="buai-x" aria-label="Close Bela">&times;</button></div>';
 
   var frame = null;
   function open() {
     if (!frame) {
       frame = document.createElement("iframe");
       frame.className = "buai-frame";
-      frame.title = "BU AI assistant";
+      frame.title = "Bela assistant";
       frame.src = base.replace(/\/$/, "") + "/?embed=1";
       frame.setAttribute("allow", "microphone");
       panel.appendChild(frame);

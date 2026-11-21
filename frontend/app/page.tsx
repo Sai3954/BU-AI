@@ -145,7 +145,7 @@ export default function Home() {
   };
   const reset = () => { abortRef.current?.abort(); setMsgs([]); setBusy(false); };
 
-  const name = meta?.app_name || process.env.NEXT_PUBLIC_APP_NAME || "BU AI";
+  const name = meta?.app_name || process.env.NEXT_PUBLIC_APP_NAME || "Bela";
   const chatting = msgs.length > 0;
 
   return (
@@ -253,7 +253,7 @@ export default function Home() {
       </main>
 
       {embed && !chatting && (
-        <nav className="embed-tools" aria-label="BU AI tools">
+        <nav className="embed-tools" aria-label="Bela tools">
           <a href="/programs" target="_blank" rel="noopener noreferrer">Programs</a>
           <a href="/scholarships" target="_blank" rel="noopener noreferrer">Scholarships</a>
           <a href="/directory" target="_blank" rel="noopener noreferrer">Contacts</a>

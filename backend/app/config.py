@@ -14,8 +14,8 @@ def _env(key: str, default: str = "") -> str:
 
 
 class Settings:
-    APP_NAME = _env("APP_NAME", "BU AI")
-    APP_TAGLINE = _env("APP_TAGLINE", "Intelligent Student Success Platform")
+    APP_NAME = _env("APP_NAME", "Bela")
+    APP_TAGLINE = _env("APP_TAGLINE", "Your Belhaven guide")
     UNIVERSITY = _env("UNIVERSITY_NAME", "Belhaven University")
 
     DATABASE_URL = _env("DATABASE_URL", f"sqlite:///{BASE_DIR / 'data' / 'app.db'}")
