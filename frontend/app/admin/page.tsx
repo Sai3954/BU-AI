@@ -7,7 +7,9 @@ type Summary = {
   window_days: number;
   totals: { questions: number; answered_rate: number | null; helpful_rate: number | null; high_risk: number;
     avg_latency_ms: number | null; crawled_pages: number; passages: number;
-    pii_redacted: number; unverified_answers: number; ai_answers: number; ai_calls_today: number; daily_ai_limit: number };
+    pii_redacted: number; unverified_answers: number; ai_answers: number; ai_calls_today: number; daily_ai_limit: number;
+    likes?: number; dislikes?: number; not_helpful_reasons?: Record<string, number> };
+  disliked?: { question: string; reason: string; when: string }[];
   by_role: Record<string, number>; by_category: Record<string, number>;
   top_questions: { question: string; count: number }[]; unanswered: { question: string; count: number }[];
   issues: { kind: string; severity: string; url: string; detail: string; detected_at: string }[];
@@ -97,13 +99,24 @@ export default function Admin() {
       <section className="kpis">
         <div className="kpi"><span>Questions asked</span><b>{t.questions}</b></div>
         <div className="kpi"><span>Answered from sources</span><b>{pct(t.answered_rate)}</b></div>
-        <div className="kpi"><span>Rated helpful</span><b>{pct(t.helpful_rate)}</b></div>
+        <div className="kpi"><span>Student ratings</span><b>👍 {t.likes ?? 0} <small>· 👎 {t.dislikes ?? 0}</small></b><small className="muted">{t.helpful_rate == null ? "No ratings yet" : `${pct(t.helpful_rate)} helpful`}</small></div>
         <div className="kpi warn"><span>Sent to DSO (status risk)</span><b>{t.high_risk}</b></div>
         <div className="kpi"><span>Personal info removed</span><b>{t.pii_redacted}</b></div>
         <div className="kpi warn"><span>AI answers with unverified figures</span><b>{t.unverified_answers}{t.ai_answers ? <small> / {t.ai_answers}</small> : null}</b></div>
         <div className="kpi"><span>AI calls today / daily limit</span><b>{t.ai_calls_today}<small> / {t.daily_ai_limit}</small></b></div>
         <div className="kpi"><span>Content issues</span><b>{data.issues.length}</b></div>
         <div className="kpi"><span>Knowledge passages</span><b>{t.passages}</b></div>
+      </section>
+
+      <section className="cols">
+        <div className="panel">
+          <h2>Why students tapped 👎</h2>
+          {t.dislikes ? <Bars data={Object.fromEntries(Object.entries(t.not_helpful_reasons || {}).map(([k, v]) => [({ wrong: "Wrong info", missing: "Missing info", unclear: "Hard to understand" } as Record<string, string>)[k] || k, v]))} /> : <p className="muted">No 👎 yet.</p>}
+        </div>
+        <div className="panel">
+          <h2>Answers rated 👎 <small>(review these first)</small></h2>
+          {data.disliked && data.disliked.length ? <ol className="qlist">{data.disliked.map((d, i) => <li key={i}><span>{d.question}</span><b className="muted" style={{ fontWeight: 500 }}>{({ wrong: "Wrong info", missing: "Missing info", unclear: "Hard to understand" } as Record<string, string>)[d.reason] || d.reason}</b></li>)}</ol> : <p className="muted">None yet.</p>}
+        </div>
       </section>
 
       <section className="cols">

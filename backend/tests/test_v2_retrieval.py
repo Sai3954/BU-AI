@@ -53,3 +53,24 @@ def test_feedback_reason_saved_and_summarized():
         assert c.post("/api/feedback", json={"query_id": qid, "helpful": False, "reason": "rude"}).status_code == 422
         with SessionLocal() as s:
             assert s.get(QueryLog, qid).feedback_reason == "missing"
+
+
+def test_admin_summary_counts_likes_and_dislikes():
+    from fastapi.testclient import TestClient
+    from app.main import app
+    from app.config import settings
+    from app.db import SessionLocal, QueryLog
+    with TestClient(app) as c:
+        with SessionLocal() as s:
+            a = QueryLog(question="liked q", helpful=True); b = QueryLog(question="disliked q", helpful=False, feedback_reason="wrong")
+            s.add_all([a, b]); s.commit()
+        old = settings.ADMIN_TOKEN
+        settings.ADMIN_TOKEN = "Qv7-Lr2xKp9-Zw4mJt8-Hc6"
+        try:
+            r = c.get("/api/admin/summary", headers={"X-Admin-Token": settings.ADMIN_TOKEN})
+        finally:
+            settings.ADMIN_TOKEN = old
+        assert r.status_code == 200, r.text
+        t = r.json()["totals"]
+        assert t["likes"] >= 1 and t["dislikes"] >= 1 and t["not_helpful_reasons"].get("wrong", 0) >= 1
+        assert any(d["question"] == "disliked q" for d in r.json()["disliked"])
