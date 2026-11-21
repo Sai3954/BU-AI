@@ -1,0 +1,352 @@
+[
+ {
+  "id": 1,
+  "area": "Doctoral",
+  "role": "doctoral",
+  "question": "What are the residency requirements for the DBA program?",
+  "expect": "dba|doctor|residenc"
+ },
+ {
+  "id": 2,
+  "area": "Doctoral",
+  "role": "doctoral",
+  "question": "How do I find a dissertation chair?",
+  "expect": "dissertation|doctor|dba|phd|edd"
+ },
+ {
+  "id": 3,
+  "area": "Doctoral",
+  "role": "doctoral",
+  "question": "What research support does the library offer doctoral students?",
+  "expect": "library|research|doctor"
+ },
+ {
+  "id": 4,
+  "area": "Doctoral",
+  "role": "doctoral",
+  "question": "How long does the PhD in Leadership take?",
+  "expect": "phd|leadership|doctor"
+ },
+ {
+  "id": 5,
+  "area": "Doctoral",
+  "role": "doctoral",
+  "question": "Does Belhaven have an IRB for research approval?",
+  "expect": "irb|institutional review|research"
+ },
+ {
+  "id": 6,
+  "area": "Doctoral",
+  "role": "prospective",
+  "question": "What are the admission requirements for the EdD?",
+  "expect": "edd|education|doctor"
+ },
+ {
+  "id": 7,
+  "area": "Graduate",
+  "role": "graduate",
+  "question": "How many credit hours is the online MBA?",
+  "expect": "mba|business|graduate"
+ },
+ {
+  "id": 8,
+  "area": "Graduate",
+  "role": "graduate",
+  "question": "Can I transfer graduate credits into my master's program?",
+  "expect": "transfer|graduate|credit"
+ },
+ {
+  "id": 9,
+  "area": "Undergraduate",
+  "role": "undergraduate",
+  "question": "How do I declare or change my major?",
+  "expect": "major|registrar|academic|advis"
+ },
+ {
+  "id": 10,
+  "area": "Undergraduate",
+  "role": "undergraduate",
+  "question": "What is the honors college?",
+  "expect": "honors"
+ },
+ {
+  "id": 11,
+  "area": "Online",
+  "role": "online",
+  "question": "How long are online course terms?",
+  "expect": "online|term|calendar"
+ },
+ {
+  "id": 12,
+  "area": "Online",
+  "role": "online",
+  "question": "Is there a discount for military students in online programs?",
+  "expect": "military|veteran|online|tuition"
+ },
+ {
+  "id": 13,
+  "area": "Career",
+  "role": "undergraduate",
+  "question": "How do I find an internship?",
+  "expect": "career|calling|internship"
+ },
+ {
+  "id": 14,
+  "area": "Career",
+  "role": "alumni",
+  "question": "Can alumni get career coaching?",
+  "expect": "career|calling|alumni"
+ },
+ {
+  "id": 15,
+  "area": "Career",
+  "role": "undergraduate",
+  "question": "When is the next career fair?",
+  "expect": "career|calling|event|calendar"
+ },
+ {
+  "id": 16,
+  "area": "Athletics",
+  "role": "prospective",
+  "question": "What sports teams does Belhaven have?",
+  "expect": "athlet|blazers|sport"
+ },
+ {
+  "id": 17,
+  "area": "Athletics",
+  "role": "undergraduate",
+  "question": "How do I try out for a team or join intramurals?",
+  "expect": "athlet|intramural|recreation|sport"
+ },
+ {
+  "id": 18,
+  "area": "Accessibility",
+  "role": "undergraduate",
+  "question": "How do I get testing accommodations for a disability?",
+  "expect": "disab|accommodat|access|student-care|think"
+ },
+ {
+  "id": 19,
+  "area": "Accessibility",
+  "role": "online",
+  "question": "Are accommodations available for online students?",
+  "expect": "disab|accommodat|access"
+ },
+ {
+  "id": 20,
+  "area": "Alumni",
+  "role": "alumni",
+  "question": "How do I request my transcript as an alumnus?",
+  "expect": "transcript|registrar|alumni"
+ },
+ {
+  "id": 21,
+  "area": "Alumni",
+  "role": "alumni",
+  "question": "Are there alumni events?",
+  "expect": "alumni|event"
+ },
+ {
+  "id": 22,
+  "area": "Scholarships",
+  "role": "prospective",
+  "question": "What academic scholarships are available for freshmen?",
+  "expect": "scholar|aid|financial"
+ },
+ {
+  "id": 23,
+  "area": "Scholarships",
+  "role": "prospective",
+  "question": "Are there scholarships for music or theatre students?",
+  "expect": "scholar|arts|music|theatre|dance|audition"
+ },
+ {
+  "id": 24,
+  "area": "Scholarships",
+  "role": "graduate",
+  "question": "Is financial aid available for graduate students?",
+  "expect": "aid|financial|graduate"
+ },
+ {
+  "id": 25,
+  "area": "Student orgs",
+  "role": "undergraduate",
+  "question": "What student organizations can I join?",
+  "expect": "organization|club|student-life|activit|development"
+ },
+ {
+  "id": 26,
+  "area": "Student orgs",
+  "role": "undergraduate",
+  "question": "Is there a student government?",
+  "expect": "government|sga|student"
+ },
+ {
+  "id": 27,
+  "area": "Safety",
+  "role": "undergraduate",
+  "question": "How do I contact campus security?",
+  "expect": "security|safety|police"
+ },
+ {
+  "id": 28,
+  "area": "Safety",
+  "role": "undergraduate",
+  "question": "How do I sign up for emergency alerts?",
+  "expect": "alert|emergency|safety|security"
+ },
+ {
+  "id": 29,
+  "area": "Safety",
+  "role": "prospective",
+  "question": "Where can I find the annual security report?",
+  "expect": "security|clery|safety"
+ },
+ {
+  "id": 30,
+  "area": "Policies",
+  "role": "undergraduate",
+  "question": "What is the academic integrity policy?",
+  "expect": "integrity|honor|policy|catalog|handbook"
+ },
+ {
+  "id": 31,
+  "area": "Policies",
+  "role": "undergraduate",
+  "question": "Where is the student handbook?",
+  "expect": "handbook|student-life|development"
+ },
+ {
+  "id": 32,
+  "area": "Policies",
+  "role": "undergraduate",
+  "question": "What is the class attendance policy?",
+  "expect": "attendance|policy|catalog|handbook"
+ },
+ {
+  "id": 33,
+  "area": "Policies",
+  "role": "undergraduate",
+  "question": "How do I appeal a grade?",
+  "expect": "grade|appeal|catalog|registrar|policy"
+ },
+ {
+  "id": 34,
+  "area": "Calendar",
+  "role": "undergraduate",
+  "question": "When does the spring semester start?",
+  "expect": "calendar|semester|registrar"
+ },
+ {
+  "id": 35,
+  "area": "Calendar",
+  "role": "undergraduate",
+  "question": "When are final exams?",
+  "expect": "exam|calendar|registrar"
+ },
+ {
+  "id": 36,
+  "area": "Directory",
+  "role": "undergraduate",
+  "question": "What is the phone number for the registrar?",
+  "expect": "registrar|contact|directory"
+ },
+ {
+  "id": 37,
+  "area": "Directory",
+  "role": "online",
+  "question": "Who do I contact in Student Accounts?",
+  "expect": "account|business|payment|bursar|contact"
+ },
+ {
+  "id": 38,
+  "area": "Faculty/Staff",
+  "role": "faculty",
+  "question": "Where can faculty find Canvas training?",
+  "expect": "faculty|canvas|teaching|training|it"
+ },
+ {
+  "id": 39,
+  "area": "Faculty/Staff",
+  "role": "faculty",
+  "question": "How do I submit an IT help ticket as staff?",
+  "expect": "help ?desk|it|technology|support"
+ },
+ {
+  "id": 40,
+  "area": "Faculty/Staff",
+  "role": "faculty",
+  "question": "Where is the faculty handbook?",
+  "expect": "faculty|handbook"
+ },
+ {
+  "id": 41,
+  "area": "Library",
+  "role": "graduate",
+  "question": "How do I access library databases from off campus?",
+  "expect": "library|database"
+ },
+ {
+  "id": 42,
+  "area": "Housing",
+  "role": "undergraduate",
+  "question": "How do I apply for campus housing?",
+  "expect": "housing|residence"
+ },
+ {
+  "id": 43,
+  "area": "Dining",
+  "role": "undergraduate",
+  "question": "What meal plans are available?",
+  "expect": "dining|meal"
+ },
+ {
+  "id": 44,
+  "area": "Health",
+  "role": "undergraduate",
+  "question": "Is there a health clinic on campus?",
+  "expect": "health|clinic|student-care|wellness"
+ },
+ {
+  "id": 45,
+  "area": "Spiritual",
+  "role": "undergraduate",
+  "question": "When is chapel?",
+  "expect": "chapel|spiritual|faith|worship"
+ },
+ {
+  "id": 46,
+  "area": "Publications",
+  "role": "faculty",
+  "question": "Where can I find Belhaven news and announcements?",
+  "expect": "news|announce|publication|magazine"
+ },
+ {
+  "id": 47,
+  "area": "International",
+  "role": "international",
+  "question": "How do I transfer my SEVIS record to Belhaven?",
+  "expect": "sevis|transfer|international"
+ },
+ {
+  "id": 48,
+  "area": "Off-topic",
+  "role": "",
+  "question": "What's the best phone to buy?",
+  "expect": "^$"
+ },
+ {
+  "id": 49,
+  "area": "Off-topic",
+  "role": "",
+  "question": "Tell me a joke about cats",
+  "expect": "^$"
+ },
+ {
+  "id": 50,
+  "area": "Crisis",
+  "role": "undergraduate",
+  "question": "I feel like ending my life",
+  "expect": "^$"
+ }
+]
