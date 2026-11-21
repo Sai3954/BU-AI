@@ -15,7 +15,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-STOP = set("""a an and are as at be by can do does for from get how i if in is it me my of on or should the to
+STOP = set("""belhaven university bu a an and are as at be by can do does for from get how i if in is it me my of on or should the to
 was what when where which who why will with you your am have has need about into than that this these those there
 their they we our us any set up go going get got use using know tell find help want wanted like please
 thanks thank hi hello hey just also como cuanto cual cuales cuando donde que quien la el los las de del en para por un una mi mis es son hay puedo tengo doesn don didn isn aren wasn won t s ll ve re d long used there here much many some way ways able possible anyone someone things thing""".split())
@@ -54,6 +54,8 @@ SYN = {
     "costo": ["cost", "tuition"], "programa": ["program"], "linea": ["online"], "ofrecen": ["program"],
     "estudiante": ["student"], "pregrado": ["undergraduate"], "posgrado": ["graduate"], "beca": ["scholarship"],
     "ayuda": ["aid", "help"], "financiera": ["financial"], "visa": ["visa"],
+    "apply": ["request", "application"], "request": ["apply"],
+    "employer": ["corporate", "partner", "company"], "reimbursement": ["tuition", "assistance", "corporate"],
     "dinner": ["dining", "meal"], "supper": ["dining", "meal"], "admitted": ["admission"], "admit": ["admission"],
     "visit": ["tour", "admission"], "tour": ["visit"],
     "gpa": ["admission"], "bill": ["payment", "tuition"], "plan": ["payment"], "pay": ["payment", "blazenet"], "gym": ["fitness"],
@@ -145,6 +147,23 @@ def tokenize(s: str) -> list[str]:
     for pat, rep in PHRASES:
         t = re.sub(pat, rep, t)
     return [stem(w) for w in re.split(r"[^a-z0-9]+", t) if w and w not in STOP]
+
+
+FOLLOW_UP = re.compile(r"^\s*(and|also|what about|how about|what if|so|then)\b|\b(it|this|that|these|those|they|them)\b", re.I)
+
+
+UNI_NAME = re.compile(r"\b(at|of|in|from|to|for)?\s*belhaven(\s+university)?('s)?\b|\bBU\b", re.I)
+
+
+def for_meaning(q: str) -> str:
+    """Text to embed: the university's own name says nothing about the topic, and pulls the meaning
+    search toward generic 'apply to Belhaven' pages, so it is left out."""
+    return " ".join(UNI_NAME.sub(" ", q).split()) or q
+
+
+def is_follow_up(q: str) -> bool:
+    """A short question, or one that points back ("it", "that", "what about..."), continues the last topic."""
+    return bool(FOLLOW_UP.search(q)) or len(tokenize(q)) <= 3
 
 
 def is_high_risk(q: str) -> bool:
@@ -261,12 +280,19 @@ class HybridIndex:
         return [(int(i), float(sims[i])) for i in order if sims[i] > VEC_MIN]
 
     def search(self, query: str, role: str = "", qvec: list[float] | None = None, k: int = 6,
-               category: str = "") -> list[Doc]:
+               category: str = "", trace: dict | None = None) -> list[Doc]:
+        """Find the passages that answer `query`. Pass a dict as `trace` to get the working: keyword and
+        meaning candidates with their scores, and the final fused scores (used by the demo's /api/trace)."""
         with self.lock:
             if not self.docs:
                 return []
             kw = self._bm25(query)
             vec = self._vector(qvec)
+            if trace is not None:
+                trace["terms"] = tokenize(query)
+                trace["keyword"] = [(i, round(sc, 2)) for i, sc in kw[:12]]
+                trace["meaning"] = [(i, round(sc, 3)) for i, sc in vec[:12]]
+                trace["passages_searched"] = len(self.docs)
             if not kw and not vec:
                 return []
             # Off-topic guard: unless the meaning match is strong, require that the best keyword matches
@@ -346,15 +372,20 @@ class HybridIndex:
             if excluded and len(scores) - len(excluded) >= 3:
                 for i in excluded:
                     scores.pop(i)
-            out, per_url = [], Counter()
+            out, per_url, chosen, seen_text = [], Counter(), [], set()
             for i, _ in sorted(scores.items(), key=lambda x: -x[1]):
                 u = self.docs[i].page
-                if per_url[u] >= 2:
+                sig = " ".join(self.docs[i].text.split())[:200].lower()
+                if per_url[u] >= 2 or sig in seen_text:   # same page twice, or the same text at two addresses
                     continue
+                seen_text.add(sig)
                 per_url[u] += 1
                 out.append(self.docs[i])
+                chosen.append(i)
                 if len(out) >= k:
                     break
+            if trace is not None:
+                trace["final"] = [(i, round(scores[i], 5)) for i in chosen]
             return out
 
 

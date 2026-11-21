@@ -24,7 +24,7 @@ from .ingest import bootstrap, embed_missing, rebuild_index
 from .llm import get_embedder, get_provider
 from .prompts import extractive_answer, system_prompt, user_prompt
 from .redact import redact
-from .retrieval import ROLES, detect_level, index, is_crisis, is_high_risk
+from .retrieval import ROLES, detect_level, for_meaning, index, is_crisis, is_follow_up, is_high_risk
 from .conflicts import conflict_note, find_conflicts
 
 logging.basicConfig(level=logging.INFO)
@@ -246,6 +246,97 @@ def _sse(event: str, data) -> str:
     return f"event: {event}\ndata: {json.dumps(data)}\n\n"
 
 
+def retrieve(sq: str, prev: str, role: str, qvec, category: str, trace: dict | None = None):
+    """Search for one question. A follow-up ("What documents do I need?") is searched together with the
+    previous question, so it stays on the same topic; the question's own meaning vector still applies."""
+    if prev and is_follow_up(sq):
+        if trace is not None:
+            trace["combined_with_previous"] = prev
+        if qvec is not None:
+            try:
+                qvec = embedder.embed([for_meaning(f"{prev} {sq}")])[0]
+            except Exception as e:
+                log.warning("follow-up embedding failed: %s", e)
+        return index.search(f"{prev} {sq}", role=role, qvec=qvec, category=category, trace=trace)
+    docs = index.search(sq, role=role, qvec=qvec, category=category, trace=trace)
+    if len(docs) < 3 and prev:
+        docs = index.search(f"{prev} {sq}", role=role, qvec=qvec, category=category, trace=trace)
+    return docs
+
+
+@app.post("/api/trace")
+def trace(req: ChatRequest, request: Request):
+    """Show the working behind an answer, without calling the AI: what was removed for privacy, which
+    passages the keyword and meaning searches found (with scores), what was chosen, and the exact prompt
+    the language model would receive. Used by the 'AI question journey' demo page. No cost per call."""
+    if not chat_limiter.allow(client_ip(request), settings.CHAT_RATE_PER_MINUTE):
+        raise HTTPException(429, "Too many questions in a minute. Please wait a moment and try again.")
+    import numpy as np
+    t = {}
+    t0 = time.perf_counter()
+    q, pii = redact(req.question.strip())
+    history = [{"role": h.role, "text": redact(h.text)[0]} for h in req.history]
+    role = req.role if req.role in ROLES else ""
+    t["privacy_ms"] = round((time.perf_counter() - t0) * 1000, 1)
+    sq = PLACEHOLDER.sub(" ", q)
+    t1 = time.perf_counter()
+    qvec = embedder.embed([for_meaning(sq)])[0] if embedder.name != "none" else None
+    t["embed_ms"] = round((time.perf_counter() - t1) * 1000, 1)
+    t2 = time.perf_counter()
+    tr: dict = {}
+    prev = next((PLACEHOLDER.sub(" ", h["text"]) for h in reversed(history) if h["role"] == "user"), "")
+    docs = retrieve(sq, prev, role, qvec, req.category, tr)
+    t["search_ms"] = round((time.perf_counter() - t2) * 1000, 1)
+    level = detect_level(sq, role)
+    conflicts = find_conflicts(docs)
+    kw_rank = {i: (r + 1, sc) for r, (i, sc) in enumerate(tr.get("keyword", []))}
+    mv_rank = {i: (r + 1, sc) for r, (i, sc) in enumerate(tr.get("meaning", []))}
+
+    def card(i: int) -> dict:
+        d = index.docs[i]
+        return {"title": d.title, "url": d.url, "category": d.category, "updated": d.updated_label,
+                "verified": d.source == "seed", "audiences": d.audiences}
+
+    final = []
+    for n, (i, fused) in enumerate(tr.get("final", []), 1):
+        d = index.docs[i]
+        final.append({**card(i), "n": n, "text": d.text, "fused": fused,
+                      "keyword_rank": kw_rank.get(i, (None, None))[0], "keyword_score": kw_rank.get(i, (None, None))[1],
+                      "meaning_rank": mv_rank.get(i, (None, None))[0], "meaning_score": mv_rank.get(i, (None, None))[1]})
+    # A 2-D map of meaning space: the question and the candidate passages, projected with PCA.
+    space = None
+    if qvec is not None and index.vectors is not None:
+        ids = list(dict.fromkeys([i for i, _ in tr.get("meaning", [])] + [i for i, _ in tr.get("keyword", [])[:8]]
+                                 + [i for i, _ in tr.get("final", [])]))
+        if ids:
+            qv = np.asarray(qvec, dtype=np.float32)
+            qv = qv / (np.linalg.norm(qv) + 1e-9)
+            m = np.vstack([qv, index.vectors[ids]])
+            c = m - m.mean(axis=0)
+            _, _, vt = np.linalg.svd(c, full_matrices=False)
+            xy = c @ vt[:2].T
+            xy = (xy - xy.min(axis=0)) / (np.ptp(xy, axis=0) + 1e-9)
+            chosen = {i for i, _ in tr.get("final", [])}
+            space = {"question": [round(float(xy[0, 0]), 3), round(float(xy[0, 1]), 3)],
+                     "points": [{"title": index.docs[i].title, "x": round(float(xy[k + 1, 0]), 3),
+                                 "y": round(float(xy[k + 1, 1]), 3), "chosen": i in chosen,
+                                 "similarity": round(float(index.vectors[i] @ qv), 3)}
+                                for k, i in enumerate(ids)]}
+    return {
+        "question": req.question.strip(), "question_for_search": sq, "pii_removed": pii, "role": role,
+        "level": level, "intent": docs[0].category if docs else "", "high_risk": is_high_risk(q),
+        "crisis": is_crisis(q), "terms": tr.get("terms", []), "combined_with_previous": tr.get("combined_with_previous", ""), "passages_searched": tr.get("passages_searched", 0),
+        "embedding": {"model": embedder.name, "dims": len(qvec) if qvec else 0,
+                      "preview": [round(float(x), 3) for x in (qvec or [])[:8]]},
+        "keyword": [{**card(i), "score": sc} for i, sc in tr.get("keyword", [])[:8]],
+        "meaning": [{**card(i), "score": sc} for i, sc in tr.get("meaning", [])[:8]],
+        "final": final, "space": space, "conflicts": conflicts, "timings": t,
+        "llm": {"provider": provider.name, "model": getattr(provider, "model", "")},
+        "prompt": {"system": system_prompt(),
+                   "user": user_prompt(q, role, docs, history, level, conflict_note(conflicts)) if docs else ""},
+    }
+
+
 @app.post("/api/chat")
 def chat(req: ChatRequest, request: Request):
     if not chat_limiter.allow(client_ip(request), settings.CHAT_RATE_PER_MINUTE):
@@ -258,14 +349,12 @@ def chat(req: ChatRequest, request: Request):
     qvec = None
     if embedder.name != "none":
         try:
-            qvec = embedder.embed([PLACEHOLDER.sub(" ", q)])[0]
+            qvec = embedder.embed([for_meaning(PLACEHOLDER.sub(" ", q))])[0]
         except Exception as e:
             log.warning("query embedding failed: %s", e)
     # Placeholders like [EMAIL] must not steer search toward "email" pages.
     sq, prev = PLACEHOLDER.sub(" ", q), PLACEHOLDER.sub(" ", prev)
-    docs = index.search(sq, role=role, qvec=qvec, category=req.category)
-    if len(docs) < 3 and prev:
-        docs = index.search(f"{prev} {sq}", role=role, qvec=qvec, category=req.category)
+    docs = retrieve(sq, prev, role, qvec, req.category)
     level = detect_level(sq, role)
     conflicts = find_conflicts(docs)
     flags = {"high_risk": is_high_risk(q), "crisis": is_crisis(q), "pii_removed": pii,
