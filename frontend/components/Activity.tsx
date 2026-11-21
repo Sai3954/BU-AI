@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import type { Checks, Source } from "@/lib/api";
+import { sourceMeta } from "@/lib/sources";
 
 export type Stage = "searching" | "reading" | "writing" | "verifying" | "done" | "error";
 export type ActivityEvent = { at: number; kind: "search" | "found" | "write" | "verify" | "ready"; label: string };
@@ -59,8 +60,8 @@ export function Activity({ stage, events, sources, checks }: {
                   <ul className="ev-src">
                     {sources.map((s, n) => (
                       <li key={n}><span className="src-n">{n + 1}</span>
-                        <a href={s.url} target="_blank" rel="noopener noreferrer">{s.title}</a>
-                        <span className="age">{s.updated === "current site" || !s.updated ? "current page" : s.updated}</span></li>
+                        <a href={s.url} target="_blank" rel="noopener noreferrer">{sourceMeta(s).title}</a>
+                        <span className="age">{sourceMeta(s).kind}{sourceMeta(s).date ? ` · ${sourceMeta(s).date.toLowerCase()}` : ""}</span></li>
                     ))}
                   </ul>
                 )}

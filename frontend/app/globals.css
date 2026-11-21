@@ -260,3 +260,8 @@ code { background: var(--accent-soft); padding: 1px 5px; border-radius: 4px; }
 .icon-btn.vote:disabled { cursor: default; }
 .icon-btn.vote:disabled:not(.on) { opacity: .55; }
 .vcount { font-size: 12.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.src-body { display: grid; gap: 3px; }
+.src-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 12px; }
+.src-kind { background: #eef2ef; color: #2c4a40; border-radius: 6px; padding: 1px 7px; font-weight: 600; }
+.src-old { background: #fbeadf; color: #8a3b12; border-radius: 6px; padding: 1px 7px; font-weight: 600; }
+.src-meta .age { color: var(--muted); }

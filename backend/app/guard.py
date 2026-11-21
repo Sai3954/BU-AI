@@ -113,7 +113,7 @@ def check(answer: str, docs: list[Doc], question: str = "") -> dict:
     n = len(docs)
     bad_cites = sorted({int(m) for m in CITE.findall(answer) if not 1 <= int(m) <= n})
     cleaned = CITE.sub(lambda m: m.group(0) if 1 <= int(m.group(1)) <= n else "", answer)
-    texts = [f"{d.title}. {d.text} Page last updated {getattr(d, 'updated_label', '') or 'recently'}." for d in docs]
+    texts = [f"{d.title}. {d.text} Page date: {getattr(d, 'updated_label', '') or 'not listed'}." for d in docs]
     all_text = " ".join(texts)
 
     unverified, misattributed, uncited, unsupported = [], [], [], []

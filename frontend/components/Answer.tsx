@@ -1,5 +1,6 @@
 import { Fragment, ReactNode } from "react";
 import type { Source } from "@/lib/api";
+import { sourceMeta } from "@/lib/sources";
 
 /** Render the model's plain text: paragraphs, "- " bullets, **bold**, and [n] citation chips. */
 function inline(text: string, sources: Source[], key: string): ReactNode[] {
@@ -38,14 +39,16 @@ export function SourceList({ sources, text }: { sources: Source[]; text: string 
   if (!shown.length) return null;
   return (
     <div className="sources">
-      <div className="sources-h">Sources</div>
+      <div className="sources-h">Official sources</div>
       {shown.map(({ s, n }) => (
         <div className="src" key={n}>
           <span className="src-n">{n}</span>
-          <span>
-            <a href={s.url} target="_blank" rel="noopener noreferrer">{s.title}</a>
-            <span className={`age ${/year/.test(s.updated) ? "old" : ""}`}>
-              {s.updated === "current site" || !s.updated ? "Current page" : /pdf/i.test(s.updated) ? "PDF document" : `Updated ${s.updated}`}
+          <span className="src-body">
+            <a href={s.url} target="_blank" rel="noopener noreferrer">{sourceMeta(s).title}</a>
+            <span className="src-meta">
+              <span className="src-kind">{sourceMeta(s).kind}</span>
+              {sourceMeta(s).older && <span className="src-old">Older source</span>}
+              <span className="age">{sourceMeta(s).date || "Date not listed"}</span>
             </span>
           </span>
         </div>

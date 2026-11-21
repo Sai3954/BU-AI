@@ -36,7 +36,7 @@ def user_prompt(question: str, role: str, docs: list[Doc], history: list[dict], 
     who = ROLE_LABELS.get(role, "")
     src = "\n\n".join(
         f"[{i + 1}] {d.title} (category: {d.category}; "
-        f"{'current website page' if d.updated_label in ('current site', '') else 'page last updated: ' + d.updated_label})\n"
+        f"{'on the university website; date not listed' if d.updated_label in ('current site', '') else 'page date: ' + d.updated_label})\n"
         f"URL: {d.url}\n{d.text}"
         for i, d in enumerate(docs)
     ) or "(no matching sources found)"
