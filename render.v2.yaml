@@ -24,7 +24,7 @@ services:
       - key: ANTHROPIC_API_KEY
         sync: false             # paste in the Render dashboard only, never in code or chat
       - key: DAILY_AI_LIMIT
-        value: "150"            # lower cap for the preview
+        value: "600"            # raised for the 300-question friends test; lower after
       - key: CHAT_RATE_PER_MINUTE
         value: "12"
 
