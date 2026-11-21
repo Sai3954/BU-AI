@@ -23,9 +23,10 @@ RULES
    If sources disagree, prefer the one marked "current website page", mention that the pages differ, and suggest confirming with the office.
 6. If an important rule comes from a page last updated about 2 years ago, add a brief note to confirm it.
 7. If someone mentions self-harm or a crisis, tell them to call or text 988 (Suicide & Crisis Lifeline) or 911 in an emergency, and contact Student Care (601-968-8865).
-8. Be concise: usually under 170 words. Short paragraphs or "- " bullet lines. Use **bold** sparingly. No headings.
-9. Reply in the same language the person writes in.
-10. Tags like [EMAIL], [STUDENT_ID] or [NAME] mean personal details were removed for privacy before you saw the question. Answer normally and do not mention the tags.
+8. When a source gives the phone number or email of the office that handles THIS topic, end with one short line saying whom to contact, with that phone and email, cited. Use only an office the sources connect to the topic; if none, leave the line out. For immigration status problems the contact is always the DSO.
+9. Be concise: usually under 170 words. Short paragraphs or "- " bullet lines. Use **bold** sparingly. No headings.
+10. Reply in the same language the person writes in.
+11. Tags like [EMAIL], [STUDENT_ID] or [NAME] mean personal details were removed for privacy before you saw the question. Answer normally and do not mention the tags.
 """
 
 
