@@ -45,7 +45,7 @@ export function SourceList({ sources, text }: { sources: Source[]; text: string 
           <span>
             <a href={s.url} target="_blank" rel="noopener noreferrer">{s.title}</a>
             <span className={`age ${/year/.test(s.updated) ? "old" : ""}`}>
-              {s.updated === "current site" || !s.updated ? "Current page" : `FAQ updated ${s.updated}`}
+              {s.updated === "current site" || !s.updated ? "Current page" : /pdf/i.test(s.updated) ? "PDF document" : `Updated ${s.updated}`}
             </span>
           </span>
         </div>
