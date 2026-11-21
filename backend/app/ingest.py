@@ -30,8 +30,6 @@ def load_seed(force: bool = False) -> int:
             return 0
         crawled = {u for (u,) in s.execute(select(Chunk.url).where(Chunk.source == "crawl").distinct())}
         for d in data:
-            if d["url"] in crawled and not d["id"].startswith(("office-", "programs-")):
-                continue
             key = f"seed:{d['id']}"
             row = s.scalar(select(Chunk).where(Chunk.key == key))
             if row is None:
@@ -51,25 +49,29 @@ def embed_missing() -> int:
     if emb.name == "none":
         return 0
     with SessionLocal() as s:
-        rows = list(s.scalars(select(Chunk).where(Chunk.embedding.is_(None))))
-        if not rows:
-            return 0
-        vecs = emb.embed([f"{r.title}\n{r.text}" for r in rows])
-        if not vecs:
-            return 0
-        for r, v in zip(rows, vecs):
-            r.embedding = json.dumps(v)
-        s.commit()
-        return len(rows)
+        done = 0
+        while True:  # in batches, so a large knowledge base never sits in memory twice
+            rows = list(s.scalars(select(Chunk).where(Chunk.embedding.is_(None)).limit(512)))
+            if not rows:
+                return done
+            vecs = emb.embed([f"{r.title}\n{r.text}" for r in rows])
+            if not vecs:
+                return done
+            for r, v in zip(rows, vecs):
+                r.embedding = json.dumps(v)
+            s.commit()
+            done += len(rows)
+            s.expunge_all()
 
 
 def rebuild_index() -> int:
     from .redact import refresh_allowlist
+    cols = (Chunk.id, Chunk.url, Chunk.title, Chunk.category, Chunk.audiences, Chunk.text, Chunk.updated_label,
+            Chunk.embedding, Chunk.source)
     with SessionLocal() as s:
-        rows = list(s.scalars(select(Chunk)))
-    index.build(rows)
-    refresh_allowlist(r.text for r in rows)  # published contacts that redaction must keep
-    return len(rows)
+        index.build(s.execute(select(*cols).order_by(Chunk.id).execution_options(yield_per=500)))
+    refresh_allowlist(d.text for d in index.docs)  # published contacts that redaction must keep
+    return len(index.docs)
 
 
 def bootstrap() -> dict:

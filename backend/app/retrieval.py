@@ -9,6 +9,7 @@ import json
 import math
 import re
 import threading
+import unicodedata
 from collections import Counter
 from dataclasses import dataclass
 
@@ -17,7 +18,7 @@ import numpy as np
 STOP = set("""a an and are as at be by can do does for from get how i if in is it me my of on or should the to
 was what when where which who why will with you your am have has need about into than that this these those there
 their they we our us any set up go going get got use using know tell find help want wanted like please
-thanks thank hi hello hey just also doesn don didn isn aren wasn won t s ll ve re d long used there here much many some way ways able possible anyone someone things thing""".split())
+thanks thank hi hello hey just also como cuanto cual cuales cuando donde que quien la el los las de del en para por un una mi mis es son hay puedo tengo doesn don didn isn aren wasn won t s ll ve re d long used there here much many some way ways able possible anyone someone things thing""".split())
 
 PHRASES = [
     (r"\bi[- ]?20s?\b", " i20 "), (r"\bi[- ]?765\b", " i765 "), (r"\bi[- ]?983\b", " i983 "),
@@ -48,6 +49,13 @@ SYN = {
     "semester": ["term", "calendar"], "break": ["calendar", "holiday"], "deadline": ["calendar", "date"],
     "transcript": ["registrar"], "graduation": ["commencement", "registrar"], "wifi": ["helpdesk"],
     "event": ["calendar", "events"], "freshman": ["first", "undergraduate", "admission"],
+    # A few Spanish words, so common Spanish questions find the English pages.
+    "solicito": ["apply", "request"], "solicitar": ["apply", "request"], "matricula": ["tuition"], "cuesta": ["cost", "tuition"],
+    "costo": ["cost", "tuition"], "programa": ["program"], "linea": ["online"], "ofrecen": ["program"],
+    "estudiante": ["student"], "pregrado": ["undergraduate"], "posgrado": ["graduate"], "beca": ["scholarship"],
+    "ayuda": ["aid", "help"], "financiera": ["financial"], "visa": ["visa"],
+    "dinner": ["dining", "meal"], "supper": ["dining", "meal"], "admitted": ["admission"], "admit": ["admission"],
+    "visit": ["tour", "admission"], "tour": ["visit"],
     "gpa": ["admission"], "bill": ["payment", "tuition"], "plan": ["payment"], "pay": ["payment", "blazenet"], "gym": ["fitness"],
     "workout": ["fitness"], "parking": ["security", "campus"], "id": ["security", "student"], "college": ["admission", "undergraduate"], "concert": ["events"], "homecoming": ["events"],
 }
@@ -69,7 +77,15 @@ LEVELS = [
 LEVEL_NAMES = {"doctoral", "graduate", "undergraduate"}
 YEAR = re.compile(r"\b(20\d\d)\s*[-–/]\s*(?:20)?\d\d\b")
 AGE = re.compile(r"(\d+)\s*years?\s*ago|a year ago", re.I)
-VEC_MIN, VEC_STRONG, VEC_WEIGHT = 0.2, 0.5, 0.8   # cosine: a hit at all / strong enough to stand without keyword overlap
+NEWSY = re.compile(r"\b(news|announce\w*|event\w*|happening|recent(ly)?|award\w*|won|celebrat\w*|story|stories|homecoming|concert|show|game)\b", re.I)
+VEC_MIN, VEC_STRONG, VEC_WEIGHT = 0.2, 0.68, 0.8   # cosine: a hit at all / strong enough to stand without keyword overlap
+
+
+def page_key(url: str) -> str:
+    """One key per page: http/https, www, index.html and trailing slashes don't make a new page."""
+    u = re.sub(r"^https?://(www\.)?", "", url.split("#")[0].lower())
+    u = re.sub(r"/index\.(html?|php)$", "/", u)
+    return u.rstrip("/")
 
 
 def detect_level(q: str, role: str = "") -> str:
@@ -80,6 +96,24 @@ def detect_level(q: str, role: str = "") -> str:
         if rx.search(q):
             return name
     return role if role in LEVEL_NAMES or role == "online" else ""
+
+
+PAGE_LEVEL = [
+    ("doctoral", re.compile(r"\b(ph\.?d|ed\.?d|dba|doctor(ate|al)?)\b|/doctor|doctor-of", re.I)),
+    ("graduate", re.compile(r"\b(m\.?ed|mba|msitm|msl|mfa|m\.?a\.?|m\.?s\.?|master'?s?|graduate certificate)\b|/masters|master-of|"
+                            r"/graduate|-mba|graduate-certificate", re.I)),
+    ("undergraduate", re.compile(r"\b(b\.?a\.?|b\.?s\.?|b\.?f\.?a\.?|bha|bachelor'?s?|a\.?a\.?|associate)\b|/bachelors|"
+                                 r"bachelor-of|/undergrad", re.I)),
+]
+
+
+def page_level(url: str, title: str) -> str:
+    """A program page's level, read from its title and address (e.g. 'M.Ed.', '/masters-in-...')."""
+    t = f"{title} {url.rsplit('/', 1)[-1]} {url}"
+    for name, rx in PAGE_LEVEL:
+        if rx.search(t):
+            return name
+    return ""
 
 
 def _academic_year(d: "Doc") -> int:
@@ -107,7 +141,7 @@ def stem(w: str) -> str:
 
 
 def tokenize(s: str) -> list[str]:
-    t = f" {s.lower()} "
+    t = f" {unicodedata.normalize('NFKD', s.lower()).encode('ascii', 'ignore').decode()} "
     for pat, rep in PHRASES:
         t = re.sub(pat, rep, t)
     return [stem(w) for w in re.split(r"[^a-z0-9]+", t) if w and w not in STOP]
@@ -130,6 +164,11 @@ class Doc:
     audiences: list[str]
     text: str
     updated_label: str
+    source: str = ""
+
+    @property
+    def page(self) -> str:
+        return page_key(self.url)
 
     def public(self) -> dict:
         return {"title": self.title, "url": self.url, "category": self.category,
@@ -140,29 +179,52 @@ class HybridIndex:
     def __init__(self) -> None:
         self.lock = threading.Lock()
         self.docs: list[Doc] = []
-        self.tf: list[Counter] = []
-        self.lens: list[int] = []
-        self.df: Counter = Counter()
+        # Inverted index: term -> (passage numbers, counts). Compact enough for tens of thousands of passages.
+        self.post: dict[str, tuple[np.ndarray, np.ndarray]] = {}
+        self.lens: np.ndarray = np.zeros(0, dtype=np.float32)
         self.avg = 1.0
         self.vectors: np.ndarray | None = None
 
     def build(self, rows) -> None:
-        docs, tfs, lens, df, vecs = [], [], [], Counter(), []
+        from array import array
+        docs: list[Doc] = []
+        lens = array("I")
+        pd: dict[str, array] = {}
+        pf: dict[str, array] = {}
+        vecs: list[np.ndarray | None] = []
         for r in rows:
-            d = Doc(r.id, r.url, r.title, r.category, (r.audiences or "all").split(","), r.text, r.updated_label)
-            tt = tokenize(d.title)
-            toks = tt * 3 + tokenize(d.text)
-            tf = Counter(toks)
-            docs.append(d); tfs.append(tf); lens.append(len(toks)); df.update(tf.keys())
-            vecs.append(json.loads(r.embedding) if r.embedding else None)
+            i = len(docs)
+            aud = (r.audiences or "all").split(",")
+            lv = page_level(r.url, r.title)
+            if lv and not (set(aud) & LEVEL_NAMES) and r.category in ("Admissions", "Academics", "Financial Aid"):
+                aud = [a for a in aud if a != "all"] + [lv]
+            d = Doc(r.id, r.url, r.title, r.category, aud, r.text, r.updated_label, getattr(r, "source", "") or "")
+            toks = tokenize(d.title) * 3 + tokenize(d.text)
+            for w, c in Counter(toks).items():
+                if w not in pd:
+                    pd[w], pf[w] = array("I"), array("H")
+                pd[w].append(i)
+                pf[w].append(min(c, 65535))
+            docs.append(d)
+            lens.append(len(toks))
+            vecs.append(np.asarray(json.loads(r.embedding), dtype=np.float32) if r.embedding else None)
+        post = {w: (np.frombuffer(pd[w], dtype=np.uint32), np.frombuffer(pf[w], dtype=np.uint16).astype(np.float32))
+                for w in pd}
+        del pd, pf
         vectors = None
         if docs and all(v is not None for v in vecs):
-            m = np.array(vecs, dtype=np.float32)
+            m = np.vstack(vecs)
             vectors = m / (np.linalg.norm(m, axis=1, keepdims=True) + 1e-9)
+        del vecs
+        lens_np = np.frombuffer(lens, dtype=np.uint32).astype(np.float32)
         with self.lock:
-            self.docs, self.tf, self.lens, self.df = docs, tfs, lens, df
-            self.avg = (sum(lens) / len(lens)) if lens else 1.0
+            self.docs, self.post, self.lens = docs, post, lens_np
+            self.avg = float(lens_np.mean()) if len(lens_np) else 1.0
             self.vectors = vectors
+
+    def _terms(self, i: int) -> set[str]:
+        d = self.docs[i]
+        return set(tokenize(d.title)) | set(tokenize(d.text))
 
     @property
     def has_vectors(self) -> bool:
@@ -177,20 +239,17 @@ class HybridIndex:
             for s in SYN.get(w, []):
                 weights.setdefault(stem(s), 0.5)
         n, k1, b = len(self.docs), 1.4, 0.6
-        out = []
-        for i, tf in enumerate(self.tf):
-            s = 0.0
-            for w, qw in weights.items():
-                f = tf.get(w)
-                if not f:
-                    continue
-                dfw = self.df.get(w, 0)
-                idf = math.log(1 + (n - dfw + 0.5) / (dfw + 0.5))
-                s += qw * idf * (f * (k1 + 1)) / (f + k1 * (1 - b + b * self.lens[i] / self.avg))
-            if s > 0:
-                out.append((i, s))
-        out.sort(key=lambda x: -x[1])
-        return out
+        scores = np.zeros(n, dtype=np.float32)
+        for w, qw in weights.items():
+            hit = self.post.get(w)
+            if hit is None:
+                continue
+            idx, f = hit
+            idf = math.log(1 + (n - len(idx) + 0.5) / (len(idx) + 0.5))
+            scores[idx] += qw * idf * (f * (k1 + 1)) / (f + k1 * (1 - b + b * self.lens[idx] / self.avg))
+        nz = np.nonzero(scores)[0]
+        order = nz[np.argsort(-scores[nz], kind="stable")]
+        return [(int(i), float(scores[i])) for i in order]
 
     def _vector(self, qvec: list[float] | None) -> list[tuple[int, float]]:
         if qvec is None or self.vectors is None:
@@ -218,9 +277,10 @@ class HybridIndex:
                 vec = [x for x in vec if x[1] >= VEC_STRONG * 0.8]
             if not strong_vec and base:
                 alts = {w: {w, *(stem(x) for x in SYN.get(w, []))} for w in base}
-                covered = {w for w in base for i, _ in kw[:3] if alts[w] & self.tf[i].keys()}
+                top_terms = [self._terms(i) for i, _ in kw[:3]]
+                covered = {w for w in base for t in top_terms if alts[w] & t}
                 cov = len(covered) / len(base)
-                unknown = any(not (alts[w] & self.df.keys()) for w in base)
+                unknown = any(not any(a in self.post for a in alts[w]) for w in base)
                 if cov < 0.5 or (cov <= 0.5 and unknown):
                     return []
             # Keep keyword hits that are reasonably close to the best one.
@@ -236,27 +296,43 @@ class HybridIndex:
             kw_score = dict(kw)
             kw_top = kw[0][1] if kw else 0
             level = detect_level(query, role)
+            stated = detect_level(query) in LEVEL_NAMES   # the question itself names the level
+            newsy = bool(NEWSY.search(query))
             vec_top = {i for i, sim in vec[:5] if vec and sim >= vec[0][1] - 0.05}
             newest = max((_academic_year(self.docs[i]) for i in scores), default=0)
             def near(i: int) -> bool:
                 return kw_score.get(i, 0) >= kw_top * 0.75 or i in vec_top
             # Only demote another level's page when a close match exists for this student's own level.
             own_level_alt = level in LEVEL_NAMES and any(level in self.docs[j].audiences and near(j) for j in scores)
+            excluded: set[int] = set()
             for i in scores:
                 d = self.docs[i]
                 # Prefer pages for the student's level; push down pages written only for another level.
                 # (Scores here are rank-fusion values ~0.016; one rank step is ~0.0003, so these are tie-breakers.)
+                wrong_level = False
                 if level:
                     lv = set(d.audiences) & LEVEL_NAMES
                     if level in d.audiences and near(i):
                         scores[i] += 0.0015
-                    elif lv and own_level_alt and "all" not in d.audiences:
-                        scores[i] -= 0.0015
+                    elif lv and (own_level_alt or stated) and "all" not in d.audiences:
+                        scores[i] -= 0.004 if stated else 0.0015
+                        wrong_level = True
+                        if stated:
+                            excluded.add(i)
                 # Prefer current information: older catalog years and pages untouched for years rank lower.
                 y = _academic_year(d)
                 if y and newest and y < newest:
                     scores[i] -= 0.0015 * min(newest - y, 3)
                 scores[i] -= 0.0003 * min(_age_years(d.updated_label), 3)
+                # News articles answer "what's happening", not "what's the rule": below official pages otherwise.
+                if d.category == "News" and not newsy:
+                    scores[i] -= 0.004
+                # A clearly stronger keyword match keeps its place even when others also match by meaning.
+                if kw_top and kw_score.get(i, 0) >= kw_top * 0.9 and not wrong_level:
+                    scores[i] += 0.006
+                # Hand-checked passages (verified against the official page) win near-ties with raw page text.
+                if d.source == "seed":
+                    scores[i] += 0.002
                 aud = self.docs[i].audiences
                 # The role only breaks near-ties: a graduate student asking about OPT still gets the OPT pages,
                 # not admission pages that merely share the word "apply".
@@ -265,9 +341,14 @@ class HybridIndex:
                 if category and self.docs[i].category == category:
                     scores[i] += 0.006
             # Diversity: at most two passages from the same page, so one long page can't crowd out the rest.
+            # A question that names its level ("as a freshman", "my DBA") gets no pages written only for
+            # another level, unless that would leave fewer than three sources.
+            if excluded and len(scores) - len(excluded) >= 3:
+                for i in excluded:
+                    scores.pop(i)
             out, per_url = [], Counter()
             for i, _ in sorted(scores.items(), key=lambda x: -x[1]):
-                u = self.docs[i].url.split("#")[0]
+                u = self.docs[i].page
                 if per_url[u] >= 2:
                     continue
                 per_url[u] += 1

@@ -32,13 +32,14 @@ log = logging.getLogger("crawl")
 
 SKIP_HOST_PARTS = ("blazenet", "instructure", "portalguard", "adfs", "login", "elluciancrmrecruit",
                    "starrez", "cashnet", "bncollege")
-SKIP_PATH = re.compile(r"(/login|/open\.php|/view\.php|/account|/apply/account|\.(jpg|jpeg|png|gif|svg|webp|"
+SKIP_PATH = re.compile(r"[?&](key|signature|expires)=|/404\.html$|(/login|/open\.php|/view\.php|/account|/apply/account|\.(jpg|jpeg|png|gif|svg|webp|"
                        r"mp4|mp3|zip|docx?|xlsx?|pptx?)$|/news/20(0|1)\d/)", re.I)
 PDF_MAX_BYTES = 15 * 1024 * 1024
 PDF_MAX_PAGES = 80
 
 # URL path -> (category, audiences). More specific patterns first; audiences drive program/level-aware answers.
 RULES = [
+    (r"/news/", ("News", ["all"])),   # announcements: kept, but ranked below official pages
     (r"igsupport\.belhaven\.edu.*cid=4|residency", ("Academics", ["international", "graduate", "doctoral"])),
     (r"igsupport\.belhaven\.edu", ("International", ["international", "graduate", "doctoral"])),
     (r"/international/", ("International", ["international"])),
