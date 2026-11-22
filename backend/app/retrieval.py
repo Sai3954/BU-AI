@@ -41,7 +41,7 @@ SYN = {
     "ielts": ["english", "proficiency"], "apply": ["application", "admission"], "admission": ["apply"],
     "license": ["driver"], "dmv": ["driver"], "tax": ["taxes"], "h1b": ["capgap"],
     "balance": ["proof", "fund"], "bank": ["proof", "fund"], "phone": ["contact"], "office": ["contact"],
-    "dorm": ["housing", "residence"], "room": ["housing", "residence"], "roommate": ["housing"],
+    "dorm": ["housing", "residence"], "room": ["housing", "residence"], "roommate": ["housing"], "located": ["address", "peachtree", "directions"], "tech": ["helpdesk", "technology"], "locked": ["password", "helpdesk", "portalguard"],
     "food": ["dining", "meal"], "eat": ["dining", "meal"], "lunch": ["dining"], "breakfast": ["dining"],
     "log": ["login", "logg", "helpdesk"], "call": ["contact", "phone"], "book": ["library"], "borrow": ["loan", "library"], "renew": ["renewal", "library"], "research": ["library", "database"], "tutor": ["think", "tutoring"],
     "tutoring": ["think"], "disability": ["accommodation", "ada"], "counseling": ["care", "wellness"],
@@ -140,6 +140,10 @@ def stem(w: str) -> str:
     if len(w) > 3 and w.endswith("s") and not w.endswith(("ss", "us", "is", "as")):
         return w[:-1]
     return w
+
+
+GENERIC = {stem(w) for w in ("contact", "problem", "problems", "issue", "help", "question", "hear", "back",
+                                "need", "know", "find", "get", "talk", "someone")}
 
 
 def tokenize(s: str) -> list[str]:
@@ -302,11 +306,14 @@ class HybridIndex:
             if not strong_vec:
                 vec = [x for x in vec if x[1] >= VEC_STRONG * 0.8]
             if not strong_vec and base:
-                alts = {w: {w, *(stem(x) for x in SYN.get(w, []))} for w in base}
-                top_terms = [self._terms(i) for i, _ in kw[:3]]
-                covered = {w for w in base for t in top_terms if alts[w] & t}
-                cov = len(covered) / len(base)
-                unknown = any(not any(a in self.post for a in alts[w]) for w in base)
+                # Words like "contact", "problem" or "hear back" say the student wants help, not what the
+                # help is about, so coverage is judged on the remaining words when there are any.
+                content = {w for w in base if w not in GENERIC} or base
+                alts = {w: {w, *(stem(x) for x in SYN.get(w, []))} for w in content}
+                top_terms = [self._terms(i) for i, _ in kw[:3]] + [self._terms(i) for i, _ in vec[:3]]
+                covered = {w for w in content for t in top_terms if alts[w] & t}
+                cov = len(covered) / len(content)
+                unknown = any(not any(a in self.post for a in alts[w]) for w in content)
                 if cov < 0.5 or (cov <= 0.5 and unknown):
                     return []
             # Keep keyword hits that are reasonably close to the best one.
