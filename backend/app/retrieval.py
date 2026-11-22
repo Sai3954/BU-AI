@@ -41,7 +41,7 @@ SYN = {
     "ielts": ["english", "proficiency"], "apply": ["application", "admission"], "admission": ["apply"],
     "license": ["driver"], "dmv": ["driver"], "tax": ["taxes"], "h1b": ["capgap"],
     "balance": ["proof", "fund"], "bank": ["proof", "fund"], "phone": ["contact"], "office": ["contact"],
-    "dorm": ["housing", "residence"], "room": ["housing", "residence"], "roommate": ["housing"], "located": ["address", "peachtree", "directions"], "tech": ["helpdesk", "technology"], "locked": ["password", "helpdesk", "portalguard"],
+    "dorm": ["housing", "residence"], "room": ["housing", "residence"], "roommate": ["housing"], "located": ["address", "peachtree", "directions"], "tech": ["helpdesk", "technology"], "admision": ["admission"], "requisito": ["requirement"], "beca": ["scholarship"], "matricula": ["tuition", "registration"], "costo": ["cost", "tuition"], "solicitud": ["application"], "clase": ["class"], "horario": ["schedule", "hours"], "becas": ["scholarship"], "estudiante": ["student"], "internacionale": ["international"], "locked": ["password", "helpdesk", "portalguard"],
     "food": ["dining", "meal"], "eat": ["dining", "meal"], "lunch": ["dining"], "breakfast": ["dining"],
     "log": ["login", "logg", "helpdesk"], "call": ["contact", "phone"], "book": ["library"], "borrow": ["loan", "library"], "renew": ["renewal", "library"], "research": ["library", "database"], "tutor": ["think", "tutoring"],
     "tutoring": ["think"], "disability": ["accommodation", "ada"], "counseling": ["care", "wellness"],

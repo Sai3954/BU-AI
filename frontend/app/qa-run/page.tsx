@@ -37,7 +37,8 @@ export default function QARun() {
     const from = +(p.get("from") || 1), to = +(p.get("to") || 25);
     (async () => {
       const all: Q[] = await (await fetch("/qa/questions.json")).json();
-      const qs = all.filter(q => q.id >= from && q.id <= to);
+      const ids = (p.get("ids") || "").split(",").filter(Boolean).map(Number);
+      const qs = ids.length ? all.filter(q => ids.includes(q.id)) : all.filter(q => q.id >= from && q.id <= to);
       for (let i = 0; i < qs.length; i++) {
         setStatus(`running ${i + 1}/${qs.length}`);
         const start = Date.now();
