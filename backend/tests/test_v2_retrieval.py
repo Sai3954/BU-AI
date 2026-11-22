@@ -107,3 +107,11 @@ def test_handoff_routing_and_logging():
         assert c.post("/api/handoff", json={"query_id": qid, "office": "Hackers Inc"}).status_code == 422
         with SessionLocal() as s:
             assert s.get(QueryLog, qid).handoff_office == "Registrar"
+
+
+def test_trim_unfinished_answer():
+    from app.main import trim_unfinished as t
+    cut = t("Steps\n1. Do this [1].\n2. Then that [2].\n**Key rules**\n- The job must")
+    assert "The job must" not in cut and "Key rules" not in cut and cut.startswith("Steps\n1. Do this [1].\n2. Then that [2].")
+    assert t("All complete [1].") == "All complete [1]."
+    assert t("Done [1]. And this is cut off mid").startswith("Done [1].")

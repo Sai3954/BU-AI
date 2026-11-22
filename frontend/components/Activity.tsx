@@ -69,7 +69,7 @@ export function Activity({ stage, events, sources, checks }: {
               </div>
             </li>
           ))}
-          {working && <li className="ev now"><span className="ev-t">…</span><div><b>{LIVE[stage]}</b></div></li>}
+          {working && events[events.length - 1]?.label.replace("’", "'") !== LIVE[stage].replace("’", "'") && <li className="ev now"><span className="ev-t">…</span><div><b>{LIVE[stage]}</b></div></li>}
           {!working && pages > 0 && <li className="ev meta"><span className="ev-t" /><div className="muted">Only Belhaven’s public pages were used ({pages} page{pages > 1 ? "s" : ""}). No student records.</div></li>}
         </ol>
       )}

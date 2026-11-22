@@ -286,3 +286,16 @@ code { background: var(--accent-soft); padding: 1px 5px; border-radius: 4px; }
 .contact-link:hover { border-color: var(--accent); }
 .contact-link svg { flex: none; }
 .contact-line { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 10px; padding: 10px 12px; }
+/* Narrow panels (website widget, phones): nothing may be wider than the answer card */
+.rate { flex-wrap: wrap; row-gap: 6px; }
+.rate .why { flex-basis: 100%; margin-left: 0; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.rate .why .muted { flex-basis: 100%; font-size: 13px; }
+.handoff-card { box-sizing: border-box; max-width: 100%; min-width: 0; }
+.handoff-card.open { grid-template-columns: minmax(0, 1fr); }
+.hf { min-width: 0; }
+.hf select, .hf textarea { width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; }
+.hf select { text-overflow: ellipsis; }
+.handoff-actions > * { max-width: 100%; box-sizing: border-box; }
+.handoff-actions .btn-primary { white-space: normal; overflow-wrap: anywhere; text-align: center; }
+.handoff-preview pre { overflow-wrap: anywhere; word-break: break-word; max-width: 100%; box-sizing: border-box; }
+.a, .a p, .a li { overflow-wrap: anywhere; }

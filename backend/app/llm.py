@@ -58,10 +58,16 @@ class AnthropicProvider(Provider):
         self.client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
 
     def stream(self, system: str, user: str) -> Iterator[str]:
-        with self.client.messages.stream(model=settings.ANTHROPIC_MODEL, max_tokens=900, system=system,
+        self.last_stop = ""
+        # Generous room: answers are ~170 words, but some models spend part of the budget before writing.
+        with self.client.messages.stream(model=settings.ANTHROPIC_MODEL, max_tokens=2000, system=system,
                                          messages=[{"role": "user", "content": user}]) as s:
             for text in s.text_stream:
                 yield text
+            try:
+                self.last_stop = s.get_final_message().stop_reason or ""
+            except Exception:
+                self.last_stop = ""
 
 
 def get_provider() -> Provider:

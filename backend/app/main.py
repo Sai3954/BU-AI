@@ -288,6 +288,27 @@ def question_votes(q: str, days: int = 180) -> dict:
     return {"likes": sum(1 for h in hits if h), "dislikes": sum(1 for h in hits if not h)}
 
 
+def trim_unfinished(text: str) -> str:
+    """Cut an answer that stopped mid-sentence back to its last complete sentence or list item."""
+    t = text.rstrip()
+    lines = t.split("\n")
+    while lines:
+        last = lines[-1].rstrip()
+        end = max(last.rfind(". "), last.rfind("? "), last.rfind("! "))
+        if re.search(r"[.!?](\s*\[\d+\])*\s*$|\]\s*\.?$", last):
+            break                                   # the last line is already complete
+        if end > 0 and not re.match(r"^\s*([-*•]|\d+\.)\s", last):
+            lines[-1] = last[:end + 1]              # paragraph: keep its finished sentences
+            break
+        lines.pop()                                 # unfinished list item or heading-like line: drop it
+        while lines and (not lines[-1].strip() or lines[-1].rstrip().endswith(":") or re.fullmatch(r"\s*\*\*[^*]+\*\*:?\s*", lines[-1])):
+            lines.pop()                             # and a lead-in such as "**Key rules**" left without items
+    out = "\n".join(lines).rstrip()
+    if not out or out == t:
+        return t
+    return out + "\n\nThe full details are in the official sources below."
+
+
 def retrieve(sq: str, prev: str, role: str, qvec, category: str, trace: dict | None = None):
     """Search for one question. A follow-up ("What documents do I need?") is searched together with the
     previous question, so it stays on the same topic; the question's own meaning vector still applies."""
@@ -429,6 +450,10 @@ def chat(req: ChatRequest, request: Request):
                     for delta in provider.stream(system_prompt(), user_prompt(q, role, docs, history, level, conflict_note(conflicts))):
                         answer += delta
                         yield _sse("delta", {"text": delta})
+                    if getattr(provider, "last_stop", "") == "max_tokens":
+                        # Never show a sentence cut in half: keep the complete part and point to the sources.
+                        answer = trim_unfinished(answer)
+                        yield _sse("replace", {"text": answer})
                     yield _sse("stage", {"stage": "verifying"})   # the answer checker is running now
                     checked = guard.check(answer, docs, q)
                     if checked["invalid_citations"]:

@@ -19,14 +19,14 @@
     ".buai-fab:hover{background:#1D5246}",
     ".buai-fab:focus-visible{outline:3px solid #C9A14A;outline-offset:3px}",
     ".buai-mark{width:40px;height:40px;border-radius:50%;background:#0B2B25;border:2px solid #C9A14A;display:flex;align-items:center;",
-    "justify-content:center;font:700 14px/1 Georgia,serif;letter-spacing:.5px;color:#fff}",
+    "justify-content:center;font:700 18px/1 Georgia,serif;color:#C9A14A}",
     ".buai-panel{position:fixed;" + side + ":24px;bottom:96px;z-index:2147483000;width:420px;height:min(680px,calc(100vh - 120px));",
     "border-radius:18px;overflow:hidden;background:#fff;box-shadow:0 24px 70px rgba(0,0,0,.28);display:flex;flex-direction:column}",
     ".buai-panel[hidden]{display:none}",
     ".buai-head{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#123D35;color:#F6F2E7;",
     "font:600 15px/1.2 system-ui,-apple-system,'Segoe UI',Arial,sans-serif}",
     ".buai-head small{display:block;font-weight:400;font-size:12px;color:#C3D6CF}",
-    ".buai-head .buai-mark{width:32px;height:32px;font-size:12px}",
+    ".buai-head .buai-mark{width:32px;height:32px;font-size:16px}",
     ".buai-x{margin-left:auto;border:0;background:transparent;color:#F6F2E7;font-size:24px;line-height:1;cursor:pointer;padding:4px 8px;border-radius:8px}",
     ".buai-x:focus-visible{outline:2px solid #C9A14A}",
     ".buai-frame{flex:1;border:0;width:100%}",
@@ -46,7 +46,7 @@
   btn.setAttribute("aria-expanded", "false");
   btn.setAttribute("aria-controls", "buai-panel");
   btn.setAttribute("aria-label", label);
-  btn.innerHTML = '<span class="buai-mark" aria-hidden="true">BU</span><span class="buai-text"></span>';
+  btn.innerHTML = '<span class="buai-mark" aria-hidden="true">B</span><span class="buai-text"></span>';
   btn.querySelector(".buai-text").textContent = label;
 
   var panel = document.createElement("div");
@@ -55,7 +55,7 @@
   panel.hidden = true;
   panel.setAttribute("role", "dialog");
   panel.setAttribute("aria-label", "Bela assistant");
-  panel.innerHTML = '<div class="buai-head"><span class="buai-mark" aria-hidden="true">BU</span>' +
+  panel.innerHTML = '<div class="buai-head"><span class="buai-mark" aria-hidden="true">B</span>' +
     '<span>Ask Bela<small>Independent prototype</small></span>' +
     '<button type="button" class="buai-x" aria-label="Close Bela">&times;</button></div>';
 
