@@ -1,16 +1,22 @@
 # v2 PREVIEW (separate from the live demo). In Render: New > Blueprint > this repository,
-# Branch: v2, Blueprint Path: render.v2.yaml. Creates bu-ai-v2-api and bu-ai-v2-web on the free plan.
-# No separate database: the knowledge base is rebuilt at each start from backend/data/crawled_pages.json.gz
-# (and the seed file), so nothing needs to persist. Question logs reset when the service restarts.
+# Branch: v2, Blueprint Path: render.v2.yaml. bu-ai-v2-api on Standard (1 CPU, 2 GB), bu-ai-v2-web on Starter.
+# No separate database: SQLite on a 1 GB persistent disk at /data, so question logs, ratings and handoff
+# counts survive restarts and deploys. The knowledge base is (re)built from backend/data at start.
 services:
   - type: web
     name: bu-ai-v2-api
     runtime: docker
     rootDir: backend
     branch: v2
-    plan: free
+    plan: standard              # $25/month, demo week; drop to starter afterwards
     healthCheckPath: /api/health
+    disk:
+      name: data
+      mountPath: /data
+      sizeGB: 1
     envVars:
+      - key: DATABASE_URL
+        value: sqlite:////data/app.db
       - key: CORS_ORIGINS
         value: https://bu-ai-v2-web.onrender.com
       - key: TRUST_PROXY
@@ -33,7 +39,7 @@ services:
     runtime: docker
     rootDir: frontend
     branch: v2
-    plan: free
+    plan: starter               # $7/month: always on, no spin-down
     envVars:
       - key: NEXT_PUBLIC_API_URL
         value: https://bu-ai-v2-api.onrender.com
