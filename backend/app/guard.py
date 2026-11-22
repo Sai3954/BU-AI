@@ -109,6 +109,11 @@ def _sentences(text: str) -> list[tuple[str, list[int]]]:
     return out
 
 
+# Safety lines Bela is told to give (prompts.py, CRISIS_TEXT): fixed, hand-checked numbers, not claims from sources.
+SAFETY = re.compile(r"\b988\b|crisis lifeline|\b911\b", re.I)
+SAFETY_PHONES = {"6019688865", "6019654128"}
+
+
 def check(answer: str, docs: list[Doc], question: str = "") -> dict:
     n = len(docs)
     bad_cites = sorted({int(m) for m in CITE.findall(answer) if not 1 <= int(m) <= n})
@@ -124,11 +129,15 @@ def check(answer: str, docs: list[Doc], question: str = "") -> dict:
     digits = lambda x: re.sub(r"\D", "", x)
     all_phones = {digits(p) for p in PHONE.findall(all_text)}
     for sentence, inherited in _sentences(cleaned):
+        if SAFETY.search(sentence):
+            continue  # a crisis line: always shown, never flagged
         cited = sorted({int(c) - 1 for c in CITE.findall(sentence)}) or inherited
         scope = " ".join(texts[i] for i in cited) if cited else all_text
         body = NOISE.sub(" ", CITE.sub(" ", sentence))
         for ph in PHONE.findall(body):
             d = digits(ph)
+            if d in SAFETY_PHONES:
+                continue
             if d not in {digits(p) for p in PHONE.findall(scope)}:
                 (misattributed if d in all_phones else unverified).append(ph.strip())
         body = PHONE.sub(" ", body)

@@ -115,3 +115,15 @@ def test_trim_unfinished_answer():
     assert "The job must" not in cut and "Key rules" not in cut and cut.startswith("Steps\n1. Do this [1].\n2. Then that [2].")
     assert t("All complete [1].") == "All complete [1]."
     assert t("Done [1]. And this is cut off mid").startswith("Done [1].")
+
+
+def test_crisis_lines_are_not_flagged():
+    from app.guard import check
+    docs = [d(1, "Students may visit the library for study help.")]
+    ans = ("I'm sorry you're feeling overwhelmed. Ask your advisor about study help [1]. "
+           "If the stress ever feels like too much, contact Student Care at 601-968-8865. "
+           "You can also call or text 988 (Suicide & Crisis Lifeline) any time, or 911 in an emergency.")
+    r = check(ans, docs)
+    assert r["unverified"] == [] and r["misattributed"] == [] and r["uncited"] == []
+    # an ordinary made-up number is still caught
+    assert "601-555-0100" in check("Call the office at 601-555-0100 [1].", docs)["unverified"]
