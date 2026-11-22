@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { BelaMark, Sparkle } from "./BelaMark";
 
 const NAV = [
   { href: "/", label: "Ask" },
@@ -11,15 +12,15 @@ const NAV = [
   { href: "/onboarding", label: "Getting started" },
 ];
 
-export function Header({ name = process.env.NEXT_PUBLIC_APP_NAME || "Bela", tagline = "Your Belhaven guide", onHome }: {
-  name?: string; tagline?: string; onHome?: () => void;
+export function Header({ name = process.env.NEXT_PUBLIC_APP_NAME || "Bela", tagline = "Your Belhaven guide", onHome, thinking = false }: {
+  name?: string; tagline?: string; onHome?: () => void; thinking?: boolean;
 }) {
   const path = usePathname();
   return (
     <header className="top">
       <Link className="brand" href="/" onClick={onHome} aria-label={`${name} home`}>
-        <span className="mark" aria-hidden="true">B</span>
-        <span><b>{name}</b><small>{tagline}</small></span>
+        <BelaMark size={40} />
+        <span><b>{name} <Sparkle size={18} active={thinking} /></b><small>{tagline}</small></span>
       </Link>
       <nav className="nav" aria-label="Main">
         {NAV.map(n => (

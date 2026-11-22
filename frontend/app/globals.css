@@ -299,3 +299,15 @@ code { background: var(--accent-soft); padding: 1px 5px; border-radius: 4px; }
 .handoff-actions .btn-primary { white-space: normal; overflow-wrap: anywhere; text-align: center; }
 .handoff-preview pre { overflow-wrap: anywhere; word-break: break-word; max-width: 100%; box-sizing: border-box; }
 .a, .a p, .a li { overflow-wrap: anywhere; }
+
+/* Ask Bela mark and AI sparkle */
+.bela-mark { flex: none; display: block; }
+.brand b { display: inline-flex; align-items: center; gap: 6px; }
+.sparkle { flex: none; display: inline-block; vertical-align: middle; }
+.sparkle path { transform-box: fill-box; transform-origin: center; }
+@media (prefers-reduced-motion: no-preference) {
+  .sparkle.on .s1 { animation: twinkle 1.2s ease-in-out infinite; }
+  .sparkle.on .s2 { animation: twinkle 1.2s ease-in-out .3s infinite; }
+  .sparkle.on .s3 { animation: twinkle 1.2s ease-in-out .6s infinite; }
+}
+@keyframes twinkle { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.6); } }

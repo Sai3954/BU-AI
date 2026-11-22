@@ -197,7 +197,7 @@ export default function Home() {
 
   return (
     <div className={embed ? "shell embed" : "shell"}>
-      {!embed && <Header name={name} tagline={meta?.tagline} onHome={reset} />}
+      {!embed && <Header name={name} tagline={meta?.tagline} onHome={reset} thinking={busy} />}
 
       {apiDown && (
         <div className="banner">The assistant service isn't running. Start the backend (see README), then refresh this page.</div>
