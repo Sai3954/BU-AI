@@ -10,6 +10,7 @@ type Summary = {
     pii_redacted: number; unverified_answers: number; ai_answers: number; ai_calls_today: number; daily_ai_limit: number;
     likes?: number; dislikes?: number; not_helpful_reasons?: Record<string, number> };
   disliked?: { question: string; reason: string; when: string }[];
+  handoffs?: Record<string, number>;
   by_role: Record<string, number>; by_category: Record<string, number>;
   top_questions: { question: string; count: number }[]; unanswered: { question: string; count: number }[];
   issues: { kind: string; severity: string; url: string; detail: string; detected_at: string }[];
@@ -120,6 +121,10 @@ export default function Admin() {
       </section>
 
       <section className="cols">
+        <div className="panel">
+          <h2>Requests prepared for offices <small>(students who needed a person)</small></h2>
+          {data.handoffs && Object.keys(data.handoffs).length ? <Bars data={data.handoffs} /> : <p className="muted">None yet.</p>}
+        </div>
         <div className="panel"><h2>Questions by role</h2><Bars data={data.by_role} /></div>
         <div className="panel"><h2>Questions by topic</h2><Bars data={data.by_category} /></div>
       </section>

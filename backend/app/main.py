@@ -27,6 +27,7 @@ from .prompts import extractive_answer, system_prompt, user_prompt
 from .redact import redact
 from .retrieval import ROLES, detect_level, for_meaning, index, is_crisis, is_follow_up, is_high_risk
 from .conflicts import conflict_note, find_conflicts
+from .handoff import office_list, suggest_office
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("api")
@@ -216,6 +217,34 @@ class ChatRequest(BaseModel):
     role: str = ""
     category: str = ""
     history: list[Turn] = Field(default=[], max_length=10)
+
+
+class HandoffLog(BaseModel):
+    query_id: int
+    office: str = Field(max_length=120)
+
+
+@app.get("/api/offices")
+def offices_for_handoff():
+    """Offices a student can contact (public directory data only)."""
+    return {"offices": office_list()}
+
+
+@app.post("/api/handoff")
+def log_handoff(h: HandoffLog, request: Request):
+    """Count that a student prepared a request to an office. Nothing is sent from here: the student sends
+    the email or ticket themselves. Only the office name is stored, no message text."""
+    if not chat_limiter.allow("ho:" + client_ip(request), 20):
+        raise HTTPException(429, "Too many requests. Please wait a moment.")
+    if h.office not in {o["name"] for o in office_list()}:
+        raise HTTPException(422, "Unknown office")
+    with SessionLocal() as s:
+        row = s.get(QueryLog, h.query_id)
+        if not row:
+            raise HTTPException(404, "Not found")
+        row.handoff_office = h.office
+        s.commit()
+    return {"ok": True}
 
 
 class Feedback(BaseModel):
@@ -422,6 +451,7 @@ def chat(req: ChatRequest, request: Request):
                 yield _sse("delta", {"text": answer})
             finished = True
             yield _sse("done", {"query_id": qid, "answered": is_answered(answer, docs), "votes": question_votes(q),
+                                "handoff": suggest_office(q, role, detect_level(sq, role)),
                                 **{k: checked.get(k, []) for k in ("unverified", "misattributed", "uncited",
                                                                     "unsupported_claims", "ai_flags")}})
         finally:
@@ -504,6 +534,7 @@ def admin_summary(days: int = 30):
         "by_category": dict(Counter(q.top_category or "none" for q in qs)),
         "top_questions": [{"question": k, "count": v} for k, v in top],
         "unanswered": [{"question": k, "count": v} for k, v in unanswered],
+        "handoffs": dict(Counter(q.handoff_office for q in qs if q.handoff_office)),
         "disliked": [{"question": norm(q.question), "reason": q.feedback_reason or "no reason given",
                       "when": q.created_at.isoformat()} for q in rated if not q.helpful][:10],
         "issues": [{"kind": i.kind, "severity": i.severity, "url": i.url, "detail": i.detail,

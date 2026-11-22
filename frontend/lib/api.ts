@@ -13,6 +13,8 @@ function apiBase(): string {
 export const API = apiBase();
 
 export type Source = { title: string; url: string; category: string; updated: string; text: string };
+export type Office = { name: string; email: string; phone: string; url: string; location: string; handles: string; reason?: string };
+export type DoneExtra = { answered?: boolean; handoff?: Office | null };
 export type Conflict = { fact: string; values: { value: string; sources: number[] }[] };
 export type Flags = { high_risk: boolean; crisis: boolean; pii_removed?: string[]; level?: string; conflicts?: Conflict[] };
 export type Meta = {
@@ -32,7 +34,7 @@ export async function getMeta(): Promise<Meta> {
 type Handlers = {
   onSources: (s: Source[], f: Flags) => void;
   onDelta: (t: string) => void;
-  onDone: (queryId: number, checks: Checks, votes?: { likes: number; dislikes: number }) => void;
+  onDone: (queryId: number, checks: Checks, votes?: { likes: number; dislikes: number }, extra?: DoneExtra) => void;
   onReplace?: (t: string) => void;
   onStage?: (stage: string) => void;
   onError: (msg: string) => void;
@@ -72,7 +74,7 @@ export async function streamChat(
       else if (ev === "delta") h.onDelta(d.text);
       else if (ev === "replace") h.onReplace?.(d.text);
       else if (ev === "stage") h.onStage?.(d.stage);
-      else if (ev === "done") h.onDone(d.query_id, { unverified: d.unverified || [], misattributed: d.misattributed || [], uncited: d.uncited || [], unsupported_claims: d.unsupported_claims || [], ai_flags: d.ai_flags || [] }, d.votes);
+      else if (ev === "done") h.onDone(d.query_id, { unverified: d.unverified || [], misattributed: d.misattributed || [], uncited: d.uncited || [], unsupported_claims: d.unsupported_claims || [], ai_flags: d.ai_flags || [] }, d.votes, { answered: d.answered, handoff: d.handoff || null });
       else if (ev === "error") h.onError(d.message);
     }
   }
@@ -82,6 +84,19 @@ export async function sendFeedback(queryId: number, helpful: boolean, reason: ""
   await fetch(`${API}/api/feedback`, {
     method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ query_id: queryId, helpful, reason }),
+  }).catch(() => {});
+}
+
+let officesCache: Promise<Office[]> | null = null;
+export function getOffices(): Promise<Office[]> {
+  officesCache ??= fetch(`${API}/api/offices`).then(r => r.json()).then(j => j.offices as Office[]).catch(() => { officesCache = null; return []; });
+  return officesCache;
+}
+
+export async function logHandoff(queryId: number, office: string) {
+  await fetch(`${API}/api/handoff`, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ query_id: queryId, office }),
   }).catch(() => {});
 }
 

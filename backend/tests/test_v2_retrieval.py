@@ -88,3 +88,22 @@ def test_question_votes_counts_same_question_only():
     v = question_votes("How do I request OPT?")
     assert v["likes"] >= 2 and v["dislikes"] >= 1
     assert question_votes("Something nobody asked?") == {"likes": 0, "dislikes": 0}
+
+
+def test_handoff_routing_and_logging():
+    from fastapi.testclient import TestClient
+    from app.main import app
+    from app.handoff import suggest_office
+    from app.db import SessionLocal, QueryLog
+    assert suggest_office("How do I apply for CPT?", "international")["name"].startswith("DSO")
+    assert suggest_office("I forgot my password", "")["name"] == "IT Help Desk"
+    assert suggest_office("When is my tuition due?", "online")["name"] == "Online & Graduate Student Services"
+    assert suggest_office("Tell me something nice", "") is None
+    with TestClient(app) as c:
+        assert any(o["name"] == "Registrar" for o in c.get("/api/offices").json()["offices"])
+        with SessionLocal() as s:
+            r = QueryLog(question="hand me off"); s.add(r); s.commit(); qid = r.id
+        assert c.post("/api/handoff", json={"query_id": qid, "office": "Registrar"}).status_code == 200
+        assert c.post("/api/handoff", json={"query_id": qid, "office": "Hackers Inc"}).status_code == 422
+        with SessionLocal() as s:
+            assert s.get(QueryLog, qid).handoff_office == "Registrar"

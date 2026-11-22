@@ -265,3 +265,19 @@ code { background: var(--accent-soft); padding: 1px 5px; border-radius: 4px; }
 .src-kind { background: #eef2ef; color: #2c4a40; border-radius: 6px; padding: 1px 7px; font-weight: 600; }
 .src-old { background: #fbeadf; color: #8a3b12; border-radius: 6px; padding: 1px 7px; font-weight: 600; }
 .src-meta .age { color: var(--muted); }
+/* Human handoff */
+.handoff-link { background: none; border: 0; padding: 4px 0; margin-top: 6px; color: var(--accent); font: inherit; font-size: 13px; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.handoff-card { margin-top: 12px; border: 1px solid #c9a14a; background: #fdf8ec; border-radius: 12px; padding: 12px 14px; display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; font-size: 14px; }
+.handoff-card p { margin: 3px 0 0; font-size: 13px; }
+.handoff-card.open { display: grid; gap: 10px; align-items: stretch; }
+.handoff-head { display: flex; justify-content: space-between; align-items: center; }
+.hf { display: grid; gap: 4px; font-size: 13px; font-weight: 600; }
+.hf select, .hf textarea { font: inherit; font-weight: 400; border: 1px solid var(--line); border-radius: 8px; padding: 7px 9px; background: #fff; }
+.hf .muted { font-weight: 400; font-size: 12px; }
+.handoff-privacy { margin: 0; font-size: 12.5px; color: #7a4a10; }
+.handoff-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13px; }
+.btn-primary { background: var(--accent); color: #fff; border: 0; border-radius: 9px; padding: 8px 14px; font: inherit; font-weight: 600; font-size: 13.5px; cursor: pointer; text-decoration: none; display: inline-block; }
+.btn-secondary { background: #fff; color: var(--accent); border: 1px solid var(--accent); border-radius: 9px; padding: 7px 13px; font: inherit; font-weight: 600; font-size: 13.5px; cursor: pointer; }
+.handoff-done { margin: 0; color: var(--accent); font-size: 13px; font-weight: 600; }
+.handoff-preview summary { cursor: pointer; font-size: 12.5px; color: var(--muted); }
+.handoff-preview pre { white-space: pre-wrap; font-size: 12.5px; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; margin: 6px 0 0; }

@@ -60,6 +60,7 @@ class QueryLog(Base):
     unverified: Mapped[int] = mapped_column(Integer, default=0)  # figures in the answer not found in sources
     ai: Mapped[bool] = mapped_column(Boolean, default=False)
     feedback_reason: Mapped[str] = mapped_column(String(40), default="")  # wrong | missing | unclear (on thumbs-down)
+    handoff_office: Mapped[str] = mapped_column(String(120), default="")  # office a student prepared a request to
 
 
 class Issue(Base):

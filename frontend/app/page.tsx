@@ -4,6 +4,8 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import { Answer, SourceList } from "@/components/Answer";
 import { Header } from "@/components/Header";
 import { Activity, ActivityEvent, Stage } from "@/components/Activity";
+import { Handoff } from "@/components/Handoff";
+import type { Office } from "@/lib/api";
 import { Checks, Flags, Meta, Source, Turn, getMeta, sendFeedback, streamChat } from "@/lib/api";
 
 const ROLES: { id: string; label: string }[] = [
@@ -37,6 +39,7 @@ type Msg = {
   status: "searching" | "streaming" | "done" | "error"; queryId?: number; rated?: boolean; checks?: Checks;
   stage: Stage; events: ActivityEvent[]; started: number; reason?: "" | "wrong" | "missing" | "unclear"; askWhy?: boolean;
   copied?: boolean; votes?: { likes: number; dislikes: number }; myVote?: "up" | "down";
+  answered?: boolean; handoff?: Office | null;
 };
 
 /** Follow-up suggestions grounded in what was found: titles of retrieved FAQ pages that are themselves
@@ -164,7 +167,8 @@ export default function Home() {
         : { text: m.text + t, stage: "writing", events: [...m.events, { at: at(), kind: "write", label: "Wrote the answer from those sources" }] }),
       onReplace: text => update(id, { text }),
       onStage: st => { if (st === "verifying") update(id, m => ({ stage: "verifying", events: [...m.events, { at: at(), kind: "verify", label: "Checked every fact against the sources" }] })); },
-      onDone: (queryId, checks, votes) => update(id, m => ({ status: "done", stage: "done", queryId, checks, votes,
+      onDone: (queryId, checks, votes, extra) => update(id, m => ({ status: "done", stage: "done", queryId, checks, votes,
+        answered: extra?.answered, handoff: extra?.handoff,
         events: [...m.events, { at: at(), kind: "ready", label: "Answer ready" }] })),
       onError: msg => update(id, m => ({ status: "error", stage: "error", text: m.text || msg })),
     }, abortRef.current.signal);
@@ -268,6 +272,13 @@ export default function Home() {
                       </>)}
                     </div>
                   )}
+                  {m.status === "done" && !m.flags?.crisis && (() => {
+                    // Prominent when Bela couldn't answer, for immigration-status risk, or after a 👎; else a small link on the latest answer.
+                    const prominent = m.answered === false || !!m.flags?.high_risk || m.myVote === "down";
+                    return (prominent || m.id === msgs[msgs.length - 1]?.id) ? (
+                      <Handoff question={m.q} sources={m.sources} text={m.text} suggested={m.handoff} queryId={m.queryId} prominent={prominent} />
+                    ) : null;
+                  })()}
                   {m.status === "done" && m.id === msgs[msgs.length - 1]?.id && suggestions(m, msgs.map(x => x.q)).length > 0 && (
                     <div className="suggest">
                       <div className="muted">You might also ask</div>
