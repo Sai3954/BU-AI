@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: process.env.NEXT_PUBLIC_APP_NAME || "Bela",
+  title: (n => /^ask\b/i.test(n) ? n : `Ask ${n}`)(process.env.NEXT_PUBLIC_APP_NAME || "Bela"),
   description: "Independent prototype of an AI student success assistant built from public university information.",
   icons: {
     icon: [

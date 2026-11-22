@@ -16,11 +16,12 @@ export function Header({ name = process.env.NEXT_PUBLIC_APP_NAME || "Bela", tagl
   name?: string; tagline?: string; onHome?: () => void; thinking?: boolean;
 }) {
   const path = usePathname();
+  const label = /^ask\b/i.test(name) ? name : `Ask ${name}`;
   return (
     <header className="top">
-      <Link className="brand" href="/" onClick={onHome} aria-label={`${name} home`}>
+      <Link className="brand" href="/" onClick={onHome} aria-label={`${label} home`}>
         <BelaMark size={40} />
-        <span><b>{name} <Sparkle size={18} active={thinking} /></b><small>{tagline}</small></span>
+        <span><b>{label} <Sparkle size={18} active={thinking} /></b><small>{tagline}</small></span>
       </Link>
       <nav className="nav" aria-label="Main">
         {NAV.map(n => (
