@@ -253,6 +253,20 @@ class HybridIndex:
     def has_vectors(self) -> bool:
         return self.vectors is not None
 
+    def _spell(self, query: str) -> str:
+        """Fix common misspellings ("finacial aid", "aply"): a word the index has never seen is swapped
+        for the closest word that appears on at least 5 passages. Known words are never changed."""
+        import difflib
+        toks = tokenize(query)
+        unknown = [t for t in toks if t not in self.post and len(t) >= 4 and t.isalpha()]
+        if not unknown:
+            return query
+        if getattr(self, "_common", None) is None or self._common_n != len(self.docs):
+            self._common = [w for w, hits in self.post.items() if len(hits[0]) >= 5 and w.isalpha()]
+            self._common_n = len(self.docs)
+        fixed = {t: (difflib.get_close_matches(t, self._common, n=1, cutoff=0.8) or [t])[0] for t in unknown}
+        return " ".join(fixed.get(t, t) for t in toks)
+
     def _bm25(self, query: str) -> list[tuple[int, float]]:
         base = tokenize(query)
         weights: dict[str, float] = {}
@@ -290,6 +304,7 @@ class HybridIndex:
         with self.lock:
             if not self.docs:
                 return []
+            query = self._spell(query)
             kw = self._bm25(query)
             vec = self._vector(qvec)
             if trace is not None:

@@ -127,3 +127,17 @@ def test_crisis_lines_are_not_flagged():
     assert r["unverified"] == [] and r["misattributed"] == [] and r["uncited"] == []
     # an ordinary made-up number is still caught
     assert "601-555-0100" in check("Call the office at 601-555-0100 [1].", docs)["unverified"]
+
+
+def test_misspelled_words_still_find_pages():
+    from types import SimpleNamespace as R
+    from app.retrieval import HybridIndex
+    rows = [R(id=i, url=f"https://www.belhaven.edu/aid{i}", title="Applying for Financial Aid", category="Financial Aid",
+              audiences="all", text=f"Apply for financial aid with the FAFSA. Financial aid step {i}.", updated_label="",
+              embedding=None, source="") for i in range(6)]
+    rows.append(R(id=9, url="https://www.belhaven.edu/dining", title="Dining", category="Student Services", audiences="all",
+                  text="Dining hours for the Commons.", updated_label="", embedding=None, source=""))
+    ix = HybridIndex()
+    ix.build(rows)
+    assert ix.search("how do i aply for finacial aid")
+    assert ix._spell("financial aid") == "financial aid"   # known words are never changed
