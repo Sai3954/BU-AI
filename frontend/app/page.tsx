@@ -55,8 +55,12 @@ function suggestions(m: Msg, asked: string[]): string[] {
   const out: string[] = [];
   // The server's suggestions come first: questions from the official pages just used, staff-interview
   // titles filtered out, with a topic list as fallback. Anything already asked in this chat is skipped.
+  // The server already dropped suggestions close to this question; here only skip ones that nearly repeat
+  // something asked earlier in the chat (sharing one word like "CPT" is fine).
+  const repeats = (t: string) => { const w = words(t); return askedWords.some(a => {
+    const common = Array.from(w).filter(x => a.has(x)).length; return w.size > 0 && common / Math.max(w.size, a.size || 1) >= 0.75; }); };
   for (const t of m.followups || []) {
-    if (seen.has(norm(t)) || tooClose(t)) continue;
+    if (seen.has(norm(t)) || repeats(t)) continue;
     seen.add(norm(t)); out.push(t);
     if (out.length === 3) return out;
   }
