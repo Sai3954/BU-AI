@@ -30,6 +30,15 @@ UNIT = (r"(?:credit|credits|credit-hour|hours?|days?|weeks?|months?|years?|semes
 FIG = re.compile(rf"\$?\d{{1,3}}(?:,\d{{3}})+(?:\.\d+)?%?|\$?\d[\d,]*(?:\.\d+)?%?(?=\s*{UNIT}\b)|\$?\d{{2,}}[\d,]*(?:\.\d+)?%?|\$\d(?:\.\d+)?|\d+\.\d+", re.I)
 CLAUSE = re.compile(r",(?!\d{3}(?!\d))|[;:()]|\s(?:and|but|while|whereas)\s|\.\s")  # "27,275" stays whole
 PHONE = re.compile(r"\(?\b\d{3}\)?[-.\s]\d{3}[-.]\d{4}\b")
+CLOCK = re.compile(r"\b(\d{1,2}):(\d{2})\b")  # a clock time is one figure, not "10" and "00"
+
+
+def _time_on_page(h: str, m: str, scope: str) -> bool:
+    """10:00 in the answer matches 10:00, 10:00pm or "10 p.m." on the page; 7:30 needs 7:30."""
+    h = str(int(h))
+    if re.search(rf"(?<!\d)0?{h}:{m}(?!\d)", scope):
+        return True
+    return m == "00" and re.search(rf"(?<![\d:])0?{h}\s*(?:a\.?\s?m\b|p\.?\s?m\b|o'clock|noon|midnight)", scope, re.I) is not None
 NOISE = re.compile(r"https?://\S+|\b[\w.+-]+@[\w-]+\.[\w.]+|\b[A-Z]-\d{1,4}\b|"
                    r"(?:about |~)?\b\d+\s+(?:years?|months?)\s+ago\b", re.I)  # links, emails, form IDs (I-20), page ages: not figures
 RISKY = re.compile(r"\b(guarantee[sd]?|guaranteed|automatically|definitely|certainly|"
@@ -142,6 +151,10 @@ def check(answer: str, docs: list[Doc], question: str = "") -> dict:
             if d not in {digits(p) for p in PHONE.findall(scope)}:
                 (misattributed if d in all_phones else unverified).append(ph.strip())
         body = PHONE.sub(" ", body)
+        for tm in CLOCK.finditer(body):
+            if not _time_on_page(tm.group(1), tm.group(2), scope):
+                unverified.append(tm.group(0))
+        body = CLOCK.sub(" ", body)
         figs = [m for m in FIG.finditer(body)]
         own_voice = (re.match(r"^\W*(i|i'm|i've|i'd)\b", body, re.I) or re.search(r"\b(the|these|those)( same)? (sources|pages)\b", body, re.I)
                      or body.strip().endswith(":"))

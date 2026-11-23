@@ -325,3 +325,14 @@ def test_extract_skips_empty_skip_link_anchor():
     html = KILT_HTML.replace("<main>", '<a id="acalog-content"></a><table><tr><td>').replace("</main>", "</td></tr></table>")
     _, text, _, _ = crawl.extract(html, "https://catalogue.belhaven.edu/content.php?catoid=8&navoid=1370&print")
     assert "register it with Campus Safety" in text and "#VISITATION" in text
+
+
+def test_guard_checks_clock_times_whole():
+    from app import guard
+    from app.retrieval import Doc
+    d = [Doc(1, "u", "Hood Library Regular Hours", "Library", ["all"],
+             "Monday - Friday 7:30am - 10pm. Saturday 1:30pm - 10pm. Sunday 6pm - midnight.", "")]
+    ok = guard.check("Monday–Friday: 7:30 a.m.–10:00 p.m. [1]. Saturday: 1:30 p.m.–10:00 p.m. [1].", d)
+    assert not ok["unverified"] and not ok["misattributed"], ok
+    bad = guard.check("Monday–Friday: 7:30 a.m.–9:00 p.m. [1].", d)
+    assert "9:00" in bad["unverified"] and "00" not in bad["unverified"] + bad["misattributed"]
