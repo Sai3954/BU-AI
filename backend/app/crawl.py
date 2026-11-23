@@ -230,6 +230,24 @@ def sitemap_urls(client: httpx.Client, host: str, limit: int = 5000) -> list[str
     return [u for u in dict.fromkeys(found) if allowed(u)][:limit]
 
 
+def read_robots(client: httpx.Client, host: str) -> RobotFileParser | None:
+    """robots.txt fetched with the crawler's own client and user agent (urllib's default agent is
+    refused by some hosts, which RobotFileParser would treat as "disallow everything").
+    None = no usable robots.txt, so everything not otherwise blocked is allowed."""
+    rp = RobotFileParser(f"https://{host}/robots.txt")
+    try:
+        r = client.get(f"https://{host}/robots.txt")
+    except Exception:
+        return None
+    if r.status_code in (401, 403):
+        rp.disallow_all = True
+    elif r.status_code == 200:
+        rp.parse(r.text.splitlines())
+    else:
+        return None
+    return rp
+
+
 def crawl(seeds: list[str], max_pages: int, use_sitemap: bool = False, follow_links: bool = True,
           finalize: bool = True, client: httpx.Client | None = None) -> dict:
     """Fetch pages from the seeds (following links on allowed hosts unless follow_links=False).
@@ -238,6 +256,8 @@ def crawl(seeds: list[str], max_pages: int, use_sitemap: bool = False, follow_li
     robots: dict[str, RobotFileParser] = {}
     seen, queue = set(), deque((u, "") for u in seeds)
     stats = {"fetched": 0, "changed": 0, "errors": 0}
+    problems = stats.setdefault("problems", [])   # first few failures, for the health check
+    note = lambda u, why: len(problems) < 5 and problems.append(f"{why}: {u[-60:]}")
     own = client is None
     if own:
         client = httpx.Client(headers={"User-Agent": settings.CRAWL_USER_AGENT}, follow_redirects=False, timeout=30)
@@ -254,15 +274,11 @@ def crawl(seeds: list[str], max_pages: int, use_sitemap: bool = False, follow_li
             seen.add(url)
             host = urlparse(url).netloc
             if host not in robots:
-                rp = RobotFileParser(f"https://{host}/robots.txt")
-                try:
-                    rp.read()
-                except Exception:
-                    rp = None
-                robots[host] = rp
+                robots[host] = read_robots(client, host)
             if robots[host] is not None and not robots[host].can_fetch(settings.CRAWL_USER_AGENT, url):
                 stats.setdefault("robots_blocked", 0)
                 stats["robots_blocked"] += 1
+                note(url, "robots.txt disallows")
                 continue
             delay = settings.CRAWL_DELAY_SECONDS
             if robots[host] is not None:  # honour the site's Crawl-delay (the catalogue asks for 120 s)
@@ -275,6 +291,7 @@ def crawl(seeds: list[str], max_pages: int, use_sitemap: bool = False, follow_li
             except Exception as e:
                 log.warning("fetch failed %s: %s", url, e)
                 stats["errors"] += 1
+                note(url, type(e).__name__)
                 continue
             finally:
                 if queue:
@@ -292,6 +309,7 @@ def crawl(seeds: list[str], max_pages: int, use_sitemap: bool = False, follow_li
             if r.status_code >= 400:
                 monitor.record_link_problem(url, r.status_code, parent)
                 stats["errors"] += 1
+                note(url, f"HTTP {r.status_code}")
                 continue
             ctype = r.headers.get("content-type", "")
             if "application/pdf" in ctype or urlparse(url).path.lower().endswith(".pdf"):
@@ -308,8 +326,11 @@ def crawl(seeds: list[str], max_pages: int, use_sitemap: bool = False, follow_li
                 log.info("[%d] PDF %s", stats["fetched"], url)
                 continue
             if "text/html" not in ctype:
+                note(url, f"not HTML ({ctype[:30]})")
                 continue
             title, text, updated, links = extract(r.text, url)
+            if len(text) <= 200:
+                note(url, f"too little text ({len(text)} chars)")
             if len(text) > 200 and store_page(url, title, text, updated, r.status_code):
                 stats["changed"] += 1
                 monitor.record_change(url, title)

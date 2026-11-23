@@ -104,12 +104,20 @@ def _watch_index(stop: threading.Event) -> None:
             log.exception("index watcher error")
 
 
+EXTRA_STATUS: dict = {"state": "not started"}
+
+
 def _extra_sources() -> None:
     """Fetch configured official pages that aren't stored yet; the index watcher picks them up."""
     from .crawl import crawl_missing
+    EXTRA_STATUS.update(state="running", pages=len(settings.EXTRA_URLS))
     try:
-        log.info("Extra sources: %s", crawl_missing(settings.EXTRA_URLS))
-    except Exception:
+        st = crawl_missing(settings.EXTRA_URLS)
+        EXTRA_STATUS.clear()
+        EXTRA_STATUS.update(state="done", **{k: v for k, v in st.items() if k != "embedded"})
+        log.info("Extra sources: %s", st)
+    except Exception as e:
+        EXTRA_STATUS.update(state="failed", error=f"{type(e).__name__}: {str(e)[:120]}")
         log.exception("extra sources fetch failed")
 
 
@@ -277,7 +285,8 @@ class Feedback(BaseModel):
 
 @app.get("/api/health")
 def health():
-    return {"ok": True, "provider": provider.name, "vectors": index.has_vectors, "chunks": len(index.docs)}
+    return {"ok": True, "provider": provider.name, "vectors": index.has_vectors, "chunks": len(index.docs),
+            "extra_sources": EXTRA_STATUS}
 
 
 @app.get("/api/meta")

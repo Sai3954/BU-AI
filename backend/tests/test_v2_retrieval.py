@@ -264,11 +264,12 @@ def test_crawl_missing_fetches_only_new_pages_without_following_links(monkeypatc
     from urllib.robotparser import RobotFileParser
     from app import crawl
     from app.db import Page, SessionLocal
-    monkeypatch.setattr(RobotFileParser, "read", lambda self: (_ for _ in ()).throw(OSError("offline")))
     monkeypatch.setattr(crawl.settings, "CRAWL_DELAY_SECONDS", 0)
     hits = []
 
     def handler(request):
+        if request.url.path == "/robots.txt":
+            return httpx.Response(404)
         hits.append(str(request.url))
         body = KILT_HTML.replace("</main>", '<a href="https://www.belhaven.edu/other.html">x</a></main>')
         return httpx.Response(200, text=body, headers={"content-type": "text/html"})
@@ -290,11 +291,11 @@ def test_crawl_honours_robots_crawl_delay(monkeypatch):
     from app import crawl
     from app.db import Page, SessionLocal
     rules = "User-agent: *\nDisallow: /portfolio.php\nCrawl-delay: 120\n"
-    monkeypatch.setattr(RobotFileParser, "read", lambda self: self.parse(rules.splitlines()))
     monkeypatch.setattr(crawl.settings, "CRAWL_DELAY_SECONDS", 0)
     slept = []
     monkeypatch.setattr(crawl.time, "sleep", lambda s: slept.append(s))
-    handler = lambda req: httpx.Response(200, text=KILT_HTML, headers={"content-type": "text/html"})
+    handler = lambda req: (httpx.Response(200, text=rules) if req.url.path == "/robots.txt" else
+                           httpx.Response(200, text=KILT_HTML, headers={"content-type": "text/html"}))
     urls = [f"https://catalogue.belhaven.edu/content.php?catoid=8&navoid={n}&print" for n in (99911, 99912)]
     with SessionLocal() as s:
         s.query(Page).filter(Page.url.in_(urls)).delete()
@@ -302,3 +303,17 @@ def test_crawl_honours_robots_crawl_delay(monkeypatch):
     with httpx.Client(transport=httpx.MockTransport(handler), follow_redirects=False) as c:
         crawl.crawl_missing(urls, client=c)
     assert slept == [120.0]          # waits between the two pages, not after the last one
+
+
+
+def test_robots_read_with_crawler_client_and_refusal_blocks():
+    import httpx
+    from app import crawl
+    ok = httpx.Client(transport=httpx.MockTransport(lambda r: httpx.Response(200, text="User-agent: *\nDisallow: /portfolio.php\n")))
+    rp = crawl.read_robots(ok, "catalogue.belhaven.edu")
+    assert rp.can_fetch("Bot", "https://catalogue.belhaven.edu/content.php?catoid=8&navoid=1370&print")
+    assert not rp.can_fetch("Bot", "https://catalogue.belhaven.edu/portfolio.php")
+    no = httpx.Client(transport=httpx.MockTransport(lambda r: httpx.Response(403)))
+    assert not crawl.read_robots(no, "x.belhaven.edu").can_fetch("Bot", "https://x.belhaven.edu/a")
+    gone = httpx.Client(transport=httpx.MockTransport(lambda r: httpx.Response(404)))
+    assert crawl.read_robots(gone, "x.belhaven.edu") is None
