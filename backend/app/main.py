@@ -104,6 +104,15 @@ def _watch_index(stop: threading.Event) -> None:
             log.exception("index watcher error")
 
 
+def _extra_sources() -> None:
+    """Fetch configured official pages that aren't stored yet; the index watcher picks them up."""
+    from .crawl import crawl_missing
+    try:
+        log.info("Extra sources: %s", crawl_missing(settings.EXTRA_URLS))
+    except Exception:
+        log.exception("extra sources fetch failed")
+
+
 def _scheduled_crawl(stop: threading.Event) -> None:
     from .crawl import crawl
     every = settings.CRAWL_EVERY_HOURS * 3600
@@ -129,6 +138,8 @@ async def lifespan(_app):
         threads.append(threading.Thread(target=_watch_index, args=(stop,), daemon=True))
     if settings.CRAWL_EVERY_HOURS > 0:
         threads.append(threading.Thread(target=_scheduled_crawl, args=(stop,), daemon=True))
+    if settings.EXTRA_URLS and settings.INDEX_WATCH_SECONDS > 0:
+        threads.append(threading.Thread(target=_extra_sources, daemon=True))
     for t in threads:
         t.start()
     yield

@@ -98,10 +98,15 @@ def extract(html: str, url: str) -> tuple[str, str, str, list[str]]:
         tag.decompose()
     main = soup.find("main") or soup.find(id=re.compile("content|main", re.I)) or soup.body or soup
     blocks = []
-    for el in main.find_all(["h1", "h2", "h3", "h4", "p", "li", "td", "th", "dt", "dd"]):
+    for el in main.find_all(["h1", "h2", "h3", "h4", "h5", "h6", "p", "li", "td", "th", "dt", "dd"]):
         t = el.get_text(" ", strip=True)
+        if el.name == "li" and el.find("li") is None:
+            a = el.find("a", href=True)
+            if a is not None and a["href"].startswith("#") and a.get_text(" ", strip=True) == t:
+                continue  # a table-of-contents entry (in-page link only): not content
         if len(t) > 2:
-            blocks.append(("#" if el.name in ("h1", "h2", "h3", "h4") else "") + t)
+            # h5/h6 are section headings in the university catalogue and student handbook (The Kilt)
+            blocks.append(("#" if el.name in ("h1", "h2", "h3", "h4", "h5", "h6") else "") + t)
     text = "\n".join(dict.fromkeys(blocks))  # de-duplicate repeated lines, keep order
     m = UPDATED.search(soup.get_text(" "))
     return title or url, text, (m.group(1) if m else "current site"), links
@@ -225,12 +230,18 @@ def sitemap_urls(client: httpx.Client, host: str, limit: int = 5000) -> list[str
     return [u for u in dict.fromkeys(found) if allowed(u)][:limit]
 
 
-def crawl(seeds: list[str], max_pages: int, use_sitemap: bool = False) -> dict:
+def crawl(seeds: list[str], max_pages: int, use_sitemap: bool = False, follow_links: bool = True,
+          finalize: bool = True, client: httpx.Client | None = None) -> dict:
+    """Fetch pages from the seeds (following links on allowed hosts unless follow_links=False).
+    finalize=False leaves embedding and the index rebuild to the API's index watcher."""
     init_db()
     robots: dict[str, RobotFileParser] = {}
     seen, queue = set(), deque((u, "") for u in seeds)
     stats = {"fetched": 0, "changed": 0, "errors": 0}
-    with httpx.Client(headers={"User-Agent": settings.CRAWL_USER_AGENT}, follow_redirects=False, timeout=20) as client:
+    own = client is None
+    if own:
+        client = httpx.Client(headers={"User-Agent": settings.CRAWL_USER_AGENT}, follow_redirects=False, timeout=30)
+    try:
         if use_sitemap:
             for host in settings.CRAWL_ALLOWED_HOSTS:
                 urls = sitemap_urls(client, host)
@@ -250,7 +261,15 @@ def crawl(seeds: list[str], max_pages: int, use_sitemap: bool = False) -> dict:
                     rp = None
                 robots[host] = rp
             if robots[host] is not None and not robots[host].can_fetch(settings.CRAWL_USER_AGENT, url):
+                stats.setdefault("robots_blocked", 0)
+                stats["robots_blocked"] += 1
                 continue
+            delay = settings.CRAWL_DELAY_SECONDS
+            if robots[host] is not None:  # honour the site's Crawl-delay (the catalogue asks for 120 s)
+                try:
+                    delay = max(delay, min(float(robots[host].crawl_delay(settings.CRAWL_USER_AGENT) or 0), 300.0))
+                except (TypeError, ValueError):
+                    pass
             try:
                 r, final_url = fetch(client, url)
             except Exception as e:
@@ -258,7 +277,8 @@ def crawl(seeds: list[str], max_pages: int, use_sitemap: bool = False) -> dict:
                 stats["errors"] += 1
                 continue
             finally:
-                time.sleep(settings.CRAWL_DELAY_SECONDS)
+                if queue:
+                    time.sleep(delay)
             stats["fetched"] += 1
             if r is None:
                 stats.setdefault("redirects_blocked", 0)
@@ -293,10 +313,16 @@ def crawl(seeds: list[str], max_pages: int, use_sitemap: bool = False) -> dict:
             if len(text) > 200 and store_page(url, title, text, updated, r.status_code):
                 stats["changed"] += 1
                 monitor.record_change(url, title)
-            for link in links:
-                if link not in seen and allowed(link):
-                    queue.append((link, url))
+            if follow_links:
+                for link in links:
+                    if link not in seen and allowed(link):
+                        queue.append((link, url))
             log.info("[%d] %s %s", stats["fetched"], r.status_code, url)
+    finally:
+        if own:
+            client.close()
+    if not finalize:
+        return stats
     stats["embedded"] = embed_missing()
     stats["chunks"] = rebuild_index()
     stats.update(monitor.scan())
@@ -325,6 +351,20 @@ def export_pages(path: str) -> int:
     with gzip.open(path, "wt", encoding="utf-8") as f:
         json.dump({"pages": out}, f, ensure_ascii=False)
     return len(out)
+
+
+def crawl_missing(urls: list[str], client: httpx.Client | None = None) -> dict:
+    """Fetch only the listed pages that aren't stored yet (no link following). Used at API start-up
+    to add official pages the main crawl never reached, such as the catalogue and student handbook."""
+    init_db()
+    with SessionLocal() as s:
+        have = {u for (u,) in s.execute(select(Page.url).where(Page.url.in_(urls)))}
+    todo = [u for u in dict.fromkeys(urls) if u not in have and allowed(u)]
+    if not todo:
+        return {"fetched": 0, "changed": 0, "errors": 0, "already_stored": len(have)}
+    stats = crawl(todo, len(todo), follow_links=False, finalize=False, client=client)
+    stats["already_stored"] = len(have)
+    return stats
 
 
 def load_export(path: str) -> int:

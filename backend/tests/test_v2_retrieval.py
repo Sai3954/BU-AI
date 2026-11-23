@@ -234,3 +234,71 @@ def test_followups_skip_parent_faq_titles():
     from app.followups import followups
     docs = [D(title="Parents FAQ - How does my son or daughter apply for housing next semester?", category="Library")]
     assert not any("son or daughter" in q for q in followups("How do I reserve a study room?", docs))
+
+
+# ---------- catalogue and student handbook pages ----------
+
+KILT_HTML = """<html><head><title>Belhaven University "The Kilt" Student Handbook</title></head><body>
+<nav>Catalogue Home</nav><main><h1>Belhaven University "The Kilt" Student Handbook</h1>
+<h2>Table of Contents</h2><ul><li><a href="#motor-vehicle-registration">Registration</a></li>
+<li><a href="#visitation">Visitation</a></li></ul>
+<h5>MOTOR VEHICLE REGISTRATION</h5><p>Motor Vehicle Policy</p>
+<p>All students who park a vehicle on campus must register it with Campus Safety and display a parking decal.
+Vehicles are registered each academic year through the online form.</p>
+<h5>VISITATION</h5><p>Residence Life Policies</p>
+<p>Visitation hours in residence hall rooms are set by Residence Life and posted in each hall for all residents.</p>
+</main></body></html>"""
+
+
+def test_extract_treats_h5_as_section_headings():
+    from app import crawl
+    title, text, _, _ = crawl.extract(KILT_HTML, "https://catalogue.belhaven.edu/content.php?catoid=8&navoid=1370&print")
+    assert "Kilt" in title and "#MOTOR VEHICLE REGISTRATION" in text and "#VISITATION" in text
+    assert "\nRegistration\n" not in text and "\nVisitation\n" not in text   # contents links skipped
+    heads = [h for h, _ in crawl.chunk_text(text)]
+    assert "MOTOR VEHICLE REGISTRATION" in heads and "VISITATION" in heads
+
+
+def test_crawl_missing_fetches_only_new_pages_without_following_links(monkeypatch):
+    import httpx
+    from urllib.robotparser import RobotFileParser
+    from app import crawl
+    from app.db import Page, SessionLocal
+    monkeypatch.setattr(RobotFileParser, "read", lambda self: (_ for _ in ()).throw(OSError("offline")))
+    monkeypatch.setattr(crawl.settings, "CRAWL_DELAY_SECONDS", 0)
+    hits = []
+
+    def handler(request):
+        hits.append(str(request.url))
+        body = KILT_HTML.replace("</main>", '<a href="https://www.belhaven.edu/other.html">x</a></main>')
+        return httpx.Response(200, text=body, headers={"content-type": "text/html"})
+
+    url = "https://catalogue.belhaven.edu/content.php?catoid=8&navoid=99901&print"
+    with SessionLocal() as s:
+        s.query(Page).filter(Page.url == url).delete()
+        s.commit()
+    with httpx.Client(transport=httpx.MockTransport(handler), follow_redirects=False) as c:
+        st = crawl.crawl_missing([url], client=c)
+        assert st["changed"] == 1 and hits == [url]          # the linked page was not followed
+        assert crawl.crawl_missing([url], client=c)["fetched"] == 0   # already stored: no refetch
+    assert crawl.allowed(url) and crawl.classify(url)[0] == "Policies & Registrar"
+
+
+def test_crawl_honours_robots_crawl_delay(monkeypatch):
+    import httpx
+    from urllib.robotparser import RobotFileParser
+    from app import crawl
+    from app.db import Page, SessionLocal
+    rules = "User-agent: *\nDisallow: /portfolio.php\nCrawl-delay: 120\n"
+    monkeypatch.setattr(RobotFileParser, "read", lambda self: self.parse(rules.splitlines()))
+    monkeypatch.setattr(crawl.settings, "CRAWL_DELAY_SECONDS", 0)
+    slept = []
+    monkeypatch.setattr(crawl.time, "sleep", lambda s: slept.append(s))
+    handler = lambda req: httpx.Response(200, text=KILT_HTML, headers={"content-type": "text/html"})
+    urls = [f"https://catalogue.belhaven.edu/content.php?catoid=8&navoid={n}&print" for n in (99911, 99912)]
+    with SessionLocal() as s:
+        s.query(Page).filter(Page.url.in_(urls)).delete()
+        s.commit()
+    with httpx.Client(transport=httpx.MockTransport(handler), follow_redirects=False) as c:
+        crawl.crawl_missing(urls, client=c)
+    assert slept == [120.0]          # waits between the two pages, not after the last one
