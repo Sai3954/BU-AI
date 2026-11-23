@@ -71,7 +71,7 @@ export default function Admin() {
     return (
       <div className="admin-login">
         <h1>Admin insights</h1>
-        <p className="muted">Enter the admin token from the backend's <code>.env</code> file.</p>
+        <p className="muted">Authorized administrators only.</p>
         <form onSubmit={submit} className="ask">
           <label htmlFor="tok" className="sr">Admin token</label>
           <input id="tok" type="password" value={token} onChange={e => setToken(e.target.value)} placeholder="Admin token" />

@@ -1,7 +1,8 @@
 /*
-  Ask Bela website launcher. Add one line to any page:
-    <script src="https://YOUR-BELA-HOST/embed.js" defer></script>
-  Optional attributes: data-label="Ask Bela"  data-app="https://YOUR-BELA-HOST"  data-position="right|left"
+  Ask Bela website launcher. Add one line to any page (this prototype's address shown; use the
+  address where Bela is hosted):
+    <script src="https://bu-ai-v2-web.onrender.com/embed.js" defer></script>
+  Optional attributes: data-label="Ask Bela"  data-app="https://bu-ai-v2-web.onrender.com"  data-position="right|left"
   Shows an "Ask Bela" button in the corner; clicking opens the assistant in a panel. It never opens by itself.
 */
 (function () {

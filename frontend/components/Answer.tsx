@@ -16,11 +16,15 @@ const MailIcon = () => (
 // Emails, US phone numbers (601-968-5933, (601) 968-5933, 800.960.5940) and web addresses in answer text.
 const CONTACT = /([\w.+-]+@[\w-]+(?:\.[\w-]+)+|\(?\b\d{3}\)?[-. ]\d{3}[-. ]\d{4}\b|https?:\/\/[^\s)]+[^\s).,;])/g;
 
+const PLACEHOLDER = /^(first[-_.]?(name)?[-_.]?last(name)?|first[-_.]?name|last[-_.]?name|your[-_.]?name|user[-_.]?name|name|email|example)@|@example\./i;
+
 /** Plain text with emails, phone numbers and links made tappable. */
 function contacts(text: string, key: string): ReactNode[] {
   return text.split(CONTACT).map((p, i) => {
     const k = `${key}-c${i}`;
     if (i % 2 === 0) return p ? <Fragment key={k}>{p}</Fragment> : null;
+    // A format example ("firstnamelastname@students.belhaven.edu") is not a real address: show it, don't link it.
+    if (p.includes("@") && PLACEHOLDER.test(p)) return <Fragment key={k}>{p}</Fragment>;
     if (p.includes("@")) return <a key={k} className="contact-link" href={`mailto:${p}`}><MailIcon />{p}</a>;
     if (/^https?:/.test(p)) return <a key={k} href={p} target="_blank" rel="noopener noreferrer">{p.replace(/^https?:\/\//, "")}</a>;
     return <a key={k} className="contact-link" href={`tel:+1${p.replace(/\D/g, "")}`}><PhoneIcon />{p}</a>;

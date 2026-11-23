@@ -211,7 +211,7 @@ export default function Home() {
       {!embed && <Header name={name} tagline={meta?.tagline} onHome={reset} thinking={busy} />}
 
       {apiDown && (
-        <div className="banner">The assistant service isn't running. Start the backend (see README), then refresh this page.</div>
+        <div className="banner">Bela is temporarily unavailable. Please wait a moment, then refresh this page.</div>
       )}
 
       <main className={chatting ? "main chat" : "main home"}>

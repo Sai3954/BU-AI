@@ -10,6 +10,8 @@ import difflib
 import re
 from collections import Counter
 
+from .topics import DOCTORAL, GRAD, topic
+
 # Hand-written fallbacks, by page category. Each is a question the knowledge base answers well
 # (checked in the 300-question test).
 DEFAULTS: dict[str, list[str]] = {
@@ -37,6 +39,11 @@ DEFAULTS: dict[str, list[str]] = {
     "Alumni": ["How can alumni request a transcript?", "Who do I contact in the alumni office?"],
     "Faculty & Staff": ["How do I contact Human Resources?", "Where is the employee directory?"],
 }
+# Admissions follow-ups for graduate and doctoral questions (the default list is for first-year students).
+GRAD_ADMISSIONS = ["How do I apply to a graduate program?", "What is the cost per credit hour for graduate courses?",
+                   "How do I contact graduate admissions?"]
+DOCTORAL_ADMISSIONS = ["Is the DBA program online?", "How many credit hours is the DBA program?",
+                       "Who do I contact about the doctoral programs?"]
 GENERAL = ["How do I contact the Registrar's Office?", "How do I contact the Financial Aid office?",
            "What are the library hours?"]
 
@@ -70,13 +77,19 @@ def followups(question: str, docs: list, k: int = 3) -> list[str]:
         if q and len(out) < k and not _similar(q, question) and not any(_similar(q, o) for o in out):
             out.append(q)
 
-    for d in docs:
-        if getattr(d, "category", "") != "News":
-            add(_from_title(getattr(d, "title", "")))
-    # The topic the pages are mostly about; "Student Services" is a catch-all, so it only counts if nothing else does.
+    # The question's own topic comes first ("I can't access my email" is an IT question even if admission
+    # pages were also found); otherwise the topic the pages are mostly about. "Student Services" is a
+    # catch-all, so it only counts if nothing else does.
+    asked = topic(question)
     counts = Counter(getattr(d, "category", "") for d in docs)
     specific = [c for c, _ in counts.most_common() if c in DEFAULTS and c != "Student Services"]
-    category = specific[0] if specific else ("Student Services" if "Student Services" in counts else "")
-    for q in DEFAULTS.get(category, []) + GENERAL:
+    category = asked or (specific[0] if specific else ("Student Services" if "Student Services" in counts else ""))
+    for d in docs:
+        if getattr(d, "category", "") != "News" and (not asked or getattr(d, "category", "") == asked):
+            add(_from_title(getattr(d, "title", "")))
+    defaults = DEFAULTS.get(category, [])
+    if category == "Admissions" and GRAD.search(question):
+        defaults = DOCTORAL_ADMISSIONS if DOCTORAL.search(question) else GRAD_ADMISSIONS
+    for q in defaults + GENERAL:
         add(q)
     return out

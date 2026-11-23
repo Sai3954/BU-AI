@@ -510,7 +510,7 @@ def chat(req: ChatRequest, request: Request):
             finished = True
             yield _sse("done", {"query_id": qid, "answered": is_answered(answer, docs), "votes": question_votes(q),
                                 "handoff": suggest_office(q, role, detect_level(sq, role)),
-                                "followups": followups(q, docs) if docs and not flags["crisis"] else [],
+                                "followups": followups(q, docs) if docs and not (flags["crisis"] or flags["high_risk"]) else [],
                                 **{k: checked.get(k, []) for k in ("unverified", "misattributed", "uncited",
                                                                     "unsupported_claims", "ai_flags")}})
         finally:

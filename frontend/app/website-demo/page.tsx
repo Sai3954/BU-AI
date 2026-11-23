@@ -7,12 +7,15 @@ export default function WebsiteDemo() {
   return (
     <div className="demo-site">
       <p className="demo-note">
-        Sample page for the demo (fictional “Example University”). On a real site, the button in the corner is added with one line of code:{" "}
-        <code>{'<script src="https://YOUR-BELA-HOST/embed.js" defer></script>'}</code>
+        <strong>Demonstration page.</strong> “Example University” is fictional, and its headlines, dates and
+        announcements are made up for this demo. It is not a Belhaven University page. On a real website, the
+        button in the corner is added with one line of code (shown with this prototype’s address):{" "}
+        <code>{'<script src="https://bu-ai-v2-web.onrender.com/embed.js" defer></script>'}</code>
       </p>
       <header className="demo-top">
         <span className="demo-logo" aria-hidden="true">E</span>
         <span className="demo-name">Example University</span>
+        <span className="demo-tag">Fictional demo site</span>
         <nav className="demo-nav" aria-label="Example navigation">
           <span>Admissions</span><span>Academics</span><span>Student life</span><span>Financial aid</span><span>About</span>
         </nav>
@@ -31,7 +34,7 @@ export default function WebsiteDemo() {
             <div><b>Student life</b><p>Housing, dining, clubs and campus events.</p><span>Discover →</span></div>
           </div>
           <div className="demo-news">
-            <b>News &amp; events</b>
+            <b>News &amp; events <span className="demo-tag">Sample announcements, not real</span></b>
             <div><span>Nov 20</span>Library extends evening hours for finals week</div>
             <div><span>Dec 1</span>Early acceptance deadline for first-year applicants</div>
             <div><span>Jan 12</span>Spring term classes begin</div>

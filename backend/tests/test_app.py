@@ -631,3 +631,9 @@ def test_crawl_export_roundtrip_and_tagging(tmp_path):
         assert s.scalar(select(Chunk.id).where(Chunk.source == "crawl").limit(1)) is not None
     assert crawl.load_export(str(out)) == 0
     assert crawl.load_export(str(tmp_path / "missing.json.gz")) == 0
+
+
+def test_no_followups_on_immigration_status_risk(client):
+    r = client.post("/api/chat", json={"question": "My SEVIS record was terminated. Can I continue working?", "role": "international"})
+    done = [json.loads(b.split("data: ", 1)[1]) for b in r.text.split("\n\n") if '"followups"' in b]
+    assert done and done[-1]["followups"] == []

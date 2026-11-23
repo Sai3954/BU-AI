@@ -13,7 +13,9 @@ IMMIGRATION = re.compile(r"\b(cpt|opt|stem opt|i-?20|sevis|f-?1|visa|status|trav
 
 # (pattern, office name, or a dict of office name by role/level)
 RULES: list[tuple[re.Pattern, str | dict]] = [
-    (re.compile(r"\b(password|duo|log ?in|sign ?in|wi-?fi|email account|blazenet|canvas (login|access))\b", re.I), "IT Help Desk"),
+    (re.compile(r"\b(password|duo|log ?in|sign ?in|wi-?fi|email account|blazenet|canvas (login|access)|"
+                r"locked out|(can'?t|cannot|unable to) (access|get into|open) my|"
+                r"(can'?t|cannot|unable to|trouble|problems?)\b[^.?!]{0,25}\be-?mail)\b", re.I), "IT Help Desk"),
     # Library before Financial Aid, so an "interlibrary loan" is not read as a student loan
     (re.compile(r"\b(library|databases?|research help|interlibrary)\b", re.I), "Warren A. Hood Library"),
     (re.compile(r"\b(fafsa|scholarships?|grants?|loans?|financial aid|work[- ]study)\b", re.I), "Financial Aid"),

@@ -336,3 +336,28 @@ def test_guard_checks_clock_times_whole():
     assert not ok["unverified"] and not ok["misattributed"], ok
     bad = guard.check("Monday–Friday: 7:30 a.m.–9:00 p.m. [1].", d)
     assert "9:00" in bad["unverified"] and "00" not in bad["unverified"] + bad["misattributed"]
+
+
+# ---------- QA review, Nov 23: follow-ups follow the question; IT handoff for email access ----------
+
+def _fdocs(*cats):
+    from app.retrieval import Doc
+    return [Doc(i, f"u{i}", f"Page {i}", c, ["all"], "text", "") for i, c in enumerate(cats)]
+
+
+def test_followups_follow_the_question_topic_not_the_pages():
+    from app.followups import followups
+    it = followups("I can't access my Belhaven email. Who should I contact?",
+                   _fdocs("Admissions", "Admissions", "IT Support", "Admissions"))
+    assert it[0] == "How do I contact the IT Help Desk?" and not any("freshmen" in q or "campus visit" in q for q in it)
+    dba = followups("What are the admission requirements for Belhaven's DBA program?", _fdocs("Academics", "Academics", "International"))
+    assert dba and all(q in ("Is the DBA program online?", "How many credit hours is the DBA program?",
+                             "Who do I contact about the doctoral programs?") for q in dba), dba
+    grad = followups("How do I apply to the MBA program?", _fdocs("Admissions"))
+    assert "How do I apply to a graduate program?" in grad or "How do I contact graduate admissions?" in grad
+
+
+def test_email_access_goes_to_it_help_desk_but_transcript_email_does_not():
+    from app.handoff import suggest_office
+    assert suggest_office("I can't access my Belhaven email. Who should I contact?")["name"] == "IT Help Desk"
+    assert suggest_office("Can the registrar send my transcript to my email?")["name"] == "Registrar"
