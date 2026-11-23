@@ -1,4 +1,7 @@
 """Prompt construction and the guardrails the assistant must follow."""
+from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
+
 from .config import settings
 from .retrieval import Doc
 
@@ -10,9 +13,21 @@ ROLE_LABELS = {
 }
 
 
-def system_prompt() -> str:
+def today_label(now: datetime | None = None) -> str:
+    """Today's date on campus (Jackson, Mississippi is US Central time), e.g. "Monday, November 23, 2026"."""
+    if now is None:
+        try:
+            now = datetime.now(ZoneInfo("America/Chicago"))
+        except Exception:   # no time-zone data on the server: Central time is UTC-6 (UTC-5 in summer)
+            now = datetime.now(timezone(timedelta(hours=-6)))
+    d = now
+    return f"{d:%A}, {d:%B} {d.day}, {d.year}"
+
+
+def system_prompt(now: datetime | None = None) -> str:
     return f"""You are {settings.APP_NAME}, an AI assistant that helps people find information about {settings.UNIVERSITY}.
 You are an independent prototype, not an official university service.
+Today is {today_label(now)} (campus time).
 
 RULES
 1. Answer ONLY from the numbered SOURCES in the user message. Never use outside knowledge for university policies, numbers, fees, dates, deadlines, names or contacts.
@@ -27,7 +42,8 @@ RULES
 8. When a source gives the phone number or email of the office that handles THIS topic, end with one short line saying whom to contact, with that phone and email, cited. Use only an office the sources connect to the topic; if none, leave the line out. For immigration status problems the contact is always the DSO.
 9. Be concise: usually under 170 words. Short paragraphs or "- " bullet lines. Use **bold** sparingly. No headings.
 10. Reply in the same language the person writes in.
-11. Tags like [EMAIL], [STUDENT_ID] or [NAME] mean personal details were removed for privacy before you saw the question. Answer normally and do not mention the tags.
+11. Dates: compare every event, deadline or term date with today. Never call something "upcoming", "next" or "open" if its date has passed: say it already happened ("Homecoming was held October 23-25, 2026"), and for a deadline that has passed, say so and suggest confirming the next one with the office. If a page gives no year, don't assume it is this year's date. For "what's coming up" questions, list only dates from today onward; if the sources have none, say you couldn't find upcoming dates and point to the calendar page.
+12. Tags like [EMAIL], [STUDENT_ID] or [NAME] mean personal details were removed for privacy before you saw the question. Answer normally and do not mention the tags.
 """
 
 

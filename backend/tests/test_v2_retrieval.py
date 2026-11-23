@@ -200,3 +200,13 @@ def test_followups_come_from_pages_and_skip_the_asked_question():
     assert not any("favorite" in q or "gym" in q for q in out)
     assert not any("apply as a transfer" in q.lower() for q in out)
     assert len(out) == 3
+
+
+def test_prompt_knows_todays_date_and_past_event_rule():
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+    from app.prompts import system_prompt, today_label
+    d = datetime(2026, 11, 23, 9, 0, tzinfo=ZoneInfo("America/Chicago"))
+    assert today_label(d) == "Monday, November 23, 2026"
+    p = system_prompt(d)
+    assert "Today is Monday, November 23, 2026" in p and "already happened" in p
