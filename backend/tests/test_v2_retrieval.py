@@ -210,3 +210,12 @@ def test_prompt_knows_todays_date_and_past_event_rule():
     assert today_label(d) == "Monday, November 23, 2026"
     p = system_prompt(d)
     assert "Today is Monday, November 23, 2026" in p and "already happened" in p
+
+
+def test_followup_fallback_uses_the_specific_topic():
+    from types import SimpleNamespace as D
+    from app.followups import followups
+    docs = [D(title="Campus Life", category="Student Services"), D(title="Alumni", category="Alumni"),
+            D(title="Homecoming", category="Alumni")]
+    out = followups("Are there alumni events coming up?", docs)
+    assert out[0] in ("How can alumni request a transcript?", "Who do I contact in the alumni office?")

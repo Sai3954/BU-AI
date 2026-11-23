@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import difflib
 import re
+from collections import Counter
 
 # Hand-written fallbacks, by page category. Each is a question the knowledge base answers well
 # (checked in the 300-question test).
@@ -71,7 +72,10 @@ def followups(question: str, docs: list, k: int = 3) -> list[str]:
     for d in docs:
         if getattr(d, "category", "") != "News":
             add(_from_title(getattr(d, "title", "")))
-    category = next((d.category for d in docs if getattr(d, "category", "") in DEFAULTS), "")
+    # The topic the pages are mostly about; "Student Services" is a catch-all, so it only counts if nothing else does.
+    counts = Counter(getattr(d, "category", "") for d in docs)
+    specific = [c for c, _ in counts.most_common() if c in DEFAULTS and c != "Student Services"]
+    category = specific[0] if specific else ("Student Services" if "Student Services" in counts else "")
     for q in DEFAULTS.get(category, []) + GENERAL:
         add(q)
     return out
