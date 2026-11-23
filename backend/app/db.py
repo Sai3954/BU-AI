@@ -61,6 +61,7 @@ class QueryLog(Base):
     ai: Mapped[bool] = mapped_column(Boolean, default=False)
     feedback_reason: Mapped[str] = mapped_column(String(40), default="")  # wrong | missing | unclear (on thumbs-down)
     handoff_office: Mapped[str] = mapped_column(String(120), default="")  # office a student prepared a request to
+    content_gap: Mapped[bool] = mapped_column(Boolean, default=False)  # the answer said the public pages don't cover (part of) it
 
 
 class Issue(Base):

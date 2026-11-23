@@ -14,18 +14,24 @@ IMMIGRATION = re.compile(r"\b(cpt|opt|stem opt|i-?20|sevis|f-?1|visa|status|trav
 # (pattern, office name, or a dict of office name by role/level)
 RULES: list[tuple[re.Pattern, str | dict]] = [
     (re.compile(r"\b(password|duo|log ?in|sign ?in|wi-?fi|email account|blazenet|canvas (login|access))\b", re.I), "IT Help Desk"),
+    # Library before Financial Aid, so an "interlibrary loan" is not read as a student loan
+    (re.compile(r"\b(library|databases?|research help|interlibrary)\b", re.I), "Warren A. Hood Library"),
     (re.compile(r"\b(fafsa|scholarships?|grants?|loans?|financial aid|work[- ]study)\b", re.I), "Financial Aid"),
     (re.compile(r"\b(tuition|bill|billing|payments?|payment plan|refunds?|balance|1098)\b", re.I),
      {"online": "Online & Graduate Student Services", "graduate": "Online & Graduate Student Services",
       "doctoral": "Online & Graduate Student Services", "": "Business Office"}),
-    (re.compile(r"\b(transcripts?|enrollment verification|graduat(e|ion) application|apply (for|to) graduat|diploma|"
+    (re.compile(r"\b(transcripts?|enrollment verification|graduat(e|ion) application|apply (for|to) graduat\w*|graduation|diploma|"
                 r"grade appeal|register for classes|registration|drop (a )?class|withdraw|substitution|course waiver)\b", re.I), "Registrar"),
     (re.compile(r"\b(housing|dorm|residence hall|roommate)\b", re.I), "Office of Student Development / Housing"),
     (re.compile(r"\b(meal plan|dining|dinner|lunch|breakfast)\b", re.I), "Bailey Dining Commons"),
+    # An admission counselor, or a counseling degree, is an admission question, not a wellbeing one
+    (re.compile(r"\b(admissions?|enrollment) counselors?\b|\b(master'?s|degree|program|major)\b[^.?!]*\bcounsel|\bcounsel\w*\b[^.?!]*\b(degree|program|major)\b", re.I),
+     {"international": "International Graduate Admission / Graduate International Office",
+      "graduate": "Online & Graduate Admission", "online": "Online & Graduate Admission",
+      "doctoral": "Online & Graduate Admission", "": "Undergraduate Admission"}),
     (re.compile(r"\b(counsel(ing|or)|stress(ed)?|anxi(ous|ety)|depress(ed|ion)|lonely)\b", re.I), "Counseling Services"),
     (re.compile(r"\b(tutor(ing)?|accommodations?|disabilit(y|ies)|academic advis(or|ing))\b", re.I), "Student Care & Think Center"),
     (re.compile(r"\b(career|resume|cover letter|internships?|job interview|handshake)\b", re.I), "Center for Career & Calling"),
-    (re.compile(r"\b(library|databases?|research help|interlibrary)\b", re.I), "Warren A. Hood Library"),
     (re.compile(r"\b(veterans?|military|gi bill)\b", re.I), "Veterans Services"),
     (re.compile(r"\b(alumni|alumnus|alumna)\b", re.I), "Alumni / College Relations"),
     (re.compile(r"\b(apply|application|admission|admitted|accepted|transfer credit)\b", re.I),

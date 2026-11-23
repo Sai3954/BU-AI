@@ -14,7 +14,7 @@ export const API = apiBase();
 
 export type Source = { title: string; url: string; category: string; updated: string; text: string };
 export type Office = { name: string; email: string; phone: string; url: string; location: string; handles: string; reason?: string };
-export type DoneExtra = { answered?: boolean; handoff?: Office | null };
+export type DoneExtra = { answered?: boolean; handoff?: Office | null; followups?: string[] };
 export type Conflict = { fact: string; values: { value: string; sources: number[] }[] };
 export type Flags = { high_risk: boolean; crisis: boolean; pii_removed?: string[]; level?: string; conflicts?: Conflict[] };
 export type Meta = {
@@ -74,7 +74,7 @@ export async function streamChat(
       else if (ev === "delta") h.onDelta(d.text);
       else if (ev === "replace") h.onReplace?.(d.text);
       else if (ev === "stage") h.onStage?.(d.stage);
-      else if (ev === "done") h.onDone(d.query_id, { unverified: d.unverified || [], misattributed: d.misattributed || [], uncited: d.uncited || [], unsupported_claims: d.unsupported_claims || [], ai_flags: d.ai_flags || [] }, d.votes, { answered: d.answered, handoff: d.handoff || null });
+      else if (ev === "done") h.onDone(d.query_id, { unverified: d.unverified || [], misattributed: d.misattributed || [], uncited: d.uncited || [], unsupported_claims: d.unsupported_claims || [], ai_flags: d.ai_flags || [] }, d.votes, { answered: d.answered, handoff: d.handoff || null, followups: d.followups || [] });
       else if (ev === "error") h.onError(d.message);
     }
   }
@@ -110,6 +110,26 @@ export async function getAdminSummary(token: string, days = 30) {
   if (r.status === 429) throw new Error("Too many attempts. Wait a minute and try again.");
   if (!r.ok) throw new Error("Couldn't load analytics.");
   return r.json();
+}
+
+export type Gap = { question: string; count: number; found_nothing: number; partly_answered: number; marked_missing: number;
+  category: string; office: string; last_asked: string; roles: Record<string, number> };
+export type GapReport = { window_days: number; questions: number; gap_questions: number; by_category: Record<string, number>; gaps: Gap[] };
+
+export async function getContentGaps(token: string, days = 30): Promise<GapReport> {
+  const r = await fetch(`${API}/api/admin/gaps?days=${days}`, { headers: { "X-Admin-Token": token }, cache: "no-store" });
+  if (!r.ok) throw new Error("Couldn't load the content-gap report.");
+  return r.json();
+}
+
+export async function downloadContentGaps(token: string, days = 30) {
+  const r = await fetch(`${API}/api/admin/gaps?days=${days}&format=csv`, { headers: { "X-Admin-Token": token }, cache: "no-store" });
+  if (!r.ok) throw new Error("Couldn't download the report.");
+  const url = URL.createObjectURL(await r.blob());
+  const link = document.createElement("a");
+  link.href = url; link.download = `ask-bela-content-gaps-${days}d.csv`;
+  document.body.appendChild(link); link.click(); link.remove();
+  URL.revokeObjectURL(url);
 }
 
 export async function reindex(token: string) {

@@ -311,3 +311,13 @@ code { background: var(--accent-soft); padding: 1px 5px; border-radius: 4px; }
   .sparkle.on .s3 { animation: twinkle 1.2s ease-in-out .6s infinite; }
 }
 @keyframes twinkle { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.6); } }
+
+/* Content-gap report (admin) */
+.gaps { margin-top: 18px; }
+.gaps-head { display: flex; gap: 16px; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; }
+.gaps-head p { margin: 4px 0 0; max-width: 70ch; }
+.gap-stat { margin: 12px 0; }
+.gap-table { overflow-x: auto; }
+.gap-table table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.gap-table th, .gap-table td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line, #e3e0d6); vertical-align: top; }
+.gap-table td.num { text-align: right; font-variant-numeric: tabular-nums; }

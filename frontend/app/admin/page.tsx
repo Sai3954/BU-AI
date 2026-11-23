@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import { getAdminSummary, reindex } from "@/lib/api";
+import { getAdminSummary, reindex, getContentGaps, downloadContentGaps, type GapReport } from "@/lib/api";
 
 type Summary = {
   window_days: number;
@@ -45,11 +45,13 @@ export default function Admin() {
   const [err, setErr] = useState("");
   const [kind, setKind] = useState("all");
   const [note, setNote] = useState("");
+  const [gaps, setGaps] = useState<GapReport | null>(null);
 
   const load = async (t = token) => {
     setErr("");
     try {
       setData(await getAdminSummary(t));
+      getContentGaps(t).then(setGaps).catch(() => setGaps(null));
       try { sessionStorage.setItem("adminToken", t); } catch {}
     } catch (e) { setErr((e as Error).message); setData(null); }
   };
@@ -109,6 +111,35 @@ export default function Admin() {
         <div className="kpi"><span>Knowledge passages</span><b>{t.passages}</b></div>
       </section>
 
+
+      <section className="panel gaps">
+        <div className="gaps-head">
+          <div>
+            <h2>Content gaps <small>(what students ask that belhaven.edu doesn't answer)</small></h2>
+            <p className="muted">Questions where Bela found nothing, could only answer part, or a student marked the answer as missing information. Each one is a page an office could add or update.</p>
+          </div>
+          <button type="button" onClick={() => downloadContentGaps(token).catch(e => setNote((e as Error).message))} disabled={!gaps || !gaps.gaps.length}>Download CSV for offices</button>
+        </div>
+        {gaps ? (
+          <>
+            <p className="gap-stat"><b>{gaps.gap_questions}</b> of {gaps.questions} questions in the last {gaps.window_days} days{gaps.questions ? ` (${Math.round(gaps.gap_questions / gaps.questions * 100)}%)` : ""} pointed to a content gap.</p>
+            {gaps.gaps.length ? (
+              <div className="gap-table" role="region" aria-label="Content gaps" tabIndex={0}>
+                <table>
+                  <thead><tr><th>Question</th><th>Asked</th><th>What happened</th><th>Topic</th><th>Office that could help</th></tr></thead>
+                  <tbody>{gaps.gaps.slice(0, 25).map(g => (
+                    <tr key={g.question}>
+                      <td>{g.question}</td><td className="num">{g.count}</td>
+                      <td>{[g.found_nothing && "Found nothing", g.partly_answered && "Partly answered", g.marked_missing && "Marked missing"].filter(Boolean).join(" · ")}</td>
+                      <td>{g.category || "—"}</td><td>{g.office || "—"}</td>
+                    </tr>))}</tbody>
+                </table>
+              </div>
+            ) : <p className="muted">No gaps yet.</p>}
+          </>
+        ) : <p className="muted">Loading…</p>}
+      </section>
+
       <section className="cols">
         <div className="panel">
           <h2>Why students tapped 👎</h2>
@@ -133,10 +164,6 @@ export default function Admin() {
         <div className="panel">
           <h2>Most asked</h2>
           {data.top_questions.length ? <ol className="qlist">{data.top_questions.map(q => <li key={q.question}><span>{q.question}</span><b>{q.count}</b></li>)}</ol> : <p className="muted">No questions yet.</p>}
-        </div>
-        <div className="panel">
-          <h2>Couldn't answer <small>(content gaps)</small></h2>
-          {data.unanswered.length ? <ol className="qlist">{data.unanswered.map(q => <li key={q.question}><span>{q.question}</span><b>{q.count}</b></li>)}</ol> : <p className="muted">Nothing unanswered.</p>}
         </div>
       </section>
 

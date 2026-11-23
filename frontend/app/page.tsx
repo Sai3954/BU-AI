@@ -39,11 +39,11 @@ type Msg = {
   status: "searching" | "streaming" | "done" | "error"; queryId?: number; rated?: boolean; checks?: Checks;
   stage: Stage; events: ActivityEvent[]; started: number; reason?: "" | "wrong" | "missing" | "unclear"; askWhy?: boolean;
   copied?: boolean; votes?: { likes: number; dislikes: number }; myVote?: "up" | "down";
-  answered?: boolean; handoff?: Office | null;
+  answered?: boolean; handoff?: Office | null; followups?: string[];
 };
 
-/** Follow-up suggestions grounded in what was found: titles of retrieved FAQ pages that are themselves
- *  questions (so Bela can answer them), not already asked. */
+/** Follow-up suggestions grounded in what was found (from the server, else titles of retrieved FAQ pages
+ *  that are themselves questions), not already asked. */
 function suggestions(m: Msg, asked: string[]): string[] {
   const norm = (x: string) => x.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
   const STOP = new Set("a an the i my me do does can to of for in on is are be at before after how what when where who".split(" "));
@@ -53,9 +53,16 @@ function suggestions(m: Msg, asked: string[]): string[] {
     const common = Array.from(w).filter(x => a.has(x)).length; return w.size > 0 && common / Math.min(w.size, a.size || 1) >= 0.5; }); };
   const seen = new Set(asked.map(norm));
   const out: string[] = [];
+  // The server's suggestions come first: questions from the official pages just used, staff-interview
+  // titles filtered out, with a topic list as fallback. Anything already asked in this chat is skipped.
+  for (const t of m.followups || []) {
+    if (seen.has(norm(t)) || tooClose(t)) continue;
+    seen.add(norm(t)); out.push(t);
+    if (out.length === 3) return out;
+  }
   for (const s of m.sources) {
     const t = s.title.replace(/^(faq|frequently asked questions?)\s*[-–:]\s*/i, "").trim();
-    if (!t.endsWith("?") || t.length > 70 || seen.has(norm(t)) || tooClose(t)) continue;
+    if (!t.endsWith("?") || t.length > 70 || /\byou(r)?\b/i.test(t) || seen.has(norm(t)) || tooClose(t)) continue;
     seen.add(norm(t)); out.push(t);
     if (out.length === 3) break;
   }
@@ -168,7 +175,7 @@ export default function Home() {
       onReplace: text => update(id, { text }),
       onStage: st => { if (st === "verifying") update(id, m => ({ stage: "verifying", events: [...m.events, { at: at(), kind: "verify", label: "Checked every fact against the sources" }] })); },
       onDone: (queryId, checks, votes, extra) => update(id, m => ({ status: "done", stage: "done", queryId, checks, votes,
-        answered: extra?.answered, handoff: extra?.handoff,
+        answered: extra?.answered, handoff: extra?.handoff, followups: extra?.followups,
         events: [...m.events, { at: at(), kind: "ready", label: "Answer ready" }] })),
       onError: msg => update(id, m => ({ status: "error", stage: "error", text: m.text || msg })),
     }, abortRef.current.signal);

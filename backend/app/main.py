@@ -14,7 +14,7 @@ from datetime import timedelta
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import Response, StreamingResponse
 from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 
@@ -28,6 +28,7 @@ from .redact import redact
 from .retrieval import ROLES, detect_level, for_meaning, index, is_crisis, is_follow_up, is_high_risk
 from .conflicts import conflict_note, find_conflicts
 from .handoff import office_list, suggest_office
+from .followups import followups
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("api")
@@ -47,6 +48,16 @@ def is_answered(answer: str, docs: list) -> bool:
     if re.search(r"\[\d+\]", answer):
         return not low.lstrip().startswith(("i couldn't find that", "i could not find that"))
     return not any(p in low for p in NOT_FOUND)
+GAP = re.compile(r"\b(i (couldn't|could not|didn't|did not) find|isn't in (the|my) sources|"
+                 r"(the )?(sources|pages) (i have |i found )?(don't|do not) (say|list|give|mention|describe|explain))", re.I)
+
+
+def content_gap(answer: str, answered: bool) -> bool:
+    """True when Bela said the public pages don't cover the question, or part of it. These questions are the
+    web team's to-do list: what students ask that belhaven.edu doesn't answer."""
+    return (not answered) or bool(GAP.search(answer[:600]))
+
+
 COMMON_PARTS = ("admin", "password", "passw0rd", "belhaven", "change", "demo", "test", "secret", "token",
                 "1234", "qwerty", "letmein", "welcome", "default", "abcdef", "university", "blazer")
 
@@ -477,6 +488,7 @@ def chat(req: ChatRequest, request: Request):
             finished = True
             yield _sse("done", {"query_id": qid, "answered": is_answered(answer, docs), "votes": question_votes(q),
                                 "handoff": suggest_office(q, role, detect_level(sq, role)),
+                                "followups": followups(q, docs) if docs and not flags["crisis"] else [],
                                 **{k: checked.get(k, []) for k in ("unverified", "misattributed", "uncited",
                                                                     "unsupported_claims", "ai_flags")}})
         finally:
@@ -489,6 +501,7 @@ def chat(req: ChatRequest, request: Request):
                     r.answered = answered
                     r.latency_ms = (time.time() - t0) * 1000
                     r.unverified = guard.issue_count(checked)
+                    r.content_gap = finished and content_gap(answer, answered)
                     s.commit()
 
     return StreamingResponse(gen(), media_type="text/event-stream",
@@ -566,6 +579,51 @@ def admin_summary(days: int = 30):
                     "detected_at": i.detected_at.isoformat()} for i in issues],
         "issue_counts": dict(Counter(i.kind for i in issues)),
     }
+
+
+@app.get("/api/admin/gaps", dependencies=[Depends(admin)])
+def admin_gaps(days: int = 30, format: str = "json"):
+    """Questions Bela couldn't fully answer from public pages, grouped and counted, with the office that
+    could close each gap. Includes thumbs-down answers marked "missing". No personal data is stored."""
+    since = now() - timedelta(days=days)
+    with SessionLocal() as s:
+        qs = list(s.scalars(select(QueryLog).where(QueryLog.created_at >= since).order_by(QueryLog.created_at.desc())))
+    norm = lambda t: " ".join(t.lower().split()).rstrip("?.! ")[:160]
+    groups: dict[str, dict] = {}
+    for q in qs:
+        missing = q.helpful is False and q.feedback_reason == "missing"
+        if not (q.content_gap or not q.answered or missing):
+            continue
+        g = groups.setdefault(norm(q.question), {"question": q.question.strip()[:200], "count": 0, "last_asked": q.created_at,
+                                                 "category": q.top_category or "", "roles": Counter(),
+                                                 "found_nothing": 0, "partly_answered": 0, "marked_missing": 0})
+        g["count"] += 1
+        g["roles"][q.role or "unspecified"] += 1
+        if not q.answered:
+            g["found_nothing"] += 1
+        elif q.content_gap:
+            g["partly_answered"] += 1
+        if missing:
+            g["marked_missing"] += 1
+    rows = []
+    for g in sorted(groups.values(), key=lambda g: (-g["count"], g["question"])):
+        office = suggest_office(g["question"], "")
+        rows.append({**g, "last_asked": g["last_asked"].isoformat(), "roles": dict(g["roles"]),
+                     "office": office["name"] if office else ""})
+    total = len(qs)
+    by_cat = Counter(r["category"] or "none" for r in rows for _ in range(r["count"]))
+    if format == "csv":
+        import csv, io
+        buf = io.StringIO()
+        w = csv.writer(buf)
+        w.writerow(["Question", "Times asked", "Found nothing", "Partly answered", "Marked missing", "Topic", "Office that could help", "Last asked"])
+        for r in rows:
+            w.writerow([r["question"], r["count"], r["found_nothing"], r["partly_answered"], r["marked_missing"],
+                        r["category"], r["office"], r["last_asked"][:10]])
+        return Response(buf.getvalue(), media_type="text/csv",
+                        headers={"Content-Disposition": f'attachment; filename="ask-bela-content-gaps-{days}d.csv"'})
+    return {"window_days": days, "questions": total, "gap_questions": sum(r["count"] for r in rows),
+            "by_category": dict(by_cat.most_common()), "gaps": rows[:200]}
 
 
 @app.post("/api/admin/reindex", dependencies=[Depends(admin)])

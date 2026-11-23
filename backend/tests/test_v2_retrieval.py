@@ -141,3 +141,62 @@ def test_misspelled_words_still_find_pages():
     ix.build(rows)
     assert ix.search("how do i aply for finacial aid")
     assert ix._spell("financial aid") == "financial aid"   # known words are never changed
+
+
+def test_handoff_office_fixes_from_300_question_test():
+    from app.handoff import suggest_office
+    cases = [("How do I apply for graduation?", "undergraduate", "Registrar"),
+             ("Who is my admission counselor?", "prospective", "Undergraduate Admission"),
+             ("Can I borrow books from other libraries through interlibrary loan?", "undergraduate", "Warren A. Hood Library"),
+             ("Does Belhaven offer a master's in counseling?", "graduate", "Online & Graduate Admission"),
+             ("I'm stressed and want to talk to a counselor", "undergraduate", "Counseling Services"),
+             ("What types of federal loans can I get?", "undergraduate", "Financial Aid")]
+    for q, role, want in cases:
+        assert suggest_office(q, role)["name"] == want, q
+
+
+def test_content_gap_detection_and_report():
+    from fastapi.testclient import TestClient
+    from app.main import app, content_gap
+    from app.config import settings
+    from app.db import SessionLocal, QueryLog
+    assert content_gap("I couldn't find how to get a parking permit in the university's public pages.", True)
+    assert content_gap("Full-time is 12 hours [1]. The sources don't say whether overloads are allowed.", True)
+    assert not content_gap("The registrar is at 601-968-5922 [1].", True)
+    assert content_gap("anything", False)
+    with TestClient(app) as c:
+        with SessionLocal() as s:
+            s.add_all([QueryLog(question="How do I get a parking permit?", answered=True, content_gap=True, top_category="Student Services"),
+                       QueryLog(question="how do I get a parking permit", answered=True, content_gap=True, top_category="Student Services"),
+                       QueryLog(question="Where is the gym?", answered=True, helpful=False, feedback_reason="missing"),
+                       QueryLog(question="What are library hours?", answered=True)])
+            s.commit()
+        old = settings.ADMIN_TOKEN
+        settings.ADMIN_TOKEN = "Qv7-Lr2xKp9-Zw4mJt8-Hc6"
+        try:
+            r = c.get("/api/admin/gaps", headers={"X-Admin-Token": settings.ADMIN_TOKEN})
+            csv = c.get("/api/admin/gaps?format=csv", headers={"X-Admin-Token": settings.ADMIN_TOKEN})
+            denied = c.get("/api/admin/gaps")
+        finally:
+            settings.ADMIN_TOKEN = old
+        assert r.status_code == 200, r.text
+        gaps = {g["question"].lower().rstrip("?"): g for g in r.json()["gaps"]}
+        assert gaps["how do i get a parking permit"]["count"] >= 2
+        assert gaps["where is the gym"]["marked_missing"] >= 1
+        assert "what are library hours" not in gaps
+        assert csv.status_code == 200 and csv.text.startswith("Question,Times asked")
+        assert denied.status_code in (401, 503)
+
+
+def test_followups_come_from_pages_and_skip_the_asked_question():
+    from types import SimpleNamespace as D
+    from app.followups import followups
+    docs = [D(title="Transfer Students - Does My GPA Transfer With My Credits?", category="Admissions"),
+            D(title="Nina Jones - What is your favorite place on campus and why?", category="Admissions"),
+            D(title="Campus News - Is the new gym open?", category="News"),
+            D(title="Transfer Students - How do I apply as a transfer student?", category="Admissions")]
+    out = followups("How do I apply as a transfer student?", docs)
+    assert out[0] == "Does My GPA Transfer With My Credits?"
+    assert not any("favorite" in q or "gym" in q for q in out)
+    assert not any("apply as a transfer" in q.lower() for q in out)
+    assert len(out) == 3
