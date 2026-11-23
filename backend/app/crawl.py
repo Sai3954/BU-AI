@@ -333,7 +333,8 @@ def crawl(seeds: list[str], max_pages: int, use_sitemap: bool = False, follow_li
                 continue
             title, text, updated, links = extract(r.text, url)
             if len(text) <= 200:
-                note(url, f"too little text ({len(text)} chars)")
+                note(url, f"too little text ({len(text)} chars; HTTP {r.status_code}, {len(r.content)} bytes, "
+                          f"{r.headers.get('server', '?')[:20]}, {'script-only' if '<p' not in r.text.lower() else 'has <p>'})")
             if len(text) > 200 and store_page(url, title, text, updated, r.status_code):
                 stats["changed"] += 1
                 monitor.record_change(url, title)
