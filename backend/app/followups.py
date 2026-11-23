@@ -41,6 +41,7 @@ GENERAL = ["How do I contact the Registrar's Office?", "How do I contact the Fin
            "What are the library hours?"]
 
 ADDRESSED = re.compile(r"\b(you|your)\b", re.I)   # staff-interview titles ("What do you like most…?")
+PARENT = re.compile(r"\bmy (son|daughter|child|children|student)\b", re.I)   # parents' FAQ, not a student's question
 
 
 def _from_title(title: str) -> str | None:
@@ -48,7 +49,7 @@ def _from_title(title: str) -> str | None:
     if "?" not in t:
         return None
     q = t.rsplit(" - ", 1)[-1].strip()
-    if not q.endswith("?") or ADDRESSED.search(q) or not 15 <= len(q) <= 110:
+    if not q.endswith("?") or ADDRESSED.search(q) or PARENT.search(q) or not 15 <= len(q) <= 110:
         return None
     return q[0].upper() + q[1:]
 

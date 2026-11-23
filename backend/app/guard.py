@@ -44,7 +44,8 @@ RULE_WORDS = re.compile(r"\b(must|required|requires|need to|deadline|due|minimum
 
 
 def _norm(s: str) -> str:
-    return s.replace("$", "").replace(",", "").rstrip("%").rstrip(".")
+    # "$85.00" on the page and "$85" in the answer are the same amount; "85.50" stays different.
+    return re.sub(r"\.0+$", "", s.replace("$", "").replace(",", "").rstrip("%").rstrip("."))
 
 
 def _words(s: str) -> set[str]:

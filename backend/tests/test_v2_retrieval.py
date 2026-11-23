@@ -219,3 +219,18 @@ def test_followup_fallback_uses_the_specific_topic():
             D(title="Homecoming", category="Alumni")]
     out = followups("Are there alumni events coming up?", docs)
     assert out[0] in ("How can alumni request a transcript?", "Who do I contact in the alumni office?")
+
+
+def test_checker_accepts_whole_dollar_amounts_written_without_cents():
+    from app import guard
+    doc = d(1, "Meal Plan Total Cost 10 Meals $85.00 $8.50 per meal 120 Meals $900.00 $7.50 per meal")
+    r = guard.check("The smallest option is 10 meals for $85 ($8.50 each), and 120 meals cost $900 [1].", [doc])
+    assert r["unverified"] == [] and r["misattributed"] == []
+    assert "$86" in guard.check("Ten meals cost $86 [1].", [doc])["unverified"]
+
+
+def test_followups_skip_parent_faq_titles():
+    from types import SimpleNamespace as D
+    from app.followups import followups
+    docs = [D(title="Parents FAQ - How does my son or daughter apply for housing next semester?", category="Library")]
+    assert not any("son or daughter" in q for q in followups("How do I reserve a study room?", docs))
