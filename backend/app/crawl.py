@@ -96,7 +96,10 @@ def extract(html: str, url: str) -> tuple[str, str, str, list[str]]:
         title = h1.get_text(" ", strip=True)
     for tag in soup(["script", "style", "noscript", "nav", "header", "footer", "form", "svg", "iframe"]):
         tag.decompose()
-    main = soup.find("main") or soup.find(id=re.compile("content|main", re.I)) or soup.body or soup
+    # The first <main> or content-id element that actually holds text: the catalogue's skip-link target
+    # (id="acalog-content") is an empty anchor, and some pages have an empty <main> in the header.
+    candidates = soup.find_all("main") + soup.find_all(id=re.compile("content|main", re.I))
+    main = next((c for c in candidates if len(c.get_text(" ", strip=True)) > 200), None) or soup.body or soup
     blocks = []
     for el in main.find_all(["h1", "h2", "h3", "h4", "h5", "h6", "p", "li", "td", "th", "dt", "dd"]):
         t = el.get_text(" ", strip=True)

@@ -317,3 +317,11 @@ def test_robots_read_with_crawler_client_and_refusal_blocks():
     assert not crawl.read_robots(no, "x.belhaven.edu").can_fetch("Bot", "https://x.belhaven.edu/a")
     gone = httpx.Client(transport=httpx.MockTransport(lambda r: httpx.Response(404)))
     assert crawl.read_robots(gone, "x.belhaven.edu") is None
+
+
+
+def test_extract_skips_empty_skip_link_anchor():
+    from app import crawl
+    html = KILT_HTML.replace("<main>", '<a id="acalog-content"></a><table><tr><td>').replace("</main>", "</td></tr></table>")
+    _, text, _, _ = crawl.extract(html, "https://catalogue.belhaven.edu/content.php?catoid=8&navoid=1370&print")
+    assert "register it with Campus Safety" in text and "#VISITATION" in text
