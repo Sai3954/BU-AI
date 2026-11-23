@@ -274,7 +274,7 @@ def test_crawl_missing_fetches_only_new_pages_without_following_links(monkeypatc
         body = KILT_HTML.replace("</main>", '<a href="https://www.belhaven.edu/other.html">x</a></main>')
         return httpx.Response(200, text=body, headers={"content-type": "text/html"})
 
-    url = "https://catalogue.belhaven.edu/content.php?catoid=8&navoid=99901&print"
+    url = "https://www.belhaven.edu/test/handbook-99901.html"
     with SessionLocal() as s:
         s.query(Page).filter(Page.url == url).delete()
         s.commit()
@@ -296,7 +296,7 @@ def test_crawl_honours_robots_crawl_delay(monkeypatch):
     monkeypatch.setattr(crawl.time, "sleep", lambda s: slept.append(s))
     handler = lambda req: (httpx.Response(200, text=rules) if req.url.path == "/robots.txt" else
                            httpx.Response(200, text=KILT_HTML, headers={"content-type": "text/html"}))
-    urls = [f"https://catalogue.belhaven.edu/content.php?catoid=8&navoid={n}&print" for n in (99911, 99912)]
+    urls = [f"https://www.belhaven.edu/test/handbook-{n}.html" for n in (99911, 99912)]
     with SessionLocal() as s:
         s.query(Page).filter(Page.url.in_(urls)).delete()
         s.commit()

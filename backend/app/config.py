@@ -13,9 +13,6 @@ def _env(key: str, default: str = "") -> str:
     return os.environ.get(key, default).strip()
 
 
-_CATALOGUE = "https://catalogue.belhaven.edu/content.php?catoid=8&navoid={}&print"
-
-
 class Settings:
     APP_NAME = _env("APP_NAME", "Bela")
     APP_TAGLINE = _env("APP_TAGLINE", "Your Belhaven guide")
@@ -74,22 +71,11 @@ class Settings:
         "https://www.belhaven.edu/admission/undergrad/aid/index.html,https://www.belhaven.edu/admission/online/index.html",
     ).split(",") if s]
     CRAWL_ALLOWED_HOSTS = [h for h in _env(
-        "CRAWL_ALLOWED_HOSTS", "www.belhaven.edu,belhaven.edu,igsupport.belhaven.edu,catalogue.belhaven.edu").split(",") if h]
-    # Official pages the main crawl never reaches, fetched once at API start-up if not stored yet:
-    # the 2026-27 university catalogue's policy pages and "The Kilt" student handbook (print versions).
-    EXTRA_URLS = [u for u in _env("EXTRA_URLS", ",".join(_CATALOGUE.format(n) for n in (
-        "1425",  # Administration of the Curriculum: course load, attendance, grades, academic standing, Dean's List
-        "1370",  # "The Kilt" student handbook: vehicles and parking, residence life, conduct, grievances
-        "1274",  # Student Financial Services - Traditional: payment, refunds, scholarship renewal, SAP
-        "1287",  # Student Financial Services - Adult/Online
-        "1275",  # Campus Life: academic grievances, residence halls, chapel, athletics
-        "1288",  # Student Life - Adult/Online
-        "1437",  # Library Patron Handbook
-        "1289",  # Honors and Awards
-        "1276",  # Alumni Information
-        "1282",  # Information for Prospective Students
-        "1272",  # General Information
-    ))).split(",") if u]
+        "CRAWL_ALLOWED_HOSTS", "www.belhaven.edu,belhaven.edu,igsupport.belhaven.edu").split(",") if h]
+    # Extra official pages to fetch once at start-up if not stored yet (comma-separated, off by default).
+    # The 2026-27 catalogue and "The Kilt" (catalogue.belhaven.edu) were tried in Nov 2026: the site answers
+    # automated requests with an empty HTTP 202 bot challenge, so they need IT's approval or an export first.
+    EXTRA_URLS = [u for u in _env("EXTRA_URLS", "").split(",") if u]
     CRAWLED_FILE = _env("CRAWLED_FILE", str(BASE_DIR / "data" / "crawled_pages.json.gz"))   # written by the crawl job, loaded at startup
     CRAWL_MAX_PAGES = int(_env("CRAWL_MAX_PAGES", "400"))
     CRAWL_DELAY_SECONDS = float(_env("CRAWL_DELAY_SECONDS", "1.0"))

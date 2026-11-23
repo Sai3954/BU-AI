@@ -285,8 +285,10 @@ class Feedback(BaseModel):
 
 @app.get("/api/health")
 def health():
-    return {"ok": True, "provider": provider.name, "vectors": index.has_vectors, "chunks": len(index.docs),
-            "extra_sources": EXTRA_STATUS}
+    out = {"ok": True, "provider": provider.name, "vectors": index.has_vectors, "chunks": len(index.docs)}
+    if settings.EXTRA_URLS:
+        out["extra_sources"] = EXTRA_STATUS
+    return out
 
 
 @app.get("/api/meta")
