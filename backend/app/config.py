@@ -54,6 +54,8 @@ class Settings:
     EVAL_MODE = _env("EVAL_MODE", "false").lower() == "true"
     # Required by /api/eval/run in the X-Eval-Token header (never in the address). At least 24 characters.
     EVAL_TOKEN = _env("EVAL_TOKEN", "")
+    # Test copies only (needs EVAL_MODE=true): answer the fixed 100 questions once after each start-up.
+    EVAL_AUTORUN = _env("EVAL_AUTORUN", "false").lower() == "true"
     TRUST_PROXY = _env("TRUST_PROXY", "false").lower() == "true"     # use X-Forwarded-For behind a proxy
 
     # Automatic refresh: re-crawl the website every N hours inside the API (0 = off),

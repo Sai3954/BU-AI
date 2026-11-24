@@ -50,3 +50,24 @@ def test_repeated_attempts_are_rate_limited(monkeypatch):
     with _client(True, GOOD, monkeypatch) as c:
         codes = [c.get("/api/eval/run?part=1", headers={"X-Eval-Token": "wrong"}).status_code for _ in range(22)]
         assert codes[0] == 401 and codes[-1] == 429
+
+
+def test_autorun_answers_all_questions_and_results_page(monkeypatch):
+    import asyncio
+    monkeypatch.setattr(settings, "EVAL_MODE", True)
+    monkeypatch.setattr(settings, "CHAT_RATE_PER_MINUTE", 100000)
+    qs = main.json.loads(main.EVAL_FILE.read_text())[:3]
+    monkeypatch.setattr(main.EVAL_FILE.__class__, "read_text", lambda self, *a, **k: main.json.dumps(qs))
+    real_sleep = asyncio.sleep
+    monkeypatch.setattr(main.asyncio, "sleep", lambda s: real_sleep(0))
+    with TestClient(main.app) as c:
+        asyncio.run(main._eval_autorun())
+        j = c.get("/api/eval/results?part=1").json()
+        assert j["status"] == "finished" and j["done"] == 3 and len(j["results"]) == 3
+        assert all("answer" in r and "seconds" in r for r in j["results"])
+
+
+def test_results_page_hidden_in_production(monkeypatch):
+    monkeypatch.setattr(settings, "EVAL_MODE", False)
+    with TestClient(main.app) as c:
+        assert c.get("/api/eval/results").status_code == 404

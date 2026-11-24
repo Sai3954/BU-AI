@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import hmac
+import os
+import asyncio
 from pathlib import Path
 import re
 import json
@@ -11,7 +13,7 @@ import time
 from collections import Counter, defaultdict, deque
 from contextlib import asynccontextmanager
 from typing import Literal
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -153,7 +155,12 @@ async def lifespan(_app):
         threads.append(threading.Thread(target=_extra_sources, daemon=True))
     for t in threads:
         t.start()
+    eval_task = None
+    if settings.EVAL_MODE and settings.EVAL_AUTORUN:
+        eval_task = asyncio.create_task(_eval_autorun())
     yield
+    if eval_task:
+        eval_task.cancel()
     stop.set()
 
 
@@ -597,6 +604,37 @@ eval_limiter = RateLimiter()
 EVAL_FILE = Path(__file__).resolve().parent.parent / "evals" / "fallback_test_100.json"
 
 
+async def _eval_one(q: dict, request: Request) -> dict:
+    """Answer one test question through the normal chat pipeline and record everything about the reply."""
+    t0 = time.perf_counter()
+    resp = chat(ChatRequest(question=q["q"], role=q.get("role", "")), request)
+    events: dict = {"delta": "", "replace": None, "sources": None, "done": None}
+    buf = ""
+    async for part_bytes in resp.body_iterator:
+        buf += part_bytes if isinstance(part_bytes, str) else part_bytes.decode()
+    for block in buf.split("\n\n"):
+        ev = re.search(r"^event: (\w+)", block, re.M)
+        data = re.search(r"^data: (.*)$", block, re.M)
+        if not ev or not data:
+            continue
+        d = json.loads(data.group(1))
+        if ev.group(1) == "delta":
+            events["delta"] += d.get("text", "")
+        elif ev.group(1) in ("replace", "sources", "done"):
+            events[ev.group(1)] = d
+    answer = (events["replace"] or {}).get("text") or events["delta"]
+    done = events["done"] or {}
+    src = (events["sources"] or {})
+    return {"id": q["id"], "q": q["q"], "role": q.get("role", ""),
+                "seconds": round(time.perf_counter() - t0, 2), "answer": answer,
+                "sources": [s["url"] for s in src.get("sources", [])],
+                "source_titles": [s["title"] for s in src.get("sources", [])],
+                "evidence": done.get("evidence") or (src.get("flags") or {}).get("evidence"),
+                "answer_type": done.get("answer_type"), "answered": done.get("answered"),
+                "handoff": (done.get("handoff") or {}).get("name"), "followups": done.get("followups", []),
+                "checker": {k: done.get(k, []) for k in ("unverified", "misattributed", "uncited", "unsupported_claims")}}
+
+
 @app.get("/api/eval/run")
 async def eval_run(request: Request, part: int = 1, size: int = 10, x_eval_token: str = Header(default="")):
     """Answer a slice of the fixed 100-question test set through the normal chat pipeline and return the results.
@@ -611,37 +649,58 @@ async def eval_run(request: Request, part: int = 1, size: int = 10, x_eval_token
     qs = json.loads(EVAL_FILE.read_text())
     size = max(1, min(size, 10))
     chunk = qs[(part - 1) * size: part * size]
-    out = []
-    for q in chunk:
-        t0 = time.perf_counter()
-        resp = chat(ChatRequest(question=q["q"], role=q.get("role", "")), request)
-        events: dict = {"delta": "", "replace": None, "sources": None, "done": None}
-        buf = ""
-        async for part_bytes in resp.body_iterator:
-            buf += part_bytes if isinstance(part_bytes, str) else part_bytes.decode()
-        for block in buf.split("\n\n"):
-            ev = re.search(r"^event: (\w+)", block, re.M)
-            data = re.search(r"^data: (.*)$", block, re.M)
-            if not ev or not data:
-                continue
-            d = json.loads(data.group(1))
-            if ev.group(1) == "delta":
-                events["delta"] += d.get("text", "")
-            elif ev.group(1) in ("replace", "sources", "done"):
-                events[ev.group(1)] = d
-        answer = (events["replace"] or {}).get("text") or events["delta"]
-        done = events["done"] or {}
-        src = (events["sources"] or {})
-        out.append({"id": q["id"], "q": q["q"], "role": q.get("role", ""),
-                    "seconds": round(time.perf_counter() - t0, 2), "answer": answer,
-                    "sources": [s["url"] for s in src.get("sources", [])],
-                    "source_titles": [s["title"] for s in src.get("sources", [])],
-                    "evidence": done.get("evidence") or (src.get("flags") or {}).get("evidence"),
-                    "answer_type": done.get("answer_type"), "answered": done.get("answered"),
-                    "handoff": (done.get("handoff") or {}).get("name"), "followups": done.get("followups", []),
-                    "checker": {k: done.get(k, []) for k in ("unverified", "misattributed", "uncited", "unsupported_claims")}})
+    out = [await _eval_one(q, request) for q in chunk]
     return {"part": part, "of": (len(qs) + size - 1) // size, "provider": provider.name,
             "model": getattr(provider, "model", "") or settings.ANTHROPIC_MODEL, "results": out}
+
+
+EVAL_STATE: dict = {"status": "off", "done": 0, "total": 0, "results": [], "started": None, "finished": None}
+EVAL_OUT = Path(settings.DATABASE_URL.replace("sqlite:///", "")).parent / "eval_results.json" \
+    if settings.DATABASE_URL.startswith("sqlite:///") else Path("/tmp/eval_results.json")
+
+
+async def _eval_autorun():
+    """Answer all 100 test questions one after another (about 24 a minute, under the chat limit)."""
+    from starlette.requests import Request as _Req
+    qs = json.loads(EVAL_FILE.read_text())
+    EVAL_STATE.update(status="running", total=len(qs), done=0, results=[],
+                      started=datetime.now(timezone.utc).isoformat(timespec="seconds"))
+    req = _Req({"type": "http", "method": "POST", "path": "/api/chat", "headers": [], "query_string": b"",
+                "client": ("127.0.0.9", 0)})
+    try:
+        for q in qs:
+            try:
+                EVAL_STATE["results"].append(await _eval_one(q, req))
+            except Exception as e:   # record the failure and carry on
+                log.exception("eval question %s failed", q["id"])
+                EVAL_STATE["results"].append({"id": q["id"], "q": q["q"], "role": q.get("role", ""), "error": str(e)})
+            EVAL_STATE["done"] += 1
+            await asyncio.sleep(2.6)
+        EVAL_STATE["status"] = "finished"
+    except Exception as e:
+        EVAL_STATE["status"] = f"stopped: {e}"
+    EVAL_STATE["finished"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    try:
+        EVAL_OUT.write_text(json.dumps(EVAL_STATE))
+    except Exception:
+        pass
+
+
+@app.get("/api/eval/results")
+def eval_results(part: int = 0):
+    """Test copies only (EVAL_MODE=true): progress and answers of the start-up test run. Read-only: it shows stored
+    answers to the fixed public test questions and never calls the AI. part=1..10 returns 10 answers."""
+    if not settings.EVAL_MODE:
+        raise HTTPException(404, "Not found")
+    res = EVAL_STATE["results"]
+    body = {k: EVAL_STATE[k] for k in ("status", "done", "total", "started", "finished")}
+    body.update(commit=os.environ.get("RENDER_GIT_COMMIT", "")[:7], provider=provider.name,
+                model=getattr(provider, "model", "") or settings.ANTHROPIC_MODEL,
+                evidence_grounded=Path(__file__).with_name("evidence.py").exists())
+    if part:
+        body["part"] = part
+        body["results"] = res[(part - 1) * 10: part * 10]
+    return body
 
 
 @app.post("/api/feedback")
