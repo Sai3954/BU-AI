@@ -18,7 +18,7 @@ import numpy as np
 STOP = set("""belhaven university bu a an and are as at be by can do does for from get how i if in is it me my of on or should the to
 was what when where which who why will with you your am have has need about into than that this these those there
 their they we our us any set up go going get got use using know tell find help want wanted like please
-thanks thank hi hello hey just also como cuanto cual cuales cuando donde que quien la el los las de del en para por un una mi mis es son hay puedo tengo doesn don didn isn aren wasn won t s ll ve re d long used there here much many some way ways able possible anyone someone things thing""".split())
+thanks thank hi hello hey just also really actually basically kinda sorta guys como cuanto cual cuales cuando donde que quien la el los las de del en para por un una mi mis es son hay puedo tengo doesn don didn isn aren wasn won t s ll ve re d long used there here much many some way ways able possible anyone someone things thing""".split())
 
 PHRASES = [
     (r"\bi[- ]?20s?\b", " i20 "), (r"\bi[- ]?765\b", " i765 "), (r"\bi[- ]?983\b", " i983 "),
@@ -44,7 +44,10 @@ SYN = {
     "dorm": ["housing", "residence"], "room": ["housing", "residence"], "roommate": ["housing"], "located": ["address", "peachtree", "directions"], "tech": ["helpdesk", "technology"], "admision": ["admission"], "requisito": ["requirement"], "beca": ["scholarship"], "matricula": ["tuition", "registration"], "costo": ["cost", "tuition"], "solicitud": ["application"], "clase": ["class"], "horario": ["schedule", "hours"], "becas": ["scholarship"], "estudiante": ["student"], "internacionale": ["international"], "locked": ["password", "helpdesk", "portalguard"],
     "food": ["dining", "meal"], "eat": ["dining", "meal"], "lunch": ["dining"], "breakfast": ["dining"],
     "log": ["login", "logg", "helpdesk"], "call": ["contact", "phone"], "book": ["library"], "borrow": ["loan", "library"], "renew": ["renewal", "library"], "research": ["library", "database"], "tutor": ["think", "tutoring"],
-    "tutoring": ["think"], "disability": ["accommodation", "ada"], "counseling": ["care", "wellness"],
+    "tutoring": ["think"], "final": ["exam"], "disability": ["accommodation", "ada"], "counseling": ["care", "wellness"],
+    "stress": ["counseling", "wellness"], "stressed": ["counseling", "wellness"], "anxious": ["counseling", "anxiety"],
+    "anxiety": ["counseling"], "overwhelmed": ["counseling", "wellness"], "homesick": ["counseling", "care"],
+    "therapist": ["counseling"], "therapy": ["counseling"], "absence": ["withdrawal", "registrar"],
     "sick": ["health", "clinic"], "doctor": ["health", "clinic"], "resume": ["career"],
     "semester": ["term", "calendar"], "break": ["calendar", "holiday"], "deadline": ["calendar", "date"],
     "transcript": ["registrar"], "graduation": ["commencement", "registrar"], "wifi": ["helpdesk"],

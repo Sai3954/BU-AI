@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hmac
+from pathlib import Path
 import re
 import json
 import logging
@@ -27,6 +28,8 @@ from .prompts import extractive_answer, system_prompt, user_prompt
 from .redact import redact
 from .retrieval import ROLES, detect_level, for_meaning, index, is_crisis, is_follow_up, is_high_risk
 from .conflicts import conflict_note, find_conflicts
+from . import evidence as ev_mod
+from .topics import topic as question_topic
 from .handoff import office_list, suggest_office
 from .followups import followups
 
@@ -342,7 +345,7 @@ def trim_unfinished(text: str) -> str:
     return out + "\n\nThe full details are in the official sources below."
 
 
-def retrieve(sq: str, prev: str, role: str, qvec, category: str, trace: dict | None = None):
+def _search_once(sq: str, prev: str, role: str, qvec, category: str, trace: dict | None = None):
     """Search for one question. A follow-up ("What documents do I need?") is searched together with the
     previous question, so it stays on the same topic; the question's own meaning vector still applies."""
     if prev and is_follow_up(sq):
@@ -353,11 +356,59 @@ def retrieve(sq: str, prev: str, role: str, qvec, category: str, trace: dict | N
                 qvec = embedder.embed([for_meaning(f"{prev} {sq}")])[0]
             except Exception as e:
                 log.warning("follow-up embedding failed: %s", e)
-        return index.search(f"{prev} {sq}", role=role, qvec=qvec, category=category, trace=trace)
+        q = f"{prev} {sq}"
+        return index.search(q, role=role, qvec=qvec, category=category, trace=trace), q, qvec
     docs = index.search(sq, role=role, qvec=qvec, category=category, trace=trace)
     if len(docs) < 3 and prev:
-        docs = index.search(f"{prev} {sq}", role=role, qvec=qvec, category=category, trace=trace)
-    return docs
+        q = f"{prev} {sq}"
+        return index.search(q, role=role, qvec=qvec, category=category, trace=trace), q, qvec
+    return docs, sq, qvec
+
+
+def retrieve(sq: str, prev: str, role: str, qvec, category: str, trace: dict | None = None,
+             with_evidence: bool = False):
+    """Find the passages for a question, then keep only those that genuinely relate to it.
+
+    Everyday wording and abbreviations are first rewritten to the words official pages use. Each passage found is
+    scored on how much of the question it covers and how close it is in meaning; clearly unrelated passages are
+    dropped so they are never cited. If only weak evidence turns up, the question is rewritten once (filler removed,
+    synonyms added) and searched again, keeping whichever search is better supported."""
+    nq = ev_mod.normalize_query(sq)
+    docs, used_q, used_vec = _search_once(nq, prev, role, qvec, category, trace)
+    ev = ev_mod.assess(index, used_q, docs, used_vec)
+    rewritten = ""
+    if ev["level"] != "direct" and not (is_crisis(sq) or is_high_risk(sq)):
+        xq = ev_mod.expanded_query(used_q)
+        if xq and xq.lower() != used_q.lower():
+            xd = index.search(xq, role=role, qvec=used_vec, category=category)
+            xev = ev_mod.assess(index, used_q, xd, used_vec)   # judged against the student's own words
+            if ev_mod.better((docs, ev), (xd, xev)):
+                docs, ev, rewritten = xd, xev, xq
+    kept, labels = ev_mod.keep_relevant(docs, ev)
+    info = {"level": ev["level"], "labels": labels, "rewritten": rewritten,
+            "dropped": [d.title for d, p in zip(docs, ev["passages"]) if p["label"] == "unrelated"],
+            "passages": [p for p in ev["passages"] if p["label"] != "unrelated"]}
+    if trace is not None:
+        trace["evidence"] = info
+        if rewritten:   # show the working of the search that was actually used
+            index.search(rewritten, role=role, qvec=used_vec, category=category, trace=trace)
+            trace["rewritten_query"] = rewritten
+    return (kept, info) if with_evidence else kept
+
+
+def with_office_contact(docs: list, evid: dict, office: dict | None) -> list:
+    """Add the verified contact passage of the office that handles the topic (from the university's contact
+    page), when the search didn't already find it. Every answer can then end with the right person to ask."""
+    if not docs or not office:
+        return docs
+    title = f"Contact: {office['name']}"
+    if any(d.title == title for d in docs):
+        return docs
+    d = next((x for x in index.docs if x.title == title), None)
+    if d is None:
+        return docs
+    evid["labels"] = list(evid.get("labels", [])) + ["office contact"]
+    return docs + [d]
 
 
 @app.post("/api/trace")
@@ -381,7 +432,9 @@ def trace(req: ChatRequest, request: Request):
     t2 = time.perf_counter()
     tr: dict = {}
     prev = next((PLACEHOLDER.sub(" ", h["text"]) for h in reversed(history) if h["role"] == "user"), "")
-    docs = retrieve(sq, prev, role, qvec, req.category, tr)
+    docs, evid = retrieve(sq, prev, role, qvec, req.category, tr, with_evidence=True)
+    if not is_crisis(q):
+        docs = with_office_contact(docs, evid, suggest_office(q, role, detect_level(sq, role)))
     t["search_ms"] = round((time.perf_counter() - t2) * 1000, 1)
     level = detect_level(sq, role)
     conflicts = find_conflicts(docs)
@@ -394,7 +447,8 @@ def trace(req: ChatRequest, request: Request):
                 "verified": d.source == "seed", "audiences": d.audiences}
 
     final = []
-    for n, (i, fused) in enumerate(tr.get("final", []), 1):
+    kept_ids = {id(d) for d in docs}
+    for n, (i, fused) in enumerate([x for x in tr.get("final", []) if id(index.docs[x[0]]) in kept_ids], 1):
         d = index.docs[i]
         final.append({**card(i), "n": n, "text": d.text, "fused": fused,
                       "keyword_rank": kw_rank.get(i, (None, None))[0], "keyword_score": kw_rank.get(i, (None, None))[1],
@@ -426,10 +480,10 @@ def trace(req: ChatRequest, request: Request):
                       "preview": [round(float(x), 3) for x in (qvec or [])[:8]]},
         "keyword": [{**card(i), "score": sc} for i, sc in tr.get("keyword", [])[:8]],
         "meaning": [{**card(i), "score": sc} for i, sc in tr.get("meaning", [])[:8]],
-        "final": final, "space": space, "conflicts": conflicts, "timings": t,
+        "final": final, "evidence": evid, "space": space, "conflicts": conflicts, "timings": t,
         "llm": {"provider": provider.name, "model": getattr(provider, "model", "")},
         "prompt": {"system": system_prompt(),
-                   "user": user_prompt(q, role, docs, history, level, conflict_note(conflicts)) if docs else ""},
+                   "user": user_prompt(q, role, docs, history, level, conflict_note(conflicts), evid) if docs else ""},
     }
 
 
@@ -450,10 +504,13 @@ def chat(req: ChatRequest, request: Request):
             log.warning("query embedding failed: %s", e)
     # Placeholders like [EMAIL] must not steer search toward "email" pages.
     sq, prev = PLACEHOLDER.sub(" ", q), PLACEHOLDER.sub(" ", prev)
-    docs = retrieve(sq, prev, role, qvec, req.category)
+    docs, evid = retrieve(sq, prev, role, qvec, req.category, with_evidence=True)
     level = detect_level(sq, role)
+    office = suggest_office(q, role, level)
+    if not is_crisis(q):
+        docs = with_office_contact(docs, evid, office)
     conflicts = find_conflicts(docs)
-    flags = {"high_risk": is_high_risk(q), "crisis": is_crisis(q), "pii_removed": pii,
+    flags = {"evidence": evid["level"] if docs else "none", "high_risk": is_high_risk(q), "crisis": is_crisis(q), "pii_removed": pii,
              "level": level, "conflicts": conflicts}
     ip = client_ip(request)
     if not concurrency.acquire(ip):
@@ -480,7 +537,7 @@ def chat(req: ChatRequest, request: Request):
             yield _sse("sources", {"sources": [d.public() for d in docs], "flags": flags})
             if use_ai:
                 try:
-                    for delta in provider.stream(system_prompt(), user_prompt(q, role, docs, history, level, conflict_note(conflicts))):
+                    for delta in provider.stream(system_prompt(), user_prompt(q, role, docs, history, level, conflict_note(conflicts), evid)):
                         answer += delta
                         yield _sse("delta", {"text": delta})
                     if getattr(provider, "last_stop", "") == "max_tokens":
@@ -504,13 +561,19 @@ def chat(req: ChatRequest, request: Request):
                         yield _sse("delta", {"text": answer})
                     else:
                         yield _sse("error", {"message": "The answer was interrupted. Please try again."})
+            elif not docs and not flags["crisis"]:
+                # Nothing usable found: say so briefly and point to the verified office that handles the topic.
+                answer = ev_mod.no_evidence_answer(q, office)
+                yield _sse("delta", {"text": answer})
             else:
                 answer = extractive_answer(docs, crisis=flags["crisis"])
                 yield _sse("delta", {"text": answer})
             finished = True
             yield _sse("done", {"query_id": qid, "answered": is_answered(answer, docs), "votes": question_votes(q),
-                                "handoff": suggest_office(q, role, detect_level(sq, role)),
-                                "followups": followups(q, docs) if docs and not (flags["crisis"] or flags["high_risk"]) else [],
+                                "handoff": office,
+                                "followups": followups(q, docs) if not (flags["crisis"] or flags["high_risk"]) else [],
+                                "evidence": flags["evidence"],
+                                "answer_type": "crisis" if flags["crisis"] else ev_mod.answer_type(answer, docs, flags["evidence"]),
                                 **{k: checked.get(k, []) for k in ("unverified", "misattributed", "uncited",
                                                                     "unsupported_claims", "ai_flags")}})
         finally:
@@ -528,6 +591,51 @@ def chat(req: ChatRequest, request: Request):
 
     return StreamingResponse(gen(), media_type="text/event-stream",
                              headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+
+EVAL_FILE = Path(__file__).resolve().parent.parent / "evals" / "fallback_test_100.json"
+
+
+@app.get("/api/eval/run")
+async def eval_run(request: Request, part: int = 1, size: int = 10):
+    """Answer a slice of the fixed 100-question test set through the normal chat pipeline and return the results.
+    Only on a test copy with EVAL_MODE=true; the questions are fixed, so nothing can be passed in."""
+    if not settings.EVAL_MODE:
+        raise HTTPException(404, "Not found")
+    qs = json.loads(EVAL_FILE.read_text())
+    size = max(1, min(size, 10))
+    chunk = qs[(part - 1) * size: part * size]
+    out = []
+    for q in chunk:
+        t0 = time.perf_counter()
+        resp = chat(ChatRequest(question=q["q"], role=q.get("role", "")), request)
+        events: dict = {"delta": "", "replace": None, "sources": None, "done": None}
+        buf = ""
+        async for part_bytes in resp.body_iterator:
+            buf += part_bytes if isinstance(part_bytes, str) else part_bytes.decode()
+        for block in buf.split("\n\n"):
+            ev = re.search(r"^event: (\w+)", block, re.M)
+            data = re.search(r"^data: (.*)$", block, re.M)
+            if not ev or not data:
+                continue
+            d = json.loads(data.group(1))
+            if ev.group(1) == "delta":
+                events["delta"] += d.get("text", "")
+            elif ev.group(1) in ("replace", "sources", "done"):
+                events[ev.group(1)] = d
+        answer = (events["replace"] or {}).get("text") or events["delta"]
+        done = events["done"] or {}
+        src = (events["sources"] or {})
+        out.append({"id": q["id"], "q": q["q"], "role": q.get("role", ""),
+                    "seconds": round(time.perf_counter() - t0, 2), "answer": answer,
+                    "sources": [s["url"] for s in src.get("sources", [])],
+                    "source_titles": [s["title"] for s in src.get("sources", [])],
+                    "evidence": done.get("evidence") or (src.get("flags") or {}).get("evidence"),
+                    "answer_type": done.get("answer_type"), "answered": done.get("answered"),
+                    "handoff": (done.get("handoff") or {}).get("name"), "followups": done.get("followups", []),
+                    "checker": {k: done.get(k, []) for k in ("unverified", "misattributed", "uncited", "unsupported_claims")}})
+    return {"part": part, "of": (len(qs) + size - 1) // size, "provider": provider.name,
+            "model": getattr(provider, "model", "") or settings.ANTHROPIC_MODEL, "results": out}
 
 
 @app.post("/api/feedback")

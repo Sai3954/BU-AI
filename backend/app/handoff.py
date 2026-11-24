@@ -23,7 +23,7 @@ RULES: list[tuple[re.Pattern, str | dict]] = [
      {"online": "Online & Graduate Student Services", "graduate": "Online & Graduate Student Services",
       "doctoral": "Online & Graduate Student Services", "": "Business Office"}),
     (re.compile(r"\b(transcripts?|enrollment verification|graduat(e|ion) application|apply (for|to) graduat\w*|graduation|diploma|"
-                r"grade appeal|register for classes|registration|drop (a )?class|withdraw|substitution|course waiver)\b", re.I), "Registrar"),
+                r"grade appeal|register for classes|registration|drop (a )?class|withdraw|leave of absence|substitution|course waiver)\b", re.I), "Registrar"),
     (re.compile(r"\b(housing|dorm|residence hall|roommate)\b", re.I), "Office of Student Development / Housing"),
     (re.compile(r"\b(meal plan|dining|dinner|lunch|breakfast)\b", re.I), "Bailey Dining Commons"),
     # An admission counselor, or a counseling degree, is an admission question, not a wellbeing one

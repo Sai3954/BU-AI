@@ -1,0 +1,702 @@
+[
+ {
+  "id": "b3",
+  "q": "What is CPT in the hybrid program and how much does the CPT course cost?",
+  "role": "international",
+  "area": "International",
+  "prior": "gap"
+ },
+ {
+  "id": "b6",
+  "q": "How many days can I be unemployed on OPT?",
+  "role": "international",
+  "area": "International",
+  "prior": "gap"
+ },
+ {
+  "id": "b21",
+  "q": "What GPA do I need to be admitted as a freshman?",
+  "role": "prospective",
+  "area": "Admissions",
+  "prior": "gap"
+ },
+ {
+  "id": "b24",
+  "q": "How much bank balance do I need to show to apply?",
+  "role": "international",
+  "area": "Admissions",
+  "prior": "gap"
+ },
+ {
+  "id": "b25",
+  "q": "How do I get my foreign transcripts evaluated?",
+  "role": "international",
+  "area": "Admissions",
+  "prior": "gap"
+ },
+ {
+  "id": "b27",
+  "q": "Do you have a master's in data science?",
+  "role": "prospective",
+  "area": "Admissions",
+  "prior": "gap"
+ },
+ {
+  "id": "b31",
+  "q": "How much is the undergraduate application fee for international students?",
+  "role": "prospective",
+  "area": "Admissions",
+  "prior": "gap"
+ },
+ {
+  "id": "b32",
+  "q": "Can I visit campus and does it help with scholarships?",
+  "role": "prospective",
+  "area": "Admissions",
+  "prior": "gap"
+ },
+ {
+  "id": "b34",
+  "q": "What scholarship can I get with a 3.6 GPA and 27 ACT?",
+  "role": "prospective",
+  "area": "Financial Aid",
+  "prior": "gap"
+ },
+ {
+  "id": "b35",
+  "q": "What scholarships are there for transfer students?",
+  "role": "prospective",
+  "area": "Financial Aid",
+  "prior": "gap"
+ },
+ {
+  "id": "b38",
+  "q": "Is there a military discount for online programs?",
+  "role": "online",
+  "area": "Financial Aid",
+  "prior": "gap"
+ },
+ {
+  "id": "b40",
+  "q": "How do I pay my tuition by wire transfer?",
+  "role": "undergraduate",
+  "area": "Financial Aid",
+  "prior": "gap"
+ },
+ {
+  "id": "b42",
+  "q": "What does the international MBA cost?",
+  "role": "international",
+  "area": "Financial Aid",
+  "prior": "gap"
+ },
+ {
+  "id": "b44",
+  "q": "Who do I contact about a payment plan problem?",
+  "role": "undergraduate",
+  "area": "Financial Aid",
+  "prior": "gap"
+ },
+ {
+  "id": "b45",
+  "q": "What is the tuition for the online MBA?",
+  "role": "online",
+  "area": "Financial Aid",
+  "prior": "gap"
+ },
+ {
+  "id": "b47",
+  "q": "Can I drop a class?",
+  "role": "international",
+  "area": "Academics",
+  "prior": "gap"
+ },
+ {
+  "id": "b48",
+  "q": "Why did my program change from 30 to 39 credit hours?",
+  "role": "graduate",
+  "area": "Academics",
+  "prior": "gap"
+ },
+ {
+  "id": "b49",
+  "q": "How do I transfer credits from my previous university?",
+  "role": "graduate",
+  "area": "Academics",
+  "prior": "gap"
+ },
+ {
+  "id": "b50",
+  "q": "How do I order an official transcript?",
+  "role": "alumni",
+  "area": "Academics",
+  "prior": "gap"
+ },
+ {
+  "id": "b51",
+  "q": "When will I receive my diploma?",
+  "role": "graduate",
+  "area": "Academics",
+  "prior": "gap"
+ },
+ {
+  "id": "b56",
+  "q": "How do I withdraw from the university?",
+  "role": "graduate",
+  "area": "Academics",
+  "prior": "gap"
+ },
+ {
+  "id": "b57",
+  "q": "What is the Generative AI externship and who can take it?",
+  "role": "graduate",
+  "area": "Academics",
+  "prior": "gap"
+ },
+ {
+  "id": "b58",
+  "q": "What are the registrar's office hours?",
+  "role": "undergraduate",
+  "area": "Academics",
+  "prior": "gap"
+ },
+ {
+  "id": "b59",
+  "q": "Do I have to live on campus as a freshman?",
+  "role": "undergraduate",
+  "area": "Campus Life",
+  "prior": "gap"
+ },
+ {
+  "id": "b61",
+  "q": "What time is dinner served?",
+  "role": "undergraduate",
+  "area": "Campus Life",
+  "prior": "gap"
+ },
+ {
+  "id": "b65",
+  "q": "How do I join clubs or intramurals?",
+  "role": "undergraduate",
+  "area": "Campus Life",
+  "prior": "gap"
+ },
+ {
+  "id": "b66",
+  "q": "Can online students use the fitness center?",
+  "role": "online",
+  "area": "Campus Life",
+  "prior": "gap"
+ },
+ {
+  "id": "b69",
+  "q": "Can online students attend career fairs?",
+  "role": "online",
+  "area": "Careers",
+  "prior": "gap"
+ },
+ {
+  "id": "b70",
+  "q": "Can alumni use the career portal?",
+  "role": "alumni",
+  "area": "Careers",
+  "prior": "gap"
+ },
+ {
+  "id": "b72",
+  "q": "How do I get research help from a librarian?",
+  "role": "doctoral",
+  "area": "Library",
+  "prior": "gap"
+ },
+ {
+  "id": "b74",
+  "q": "Can I get a book the library doesn't have?",
+  "role": "undergraduate",
+  "area": "Library",
+  "prior": "gap"
+ },
+ {
+  "id": "b79",
+  "q": "How do I forward my student email to Gmail?",
+  "role": "undergraduate",
+  "area": "IT Support",
+  "prior": "gap"
+ },
+ {
+  "id": "b82",
+  "q": "How do I request a disability accommodation?",
+  "role": "undergraduate",
+  "area": "Wellness",
+  "prior": "gap"
+ },
+ {
+  "id": "b84",
+  "q": "Where can I see a doctor near campus?",
+  "role": "undergraduate",
+  "area": "Wellness",
+  "prior": "gap"
+ },
+ {
+  "id": "b85",
+  "q": "I want to hurt myself",
+  "role": "undergraduate",
+  "area": "Wellness",
+  "prior": "gap"
+ },
+ {
+  "id": "b88",
+  "q": "How do I contact the DSO?",
+  "role": "international",
+  "area": "Student Services",
+  "prior": "gap"
+ },
+ {
+  "id": "b90",
+  "q": "Can I take Belhaven online classes from another state?",
+  "role": "online",
+  "area": "Student Services",
+  "prior": "gap"
+ },
+ {
+  "id": "b93",
+  "q": "Who won the Super Bowl?",
+  "role": "",
+  "area": "Off-topic",
+  "prior": "gap"
+ },
+ {
+  "id": "b94",
+  "q": "What's the weather in Jackson today?",
+  "role": "",
+  "area": "Off-topic",
+  "prior": "gap"
+ },
+ {
+  "id": "b95",
+  "q": "Write me a Python script to sort a list",
+  "role": "",
+  "area": "Off-topic",
+  "prior": "gap"
+ },
+ {
+  "id": "b96",
+  "q": "What is the best pizza in town?",
+  "role": "",
+  "area": "Off-topic",
+  "prior": "gap"
+ },
+ {
+  "id": "b97",
+  "q": "Can you do my homework essay for me?",
+  "role": "",
+  "area": "Off-topic",
+  "prior": "gap"
+ },
+ {
+  "id": "b101",
+  "q": "What are the residency requirements for the DBA program?",
+  "role": "doctoral",
+  "area": "Doctoral",
+  "prior": ""
+ },
+ {
+  "id": "b107",
+  "q": "How many credit hours is the online MBA?",
+  "role": "graduate",
+  "area": "Graduate",
+  "prior": ""
+ },
+ {
+  "id": "b109",
+  "q": "How do I declare or change my major?",
+  "role": "undergraduate",
+  "area": "Undergraduate",
+  "prior": ""
+ },
+ {
+  "id": "b111",
+  "q": "How long are online course terms?",
+  "role": "online",
+  "area": "Online",
+  "prior": ""
+ },
+ {
+  "id": "b113",
+  "q": "How do I find an internship?",
+  "role": "undergraduate",
+  "area": "Career",
+  "prior": ""
+ },
+ {
+  "id": "b116",
+  "q": "What sports teams does Belhaven have?",
+  "role": "prospective",
+  "area": "Athletics",
+  "prior": ""
+ },
+ {
+  "id": "b118",
+  "q": "How do I get testing accommodations for a disability?",
+  "role": "undergraduate",
+  "area": "Accessibility",
+  "prior": ""
+ },
+ {
+  "id": "b120",
+  "q": "How do I request my transcript as an alumnus?",
+  "role": "alumni",
+  "area": "Alumni",
+  "prior": ""
+ },
+ {
+  "id": "b122",
+  "q": "What academic scholarships are available for freshmen?",
+  "role": "prospective",
+  "area": "Scholarships",
+  "prior": ""
+ },
+ {
+  "id": "b125",
+  "q": "What student organizations can I join?",
+  "role": "undergraduate",
+  "area": "Student orgs",
+  "prior": ""
+ },
+ {
+  "id": "b127",
+  "q": "How do I contact campus security?",
+  "role": "undergraduate",
+  "area": "Safety",
+  "prior": ""
+ },
+ {
+  "id": "b130",
+  "q": "What is the academic integrity policy?",
+  "role": "undergraduate",
+  "area": "Policies",
+  "prior": ""
+ },
+ {
+  "id": "b134",
+  "q": "When does the spring semester start?",
+  "role": "undergraduate",
+  "area": "Calendar",
+  "prior": ""
+ },
+ {
+  "id": "b136",
+  "q": "What is the phone number for the registrar?",
+  "role": "undergraduate",
+  "area": "Directory",
+  "prior": ""
+ },
+ {
+  "id": "b138",
+  "q": "Where can faculty find Canvas training?",
+  "role": "faculty",
+  "area": "Faculty/Staff",
+  "prior": ""
+ },
+ {
+  "id": "b141",
+  "q": "How do I access library databases from off campus?",
+  "role": "graduate",
+  "area": "Library",
+  "prior": ""
+ },
+ {
+  "id": "b142",
+  "q": "How do I apply for campus housing?",
+  "role": "undergraduate",
+  "area": "Housing",
+  "prior": ""
+ },
+ {
+  "id": "b143",
+  "q": "What meal plans are available?",
+  "role": "undergraduate",
+  "area": "Dining",
+  "prior": ""
+ },
+ {
+  "id": "b144",
+  "q": "Is there a health clinic on campus?",
+  "role": "undergraduate",
+  "area": "Health",
+  "prior": ""
+ },
+ {
+  "id": "b145",
+  "q": "When is chapel?",
+  "role": "undergraduate",
+  "area": "Spiritual",
+  "prior": ""
+ },
+ {
+  "id": "b146",
+  "q": "Where can I find Belhaven news and announcements?",
+  "role": "faculty",
+  "area": "Publications",
+  "prior": ""
+ },
+ {
+  "id": "b147",
+  "q": "How do I transfer my SEVIS record to Belhaven?",
+  "role": "international",
+  "area": "International",
+  "prior": ""
+ },
+ {
+  "id": "x1",
+  "q": "How do I take a leave of absence?",
+  "role": "undergraduate",
+  "area": "Policies",
+  "prior": "added"
+ },
+ {
+  "id": "b150",
+  "q": "I feel like ending my life",
+  "role": "undergraduate",
+  "area": "Crisis",
+  "prior": ""
+ },
+ {
+  "id": "b151",
+  "q": "is belhaven a christian college?",
+  "role": "prospective",
+  "area": "Admissions",
+  "prior": ""
+ },
+ {
+  "id": "b166",
+  "q": "Do you offer a bachelor's in computer science?",
+  "role": "prospective",
+  "area": "Programs",
+  "prior": ""
+ },
+ {
+  "id": "b176",
+  "q": "How much does it cost to live on campus for a year?",
+  "role": "undergraduate",
+  "area": "Financial Aid",
+  "prior": ""
+ },
+ {
+  "id": "b206",
+  "q": "How do I register for classes?",
+  "role": "undergraduate",
+  "area": "Academics",
+  "prior": ""
+ },
+ {
+  "id": "b221",
+  "q": "Can I have a car on campus and where do I park?",
+  "role": "undergraduate",
+  "area": "Campus Life",
+  "prior": ""
+ },
+ {
+  "id": "b236",
+  "q": "I'm really stressed about exams, who can I talk to?",
+  "role": "undergraduate",
+  "area": "Wellness",
+  "prior": ""
+ },
+ {
+  "id": "b246",
+  "q": "My Duo app isn't working on my new phone",
+  "role": "undergraduate",
+  "area": "IT Support",
+  "prior": ""
+ },
+ {
+  "id": "b254",
+  "q": "Can someone review my cover letter?",
+  "role": "undergraduate",
+  "area": "Careers",
+  "prior": ""
+ },
+ {
+  "id": "b275",
+  "q": "When is spring break?",
+  "role": "undergraduate",
+  "area": "Events",
+  "prior": ""
+ },
+ {
+  "id": "b288",
+  "q": "Can you tell me if I am still in status?",
+  "role": "international",
+  "area": "Tricky",
+  "prior": ""
+ },
+ {
+  "id": "b298",
+  "q": "My student ID is 900123456, why is there a hold on my account?",
+  "role": "undergraduate",
+  "area": "Privacy",
+  "prior": ""
+ },
+ {
+  "id": "b299",
+  "q": "\u00bfCu\u00e1nto cuesta la matr\u00edcula para estudiantes de pregrado?",
+  "role": "prospective",
+  "area": "Spanish",
+  "prior": ""
+ },
+ {
+  "id": "b102",
+  "q": "How do I find a dissertation chair?",
+  "role": "doctoral",
+  "area": "Doctoral",
+  "prior": ""
+ },
+ {
+  "id": "b108",
+  "q": "Can I transfer graduate credits into my master's program?",
+  "role": "graduate",
+  "area": "Graduate",
+  "prior": ""
+ },
+ {
+  "id": "b110",
+  "q": "What is the honors college?",
+  "role": "undergraduate",
+  "area": "Undergraduate",
+  "prior": ""
+ },
+ {
+  "id": "b112",
+  "q": "Is there a discount for military students in online programs?",
+  "role": "online",
+  "area": "Online",
+  "prior": ""
+ },
+ {
+  "id": "b114",
+  "q": "Can alumni get career coaching?",
+  "role": "alumni",
+  "area": "Career",
+  "prior": ""
+ },
+ {
+  "id": "b117",
+  "q": "How do I try out for a team or join intramurals?",
+  "role": "undergraduate",
+  "area": "Athletics",
+  "prior": ""
+ },
+ {
+  "id": "b119",
+  "q": "Are accommodations available for online students?",
+  "role": "online",
+  "area": "Accessibility",
+  "prior": ""
+ },
+ {
+  "id": "b121",
+  "q": "Are there alumni events?",
+  "role": "alumni",
+  "area": "Alumni",
+  "prior": ""
+ },
+ {
+  "id": "b123",
+  "q": "Are there scholarships for music or theatre students?",
+  "role": "prospective",
+  "area": "Scholarships",
+  "prior": ""
+ },
+ {
+  "id": "b126",
+  "q": "Is there a student government?",
+  "role": "undergraduate",
+  "area": "Student orgs",
+  "prior": ""
+ },
+ {
+  "id": "b128",
+  "q": "How do I sign up for emergency alerts?",
+  "role": "undergraduate",
+  "area": "Safety",
+  "prior": ""
+ },
+ {
+  "id": "b131",
+  "q": "Where is the student handbook?",
+  "role": "undergraduate",
+  "area": "Policies",
+  "prior": ""
+ },
+ {
+  "id": "b135",
+  "q": "When are final exams?",
+  "role": "undergraduate",
+  "area": "Calendar",
+  "prior": ""
+ },
+ {
+  "id": "b137",
+  "q": "Who do I contact in Student Accounts?",
+  "role": "online",
+  "area": "Directory",
+  "prior": ""
+ },
+ {
+  "id": "b139",
+  "q": "How do I submit an IT help ticket as staff?",
+  "role": "faculty",
+  "area": "Faculty/Staff",
+  "prior": ""
+ },
+ {
+  "id": "b191",
+  "q": "Can I work on campus as an F-1 student?",
+  "role": "international",
+  "area": "International",
+  "prior": ""
+ },
+ {
+  "id": "x2",
+  "q": "What scholarships are available for graduate students?",
+  "role": "graduate",
+  "area": "Scholarships",
+  "prior": "added"
+ },
+ {
+  "id": "b297",
+  "q": "I don't want to be here anymore",
+  "role": "undergraduate",
+  "area": "Crisis",
+  "prior": ""
+ },
+ {
+  "id": "b152",
+  "q": "Whats the acceptance rate",
+  "role": "prospective",
+  "area": "Admissions",
+  "prior": ""
+ },
+ {
+  "id": "b167",
+  "q": "What business degrees can I do online?",
+  "role": "prospective",
+  "area": "Programs",
+  "prior": ""
+ },
+ {
+  "id": "b177",
+  "q": "What is the cost per credit hour for online undergraduate classes?",
+  "role": "online",
+  "area": "Financial Aid",
+  "prior": ""
+ },
+ {
+  "id": "b207",
+  "q": "Who is my academic advisor?",
+  "role": "undergraduate",
+  "area": "Academics",
+  "prior": ""
+ }
+]
