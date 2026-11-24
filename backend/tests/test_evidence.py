@@ -98,3 +98,26 @@ def test_chat_with_nothing_found_gives_office_or_scope_and_followups():
         assert done["answer_type"] == "not_verified" and done["evidence"] == "none"
         assert 2 <= len(done["followups"]) <= 3
         assert "couldn't verify" in r.text
+
+
+def test_crisis_wording_is_recognised_without_false_alarms():
+    from app.retrieval import is_crisis
+    for q in ["I feel like ending my life", "I don't want to be here anymore", "i wanna die", "I want to end it all",
+              "life is not worth living", "I keep cutting myself", "I want to hurt myself", "thinking about suicide",
+              "i dont want to live anymore", "I wish I was dead"]:
+        assert is_crisis(q), q
+    for q in ["I want to drop out", "When is the deadline?", "I don't want to live on campus", "How do I end my meal plan?",
+              "my essay is killing me", "Is there a diet plan in dining?", "Do I have to live on campus?"]:
+        assert not is_crisis(q), q
+
+
+def test_crisis_question_gets_notice_and_no_followups():
+    import json
+    from fastapi.testclient import TestClient
+    from app.main import app
+    with TestClient(app) as c:
+        r = c.post("/api/chat", json={"question": "I feel like ending my life", "role": "undergraduate"})
+        blocks = {b.split("\n", 1)[0][7:]: b for b in r.text.split("\n\n") if b.startswith("event: ")}
+        flags = json.loads(blocks["sources"].split("data: ", 1)[1])["flags"]
+        done = json.loads(blocks["done"].split("data: ", 1)[1])
+        assert flags["crisis"] is True and done["followups"] == [] and "988" in r.text

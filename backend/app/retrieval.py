@@ -68,7 +68,15 @@ RISK = re.compile(r"\b(terminat|revok|revocation|out of status|deport|arrest|rei
                   r"unauthori[sz]ed work|lost (my )?status|"
                   r"work(ed|ing)? (off[- ]campus )?without (an? )?(cpt|opt|ead|authori[sz]ation|permission)|"
                   r"(am|was) i (still )?(in|out of) status|sevis (record )?(inactive|terminat))", re.I)
-CRISIS = re.compile(r"\b(suicid|kill myself|self[- ]harm|hurt myself|end my life)", re.I)
+# Crisis wording: shows the 988 / Student Care notice and turns off follow-up suggestions. Broad on purpose: a false
+# alarm only adds the notice (the answer itself is unchanged), while a miss leaves a student in crisis without it.
+CRISIS = re.compile(
+    r"\b(suicid\w*|(kill|hurt|harm|cut)\w* (my ?self|myself)|self[- ]?harm\w*|"
+    r"end(ing)? (my life|it all|everything)|take my (own )?life|"
+    r"(want|wanna|going|ready|deserve) (to )?die|wish i (was|were|had) (dead|never been born)|better off dead|"
+    r"(not|isn'?t|no longer) worth living|no (reason|point) (to|in) (live|living|going on)|"
+    r"(don'?t|do not) want to (be alive|live( anymore|\W*$)|exist|be here anymore|wake up)|"
+    r"can'?t (go on|do this anymore|keep going)|overdos\w*)", re.I)
 
 # The student's level, read from the question itself ("my DBA dissertation") or from the chosen role.
 LEVELS = [

@@ -70,7 +70,9 @@ export function Answer({ text, sources }: { text: string; sources: Source[] }) {
 
 export function SourceList({ sources, text }: { sources: Source[]; text: string }) {
   const used = new Set(Array.from(text.matchAll(/\[(\d+)\]/g)).map(m => Number(m[1])));
-  const shown = sources.map((s, i) => ({ s, n: i + 1 })).filter(x => used.size === 0 ? x.n <= 3 : used.has(x.n));
+  // Only the sources the answer actually cites. An answer that cites nothing (off-topic, crisis) shows no source list,
+  // so unrelated pages are never presented as "official sources".
+  const shown = sources.map((s, i) => ({ s, n: i + 1 })).filter(x => used.has(x.n));
   if (!shown.length) return null;
   return (
     <div className="sources">
