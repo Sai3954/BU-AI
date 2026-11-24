@@ -593,15 +593,21 @@ def chat(req: ChatRequest, request: Request):
                              headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
 
 
+eval_limiter = RateLimiter()
 EVAL_FILE = Path(__file__).resolve().parent.parent / "evals" / "fallback_test_100.json"
 
 
 @app.get("/api/eval/run")
-async def eval_run(request: Request, part: int = 1, size: int = 10):
+async def eval_run(request: Request, part: int = 1, size: int = 10, x_eval_token: str = Header(default="")):
     """Answer a slice of the fixed 100-question test set through the normal chat pipeline and return the results.
-    Only on a test copy with EVAL_MODE=true; the questions are fixed, so nothing can be passed in."""
-    if not settings.EVAL_MODE:
-        raise HTTPException(404, "Not found")
+    Only on a test copy with EVAL_MODE=true, and only with the EVAL_TOKEN secret in the X-Eval-Token header.
+    The questions are fixed, so nothing can be passed in."""
+    if not settings.EVAL_MODE or len(settings.EVAL_TOKEN) < 24:
+        raise HTTPException(404, "Not found")   # off, or no strong token configured: the endpoint doesn't exist
+    if not eval_limiter.allow(client_ip(request), 20):
+        raise HTTPException(429, "Too many requests")
+    if not hmac.compare_digest(x_eval_token.encode(), settings.EVAL_TOKEN.encode()):
+        raise HTTPException(401, "Evaluation token required")
     qs = json.loads(EVAL_FILE.read_text())
     size = max(1, min(size, 10))
     chunk = qs[(part - 1) * size: part * size]

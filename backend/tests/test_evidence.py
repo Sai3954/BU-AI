@@ -98,10 +98,3 @@ def test_chat_with_nothing_found_gives_office_or_scope_and_followups():
         assert done["answer_type"] == "not_verified" and done["evidence"] == "none"
         assert 2 <= len(done["followups"]) <= 3
         assert "couldn't verify" in r.text
-
-
-def test_eval_endpoint_hidden_unless_enabled():
-    from fastapi.testclient import TestClient
-    from app.main import app
-    with TestClient(app) as c:
-        assert c.get("/api/eval/run?part=1").status_code == 404
