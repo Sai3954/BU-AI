@@ -52,6 +52,8 @@ class Settings:
     VERIFY_WITH_AI = _env("VERIFY_WITH_AI", "false").lower() == "true"  # second AI pass to review each answer
     # Test copies only: exposes /api/eval/run, which answers the fixed 100-question test set. Never on the demo app.
     EVAL_MODE = _env("EVAL_MODE", "false").lower() == "true"
+    # Required by /api/eval/run in the X-Eval-Token header (never in the address). At least 24 characters.
+    EVAL_TOKEN = _env("EVAL_TOKEN", "")
     TRUST_PROXY = _env("TRUST_PROXY", "false").lower() == "true"     # use X-Forwarded-For behind a proxy
 
     # Automatic refresh: re-crawl the website every N hours inside the API (0 = off),
