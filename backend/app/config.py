@@ -49,9 +49,9 @@ class Settings:
     CHAT_RATE_PER_MINUTE = int(_env("CHAT_RATE_PER_MINUTE", "12"))   # per client IP
     DAILY_AI_LIMIT = int(_env("DAILY_AI_LIMIT", "2000"))             # AI calls per day; then official-text answers
     MAX_CONCURRENT_PER_IP = int(_env("MAX_CONCURRENT_PER_IP", "2"))   # simultaneous answers per visitor
-    VERIFY_WITH_AI = _env("VERIFY_WITH_AI", "false").lower() == "true"
+    VERIFY_WITH_AI = _env("VERIFY_WITH_AI", "false").lower() == "true"  # second AI pass to review each answer
     # Test copies only: exposes /api/eval/run, which answers the fixed 100-question test set. Never on the demo app.
-    EVAL_MODE = _env("EVAL_MODE", "false").lower() == "true"  # second AI pass to review each answer
+    EVAL_MODE = _env("EVAL_MODE", "false").lower() == "true"
     TRUST_PROXY = _env("TRUST_PROXY", "false").lower() == "true"     # use X-Forwarded-For behind a proxy
 
     # Automatic refresh: re-crawl the website every N hours inside the API (0 = off),
