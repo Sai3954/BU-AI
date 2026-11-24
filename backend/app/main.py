@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hmac
+from pathlib import Path
 import re
 import json
 import logging
@@ -528,6 +529,51 @@ def chat(req: ChatRequest, request: Request):
 
     return StreamingResponse(gen(), media_type="text/event-stream",
                              headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+
+EVAL_FILE = Path(__file__).resolve().parent.parent / "evals" / "fallback_test_100.json"
+
+
+@app.get("/api/eval/run")
+async def eval_run(request: Request, part: int = 1, size: int = 10):
+    """Answer a slice of the fixed 100-question test set through the normal chat pipeline and return the results.
+    Only on a test copy with EVAL_MODE=true; the questions are fixed, so nothing can be passed in."""
+    if not settings.EVAL_MODE:
+        raise HTTPException(404, "Not found")
+    qs = json.loads(EVAL_FILE.read_text())
+    size = max(1, min(size, 10))
+    chunk = qs[(part - 1) * size: part * size]
+    out = []
+    for q in chunk:
+        t0 = time.perf_counter()
+        resp = chat(ChatRequest(question=q["q"], role=q.get("role", "")), request)
+        events: dict = {"delta": "", "replace": None, "sources": None, "done": None}
+        buf = ""
+        async for part_bytes in resp.body_iterator:
+            buf += part_bytes if isinstance(part_bytes, str) else part_bytes.decode()
+        for block in buf.split("\n\n"):
+            ev = re.search(r"^event: (\w+)", block, re.M)
+            data = re.search(r"^data: (.*)$", block, re.M)
+            if not ev or not data:
+                continue
+            d = json.loads(data.group(1))
+            if ev.group(1) == "delta":
+                events["delta"] += d.get("text", "")
+            elif ev.group(1) in ("replace", "sources", "done"):
+                events[ev.group(1)] = d
+        answer = (events["replace"] or {}).get("text") or events["delta"]
+        done = events["done"] or {}
+        src = (events["sources"] or {})
+        out.append({"id": q["id"], "q": q["q"], "role": q.get("role", ""),
+                    "seconds": round(time.perf_counter() - t0, 2), "answer": answer,
+                    "sources": [s["url"] for s in src.get("sources", [])],
+                    "source_titles": [s["title"] for s in src.get("sources", [])],
+                    "evidence": done.get("evidence") or (src.get("flags") or {}).get("evidence"),
+                    "answer_type": done.get("answer_type"), "answered": done.get("answered"),
+                    "handoff": (done.get("handoff") or {}).get("name"), "followups": done.get("followups", []),
+                    "checker": {k: done.get(k, []) for k in ("unverified", "misattributed", "uncited", "unsupported_claims")}})
+    return {"part": part, "of": (len(qs) + size - 1) // size, "provider": provider.name,
+            "model": getattr(provider, "model", "") or settings.ANTHROPIC_MODEL, "results": out}
 
 
 @app.post("/api/feedback")
